@@ -1,4 +1,4 @@
-const CACHE = 'camborio-public-v4-screens-5';
+const CACHE = 'camborio-public-v4-screens-6';
 const PRECACHE = ['./', './index.html', './styles.css', './app.js', './theme.js', './manifest.webmanifest', './config.js', './logocamborio_trans.png'];
 
 self.addEventListener('install', event => {
@@ -22,14 +22,11 @@ self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
 
-  // Never allow an old cached service-worker script to survive an update.
   if (url.pathname.endsWith('/sw.js')) {
     event.respondWith(fetch(event.request, { cache: 'no-store' }));
     return;
   }
 
-  // V4 must always obtain the current application from GitHub Pages.
-  // The cache is only an offline fallback, never the preferred source.
   const isAppAsset = /\/(|index\.html|styles\.css|app\.js|theme\.js|config\.js|manifest\.webmanifest|logocamborio_trans\.png)$/.test(url.pathname);
   if (isAppAsset) {
     event.respondWith(
