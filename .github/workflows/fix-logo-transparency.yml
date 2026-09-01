@@ -2,20 +2,21 @@ name: Fix original Camborio logo transparency
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 permissions:
   contents: write
 
 jobs:
   fix-logo:
-    if: ${{ !startsWith(github.event.head_commit.message, 'chore(bot): transparent original logo') }}
+    if: ${{ startsWith(github.event.head_commit.message, 'chore(bot): transparent original logo') == false }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout V4
         uses: actions/checkout@v4
 
-      - name: Process original logo without cropping
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -33,7 +34,6 @@ jobs:
           w, h = im.size
           px = im.load()
 
-          # Detect the dominant background colour from the outer edge.
           edge = []
           for x in range(w):
               edge.append(px[x, 0][:3])
@@ -45,8 +45,7 @@ jobs:
           def quant(c):
               return tuple((v // 8) * 8 for v in c)
 
-          bg_q = Counter(quant(c) for c in edge).most_common(1)[0][0]
-          bg = bg_q
+          bg = Counter(quant(c) for c in edge).most_common(1)[0][0]
           tolerance = 52
           tolerance_sq = tolerance * tolerance
 
@@ -56,9 +55,6 @@ jobs:
               db = rgb[2] - bg[2]
               return dr * dr + dg * dg + db * db <= tolerance_sq
 
-          # Flood-fill only pixels connected to the image boundary.
-          # This preserves white/light details inside the logo because they
-          # are not connected to the external background.
           q = deque()
           seen = bytearray(w * h)
 
@@ -89,7 +85,6 @@ jobs:
               if y > 0: push(x, y - 1)
               if y + 1 < h: push(x, y + 1)
 
-          # Keep the original canvas exactly; never crop or resize.
           im.save(path, format='PNG', optimize=True)
           print(f'Original dimensions preserved: {w}x{h}')
           print(f'Connected background pixels made transparent: {removed}')
