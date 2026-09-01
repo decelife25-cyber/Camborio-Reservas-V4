@@ -1,4 +1,4 @@
-const CACHE = 'camborio-public-v4-screens-6';
+const CACHE = 'camborio-public-v4-screens-7';
 const PRECACHE = ['./', './index.html', './styles.css', './app.js', './theme.js', './manifest.webmanifest', './config.js', './logocamborio_trans.png'];
 
 self.addEventListener('install', event => {
