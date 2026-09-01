@@ -1,6 +1,6 @@
-const CACHE = 'camborio-public-v4-screens-2';
-const PRECACHE = ['./', './index.html', './styles.css', './app.js', './manifest.webmanifest', './config.js'];
-const NETWORK_FIRST = new Set(['./index.html', './app.js', './config.js']);
+const CACHE = 'camborio-public-v4-screens-3';
+const PRECACHE = ['./', './index.html', './styles.css', './app.js', './theme.js', './manifest.webmanifest', './config.js'];
+const NETWORK_FIRST = new Set(['./index.html', './app.js', './theme.js', './config.js', './sw.js']);
 
 self.addEventListener('install', event => {
   event.waitUntil(
@@ -23,15 +23,13 @@ self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
 
-  // Never serve the service worker itself from the application cache.
-  // This guarantees that a new SW version can be downloaded and activated.
   if (url.pathname.endsWith('/sw.js')) {
     event.respondWith(fetch(event.request, { cache: 'no-store' }));
     return;
   }
 
   const relativePath = url.pathname.endsWith('/') ? './index.html' : `.${url.pathname.substring(self.location.pathname.lastIndexOf('/'))}`;
-  const isDynamicAppAsset = NETWORK_FIRST.has(relativePath) || /\/(index\.html|app\.js|config\.js)$/.test(url.pathname);
+  const isDynamicAppAsset = NETWORK_FIRST.has(relativePath) || /\/(index\.html|app\.js|theme\.js|config\.js)$/.test(url.pathname);
 
   if (isDynamicAppAsset) {
     event.respondWith(
