@@ -15,10 +15,9 @@
     if (meta) meta.setAttribute('content', theme === 'dark' ? '#15181c' : '#eef2f6');
     document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
       const dark = theme === 'dark';
-      button.innerHTML = dark
-        ? '<span aria-hidden="true">☀️</span><span>Día</span>'
-        : '<span aria-hidden="true">🌙</span><span>Noche</span>';
+      button.innerHTML = dark ? '<span aria-hidden="true">☀️</span>' : '<span aria-hidden="true">🌙</span>';
       button.setAttribute('aria-label', dark ? 'Cambiar a modo día' : 'Cambiar a modo noche');
+      button.setAttribute('title', dark ? 'Modo día' : 'Modo noche');
       button.setAttribute('aria-pressed', dark ? 'true' : 'false');
     });
   }
