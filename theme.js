@@ -11,6 +11,8 @@
   function apply(theme) {
     root.dataset.theme = theme;
     localStorage.setItem(KEY, theme);
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', theme === 'dark' ? '#15181c' : '#eef2f6');
     document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
       const dark = theme === 'dark';
       button.innerHTML = dark
