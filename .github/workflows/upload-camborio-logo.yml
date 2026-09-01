@@ -1,0 +1,43 @@
+name: one-time upload Camborio logo
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'logocamborio_trans.png'
+      - '.github/workflows/upload-camborio-logo.yml'
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout V4
+        uses: actions/checkout@v4
+
+      - name: Upload original transparent logo to ReservasV4 Supabase Storage
+        env:
+          SUPABASE_URL: https://caeszgtogifserrxdrcw.supabase.co
+          SUPABASE_KEY: sb_publishable_g8c6I-h5g0omPamXeduuYQ_V4g0PlZU
+        run: |
+          set -euo pipefail
+          curl --fail-with-body --retry 3 \
+            -X POST \
+            "$SUPABASE_URL/storage/v1/object/camborio-assets/logocamborio_trans.png" \
+            -H "Authorization: Bearer $SUPABASE_KEY" \
+            -H "apikey: $SUPABASE_KEY" \
+            -H "Content-Type: image/png" \
+            -H "x-upsert: true" \
+            --data-binary @logocamborio_trans.png
+
+      - name: Remove this one-time workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/upload-camborio-logo.yml
+          git commit -m "chore: remove one-time logo upload workflow"
+          git push
