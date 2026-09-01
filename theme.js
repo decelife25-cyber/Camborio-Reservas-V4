@@ -29,7 +29,11 @@
       height: 44px !important;
       margin: 0 !important;
       border-radius: 50% !important;
-      clip-path: circle(47% at 50% 50%) !important;
+      clip-path: none !important;
+      background-image: none !important;
+      background-color: transparent !important;
+      object-fit: contain !important;
+      display: block !important;
     }
     .brand-copy {
       flex: 0 1 auto !important;
