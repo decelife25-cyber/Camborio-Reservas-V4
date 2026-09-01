@@ -2,9 +2,16 @@
   const KEY = 'camborio-theme-v4';
   const root = document.documentElement;
 
-  // Layout fix: keep the brand as one left-aligned unit and make the
-  // day/night control a genuinely small header button. These rules use
-  // !important because index.html still contains legacy inline rules.
+  // The legacy index places the toggle before <main>. Move it into the
+  // header so its position belongs to the Camborio brand block, not the viewport.
+  const themeButton = document.querySelector('[data-theme-toggle]');
+  const brandCard = document.querySelector('.brand-card');
+  if (themeButton && brandCard && themeButton.parentElement !== brandCard) {
+    brandCard.appendChild(themeButton);
+  }
+
+  // Keep the brand as one left-aligned unit and make the day/night control
+  // genuinely small. !important overrides the legacy inline rules in index.html.
   const layoutStyle = document.createElement('style');
   layoutStyle.id = 'camborio-v4-header-fix';
   layoutStyle.textContent = `
