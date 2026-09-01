@@ -1,6 +1,5 @@
-const CACHE = 'camborio-public-v4-screens-4';
+const CACHE = 'camborio-public-v4-screens-5';
 const PRECACHE = ['./', './index.html', './styles.css', './app.js', './theme.js', './manifest.webmanifest', './config.js', './logocamborio_trans.png'];
-const NETWORK_FIRST = new Set(['./index.html', './styles.css', './app.js', './theme.js', './config.js', './sw.js', './logocamborio_trans.png']);
 
 self.addEventListener('install', event => {
   event.waitUntil(
@@ -13,7 +12,7 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key))))
+      .then(keys => Promise.all(keys.map(key => caches.delete(key))))
       .then(() => self.clients.claim())
   );
 });
@@ -23,15 +22,16 @@ self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
 
+  // Never allow an old cached service-worker script to survive an update.
   if (url.pathname.endsWith('/sw.js')) {
     event.respondWith(fetch(event.request, { cache: 'no-store' }));
     return;
   }
 
-  const relativePath = url.pathname.endsWith('/') ? './index.html' : `.${url.pathname.substring(self.location.pathname.lastIndexOf('/'))}`;
-  const isDynamicAppAsset = NETWORK_FIRST.has(relativePath) || /\/(index\.html|styles\.css|app\.js|theme\.js|config\.js|logocamborio_trans\.png)$/.test(url.pathname);
-
-  if (isDynamicAppAsset) {
+  // V4 must always obtain the current application from GitHub Pages.
+  // The cache is only an offline fallback, never the preferred source.
+  const isAppAsset = /\/(|index\.html|styles\.css|app\.js|theme\.js|config\.js|manifest\.webmanifest|logocamborio_trans\.png)$/.test(url.pathname);
+  if (isAppAsset) {
     event.respondWith(
       fetch(event.request, { cache: 'no-store' })
         .then(response => {
@@ -41,10 +41,10 @@ self.addEventListener('fetch', event => {
           }
           return response;
         })
-        .catch(() => caches.match(event.request).then(cached => cached || caches.match('./index.html')))
+        .catch(() => caches.match(event.request))
     );
     return;
   }
 
-  event.respondWith(caches.match(event.request).then(cached => cached || fetch(event.request)));
+  event.respondWith(fetch(event.request, { cache: 'no-store' }).catch(() => caches.match(event.request)));
 });
