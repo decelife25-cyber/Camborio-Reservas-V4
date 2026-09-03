@@ -1,5 +1,5 @@
 window.CAMBORIO_CONFIG = Object.freeze({
-  supabaseUrl: '',
-  supabaseAnonKey: '',
+  supabaseUrl: 'https://caeszgtogifserrxdrcw.supabase.co',
+  publicFunction: 'public-reservas',
   timezone: 'Europe/Madrid'
 });
