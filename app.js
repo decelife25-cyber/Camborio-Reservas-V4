@@ -1,5 +1,6 @@
 const screens=['screen-form','screen-confirm','screen-received','screen-thanks','screen-consult','screen-found','screen-edit'];
 const state={name:'',phone:'',email:'',people:'',date:'',time:'',notes:'',code:''};
+window.state=state;
 const $=id=>document.getElementById(id);
 const API=()=>window.CAMBORIO_CONFIG?.publicReservationsFunction||'https://caeszgtogifserrxdrcw.supabase.co/functions/v1/public-reservas';
 const todayISO=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
