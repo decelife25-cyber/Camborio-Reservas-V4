@@ -68,3 +68,9 @@ function install(){
  document.addEventListener('click',e=>{const id=e.target.closest('button')?.id;if(id!=='found-cancel'&&id!=='cancel-reservation')return;e.preventDefault();e.stopImmediatePropagation();const r=window.__publicReservation||window.__v4Reservation;if(!r)return;(async()=>{const ok=await info('¿Quieres cancelar esta reserva? Esta acción no se puede deshacer desde la PWA.',{title:'Cancelar reserva',icon:'⚠️',confirm:true,ok:'CANCELAR RESERVA'});if(!ok)return;try{const res=await fetch(API(),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'cancel',telefono:r.Telefono,codigo:r.CodigoReserva})});const d=await res.json();if(!res.ok||d.ok===false)throw new Error(d.error||'No se ha podido cancelar la reserva.');window.__publicReservation=d.reservation;showScreen('screen-thanks');await info('La reserva se ha cancelado correctamente.',{title:'Reserva cancelada',icon:'✓'})}catch(err){info(err.message,{title:'No se pudo cancelar',icon:'⚠️'})}})()},true);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
+
+if('serviceWorker' in navigator){
+ window.addEventListener('load',()=>{
+  navigator.serviceWorker.register('./sw.js').catch(()=>{});
+ });
+}
