@@ -1,5 +1,5 @@
-const CACHE = 'camborio-public-v4-screens-10';
-const PRECACHE = ['./', './index.html', './styles.css', './app.js', './theme.js', './manifest.webmanifest', './config.js', './logocamborio_trans.png'];
+const CACHE = 'camborio-public-v4-screens-11';
+const PRECACHE = ['./', './index.html', './styles.css', './app.js', './public-api.js', './theme.js', './manifest.webmanifest', './config.js', './logocamborio_trans.png'];
 
 self.addEventListener('install', event => {
   event.waitUntil(
@@ -27,7 +27,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  const isAppAsset = /\/(|index\.html|styles\.css|app\.js|theme\.js|config\.js|manifest\.webmanifest|logocamborio_trans\.png)$/.test(url.pathname);
+  const isAppAsset = /\/(|index\.html|styles\.css|app\.js|public-api\.js|theme\.js|config\.js|manifest\.webmanifest|logocamborio_trans\.png)$/.test(url.pathname);
   if (isAppAsset) {
     event.respondWith(
       fetch(event.request, { cache: 'no-store' })
