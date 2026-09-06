@@ -12,8 +12,6 @@ function showScreen(id){screens.forEach(s=>$(s)?.classList.toggle('active',s===i
 function formatDate(v){return displayDate(v)||'-'}
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function setDateField(id,v){const e=$(id);if(!e)return;e.dataset.iso=v||'';e.value=displayDate(v);e.classList.toggle('has-date',!!v)}
-function openEmailModal(){$('email-modal').hidden=false;setTimeout(()=>$('email-send')?.focus(),50)}
-function closeEmailModal(){$('email-modal').hidden=true}
 function renderSummary(target='summary'){const rows=[['👤 Nombre',state.name],['📞 Teléfono',state.phone],['✉️ Email',state.email||'-'],['👥 Comensales',state.people],['📅 Fecha',formatDate(state.date)],['🕘 Hora',state.time],['📝 Observaciones',state.notes||'Sin observaciones']];$(target).innerHTML=rows.map(([l,v])=>`<div class="summary-row"><span class="summary-label">${l}</span><span class="summary-value">${escapeHtml(v||'-')}</span></div>`).join('')}
 function ensureModal(){
  if($('app-modal'))return;
@@ -44,7 +42,6 @@ function install(){
  $('reservation-form').onsubmit=e=>{e.preventDefault();if(!validForm())return;renderSummary();showScreen('screen-confirm')};
  $('back-button').onclick=()=>showScreen('screen-form');$('finish-button').onclick=()=>showScreen('screen-thanks');$('existing-button').onclick=()=>showScreen('screen-consult');$('consult-back').onclick=()=>showScreen('screen-form');$('found-edit').onclick=()=>showScreen('screen-edit');$('found-back').onclick=()=>showScreen('screen-consult');$('edit-back').onclick=()=>showScreen('screen-found');
  $('received-pdf').onclick=()=>info('La reserva ya está registrada. La descarga del justificante se habilitará en la siguiente fase.',{title:'Justificante',icon:'📄'});
- $('email-close').onclick=closeEmailModal;$('email-cancel').onclick=closeEmailModal;$('email-modal-close').onclick=closeEmailModal;$('received-email').onclick=openEmailModal;$('found-email').onclick=openEmailModal;
  setDateField('date','');setDateField('edit-date','');
  document.addEventListener('click',e=>{const id=e.target.closest('button')?.id;if(id!=='found-cancel'&&id!=='cancel-reservation')return;e.preventDefault();e.stopImmediatePropagation();const r=window.__publicReservation||window.__v4Reservation;if(!r)return;(async()=>{const ok=await info('¿Quieres cancelar esta reserva? Esta acción no se puede deshacer desde la PWA.',{title:'Cancelar reserva',icon:'⚠️',confirm:true,ok:'CANCELAR RESERVA'});if(!ok)return;try{const res=await fetch(API(),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'cancel',telefono:r.Telefono,codigo:r.CodigoReserva})});const d=await res.json();if(!res.ok||d.ok===false)throw new Error(d.error||'No se ha podido cancelar la reserva.');window.__publicReservation=d.reservation;showScreen('screen-thanks');await info('La reserva se ha cancelado correctamente.',{title:'Reserva cancelada',icon:'✓'})}catch(err){info(err.message,{title:'No se pudo cancelar',icon:'⚠️'})}})()},true);
 }
