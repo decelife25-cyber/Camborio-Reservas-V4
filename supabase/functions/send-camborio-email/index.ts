@@ -334,16 +334,45 @@ async function saveReservationEmail(reservaID: string, telefono: string, email: 
 // El estado del envío de correo se registra siempre de forma independiente al
 // estado de la reserva (PENDIENTE/CONFIRMADA/...). Un fallo aquí no debe
 // propagarse como fallo del envío principal.
-async function registerNotification(reservaID: string, destino: string, estado: 'ENVIADA' | 'ERROR'): Promise<void> {
+//
+// Equivalente a V2 (07_Notificaciones.gs):
+//   CR_Notificaciones_registrar()      -> registerNotificationPending (crea el registro en PENDIENTE
+//                                          ANTES de intentar el envío, para que quede constancia del
+//                                          intento incluso si el envío falla o la función se interrumpe).
+//   CR_Notificaciones_marcarEnviada()  -> markNotificationSent
+//   CR_Notificaciones_marcarError()    -> markNotificationError
+//
+// El identificador de fila no se conoce (la tabla "Notificaciones" no está versionada como
+// migración SQL en este repositorio), así que la fila PENDIENTE se localiza de forma determinista
+// para la actualización posterior mediante la combinación (ReservaID, Tipo, FechaHora) generada
+// aquí mismo, en vez de asumir el nombre de una columna de clave primaria.
+type NotificacionPendiente = { reservaID: string; destino: string; fechaHora: string };
+
+async function registerNotificationPending(reservaID: string, destino: string): Promise<NotificacionPendiente> {
+  const fechaHora = new Date().toISOString();
   const { error } = await supabase.from('Notificaciones').insert({
-    FechaHora: new Date().toISOString(),
+    FechaHora: fechaHora,
     ReservaID: reservaID,
     Tipo: 'EMAIL_RESERVA',
     Destino: destino,
-    Estado: estado,
+    Estado: 'PENDIENTE',
   });
-  if (error) console.error('No se pudo registrar Notificaciones', error.message);
+  if (error) console.error('No se pudo registrar Notificaciones (PENDIENTE)', error.message);
+  return { reservaID, destino, fechaHora };
 }
+
+async function markNotification(pendiente: NotificacionPendiente, estado: 'ENVIADA' | 'ERROR'): Promise<void> {
+  const { error } = await supabase
+    .from('Notificaciones')
+    .update({ Estado: estado })
+    .eq('ReservaID', pendiente.reservaID)
+    .eq('Tipo', 'EMAIL_RESERVA')
+    .eq('FechaHora', pendiente.fechaHora);
+  if (error) console.error(`No se pudo marcar Notificaciones como ${estado}`, error.message);
+}
+
+const markNotificationSent = (pendiente: NotificacionPendiente): Promise<void> => markNotification(pendiente, 'ENVIADA');
+const markNotificationError = (pendiente: NotificacionPendiente): Promise<void> => markNotification(pendiente, 'ERROR');
 
 async function registerLog(reservaID: string, destino: string): Promise<void> {
   const { error } = await supabase.from('Log').insert({
@@ -386,15 +415,20 @@ Deno.serve(async (req) => {
     const subject = `Confirmación de reserva ${clean(reserva.CodigoReserva)} - Taberna Camborio`;
     const html = buildHtml(reserva, clean(body.publicUrl));
 
+    // Se registra la notificación en PENDIENTE antes de intentar el envío (igual que
+    // CR_Notificaciones_registrar en V2), de modo que quede constancia del intento aunque
+    // el envío falle o la función se interrumpa.
+    const pendiente = await registerNotificationPending(reservaID, destino);
+
     try {
       const messageId = await sendGmail(destino, subject, html);
-      await registerNotification(reservaID, destino, 'ENVIADA');
+      await markNotificationSent(pendiente);
       await registerLog(reservaID, destino);
       return json({ ok: true, sent: true, messageId });
     } catch (sendError) {
-      // El fallo de envío se registra como notificación en ERROR, pero la
+      // El fallo de envío se marca como notificación en ERROR, pero la
       // reserva y su estado permanecen intactos.
-      await registerNotification(reservaID, destino, 'ERROR');
+      await markNotificationError(pendiente);
       throw sendError;
     }
   } catch (e) {
