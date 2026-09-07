@@ -1,0 +1,1 @@
+Referencia V2: 07_Notificaciones.gs proporcionado por el usuario. Portar exactamente el flujo y HTML de CR_Email_enviarConfirmacionReserva y CR_Email_crearHTMLConfirmacionReserva a Supabase V4; sustituir solo MailApp/ScriptApp por Gmail API/URL pública V4.
