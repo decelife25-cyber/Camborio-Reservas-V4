@@ -3,14 +3,15 @@ const CACHE = `${CACHE_PREFIX}11`;
 const PRECACHE = [
   './',
   './index.html',
-  './styles.css',
-  './app.js',
-  './public-api.js',
-  './reservation-pdf.js',
-  './theme.js',
+  './styles.css?v=20260901',
+  './app.js?v=20260907',
+  './public-api.js?v=20260907',
+  './reservation-pdf.js?v=20260907',
+  './theme.js?v=20260907',
   './manifest.webmanifest',
-  './config.js',
-  './logocamborio_trans.png',
+  './config.js?v=20260905',
+  './logocamborio_trans.png?v=20260901',
+  './logocamborio_trans.png?v=20260907',
 ];
 
 self.addEventListener('install', event => {
@@ -45,7 +46,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  const isAppAsset = /\/(|index\.html|styles\.css|app\.js|public-api\.js|reservation-pdf\.js|theme\.js|config\.js|manifest\.webmanifest|sw\.js|logocamborio_trans\.png)$/.test(url.pathname);
+  const isAppAsset = /\/(|index\.html|styles\.css|app\.js|public-api\.js|reservation-pdf\.js|theme\.js|config\.js|manifest\.webmanifest|logocamborio_trans\.png)$/.test(url.pathname);
   if (isAppAsset) {
     event.respondWith(
       fetch(event.request, { cache: 'no-store' })
