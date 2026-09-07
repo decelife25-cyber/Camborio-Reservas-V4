@@ -45,7 +45,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  const isAppAsset = /\/(|index\.html|styles\.css|app\.js|public-api\.js|reservation-pdf\.js|theme\.js|config\.js|manifest\.webmanifest|logocamborio_trans\.png)$/.test(url.pathname);
+  const isAppAsset = /\/(|index\.html|styles\.css|app\.js|public-api\.js|reservation-pdf\.js|theme\.js|config\.js|manifest\.webmanifest|sw\.js|logocamborio_trans\.png)$/.test(url.pathname);
   if (isAppAsset) {
     event.respondWith(
       fetch(event.request, { cache: 'no-store' })
