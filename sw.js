@@ -10,7 +10,6 @@ const PRECACHE = [
   './theme.js?v=20260907',
   './manifest.webmanifest',
   './config.js?v=20260905',
-  './logocamborio_trans.png?v=20260901',
   './logocamborio_trans.png?v=20260907',
 ];
 
