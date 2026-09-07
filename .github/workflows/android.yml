@@ -1,0 +1,57 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'android_app/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'android_app/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install Dependencies
+      run: |
+        cd android_app
+        npm ci
+
+    - name: Build Web Assets
+      run: |
+        cd android_app
+        npm run build
+
+    - name: Sync Capacitor
+      run: |
+        cd android_app
+        npx cap sync android
+
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'zulu'
+        java-version: '17'
+
+    - name: Build APK
+      run: |
+        cd android_app/android
+        chmod +x gradlew
+        ./gradlew assembleDebug
+
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-debug
+        path: android_app/android/app/build/outputs/apk/debug/app-debug.apk
