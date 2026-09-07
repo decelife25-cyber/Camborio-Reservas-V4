@@ -46,7 +46,10 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  const isAppAsset = /\/(|index\.html|styles\.css|app\.js|public-api\.js|public-functional\.js|reservation-pdf\.js|theme\.js|config\.js|manifest\.webmanifest|logocamborio_trans\.png)$/.test(url.pathname);
+  const requestPathWithQuery = `${url.pathname}${url.search}`;
+  const isBaseAsset = /\/(|index\.html|styles\.css|app\.js|public-api\.js|public-functional\.js|reservation-pdf\.js|theme\.js|config\.js|manifest\.webmanifest|logocamborio_trans\.png)$/.test(url.pathname);
+  const isVersionedAsset = /\/(styles\.css|app\.js|public-api\.js|public-functional\.js|reservation-pdf\.js|theme\.js|config\.js|logocamborio_trans\.png)\?v=\d+$/.test(requestPathWithQuery);
+  const isAppAsset = isBaseAsset || isVersionedAsset;
   if (isAppAsset) {
     event.respondWith(
       fetch(event.request, { cache: 'no-store' })
