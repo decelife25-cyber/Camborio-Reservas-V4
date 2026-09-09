@@ -1,15 +1,8 @@
 (function(){'use strict';
 const $=id=>document.getElementById(id);
 const clean=v=>String(v??'').trim();
-const esc=v=>String(v??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));
 let pdfLibPromise=null;
-function loadPdfLib(){
-  if(window.PDFLib)return Promise.resolve(window.PDFLib);
-  if(!pdfLibPromise){
-    pdfLibPromise=import('https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/+esm').then(m=>m.default||m).catch(e=>{pdfLibPromise=null;throw e;});
-  }
-  return pdfLibPromise;
-}
+function loadPdfLib(){if(window.PDFLib)return Promise.resolve(window.PDFLib);if(!pdfLibPromise)pdfLibPromise=import('https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/+esm').then(m=>m.default||m).catch(e=>{pdfLibPromise=null;throw e;});return pdfLibPromise;}
 function formatDate(v){const s=clean(v);if(/^\d{4}-\d{2}-\d{2}$/.test(s)){const [y,m,d]=s.split('-');return `${d}-${m}-${y}`;}return s.slice(0,10).split('-').reverse().join('-')||s;}
 function formatTime(v){const s=clean(v);const m=s.match(/^(?:.*T)?(\d{1,2}):(\d{2})/);return m?`${m[1].padStart(2,'0')}:${m[2]}`:s.slice(0,5);}
 function statusText(v){const s=clean(v).toUpperCase();return({PENDIENTE:'Pendiente de confirmación',CONFIRMADA:'Confirmada',SENTADA:'Sentada',FINALIZADA:'Finalizada',CANCELADA_CLIENTE:'Cancelada por el cliente',CANCELADA_LOCAL:'Cancelada por el restaurante',NO_PRESENTADO:'No presentado'})[s]||s||'Pendiente de confirmación';}
@@ -17,38 +10,22 @@ function wrapText(text,font,size,maxWidth){const words=clean(text).split(/\s+/);
 async function imageBytes(url){const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('logo');return new Uint8Array(await r.arrayBuffer());}
 function drawWrapped(page,text,font,size,x,y,maxWidth,lineHeight,maxLines){const lines=wrapText(text,font,size,maxWidth).slice(0,maxLines||99);for(let i=0;i<lines.length;i++)page.drawText(lines[i],{x,y:y-i*lineHeight,size,font});return y-lines.length*lineHeight;}
 async function createPdf(r){
-  const {PDFDocument,StandardFonts,rgb}=await loadPdfLib();
-  const pdf=await PDFDocument.create();
-  const page=pdf.addPage([595.28,841.89]);
-  const regular=await pdf.embedFont(StandardFonts.Helvetica);
-  const bold=await pdf.embedFont(StandardFonts.HelveticaBold);
-  const serif=await pdf.embedFont(StandardFonts.TimesRomanBold);
-  const W=page.getWidth(),H=page.getHeight(),margin=42;
-  const brown=rgb(0.357,0.149,0.059),green=rgb(0.051,0.353,0.133),gold=rgb(0.949,0.631,0.0),ink=rgb(0.067,0.094,0.129),muted=rgb(0.42,0.45,0.49),light=rgb(0.984,0.984,0.984),cream=rgb(0.996,0.992,0.949);
-  page.drawLine({start:{x:margin,y:H-92},end:{x:W-margin,y:H-92},thickness:3,color:gold});
-  try{const bytes=await imageBytes(new URL('./logocamborio_trans.png',location.href).href);const img=await pdf.embedPng(bytes);page.drawImage(img,{x:margin,y:H-78,width:68,height:68});}catch{}
-  page.drawText('TABERNA CAMBORIO',{x:125,y:H-48,size:21,font:serif,color:brown});
-  page.drawText('CERVECERÍA · TAPERÍA',{x:128,y:H-67,size:10.5,font:serif,color:green});
-  page.drawText('Calle Real, 184 · 11100 San Fernando',{x:128,y:H-82,size:8.5,font:regular,color:muted});
-  page.drawText('Teléfono: 956 25 45 32',{x:410,y:H-82,size:8.5,font:regular,color:green});
-  page.drawText('CÓDIGO DE RESERVA',{x:W/2-74,y:H-123,size:12,font:bold,color:ink});
-  const code=clean(r?.CodigoReserva)||'-';
-  page.drawRectangle({x:margin+53,y:H-178,width:W-2*margin-106,height:40,borderColor:green,borderWidth:1.5,color:rgb(0.985,0.995,0.987),borderRadius:5});
-  const cw=bold.widthOfTextAtSize(code,22);page.drawText(code,{x:W/2-cw/2,y:H-164,size:22,font:bold,color:green,characterSpacing:2});
-  const rows=[['Nombre',clean(r?.Nombre)||'-'],['Teléfono',clean(r?.Telefono)||'-'],['Email',clean(r?.Email)||'-'],['Fecha',formatDate(r?.FechaReserva)||'-'],['Hora',formatTime(r?.HoraReserva)||'-'],['Personas',clean(r?.Personas)||'-'],['Estado',statusText(r?.Estado)],['Observaciones',clean(r?.Observaciones)||'Sin observaciones']];
-  let y=H-202;const rowH=35;const labelW=135;page.drawRectangle({x:margin,y:y-rows.length*rowH,width:W-2*margin,height:rows.length*rowH,borderColor:rgb(.84,.87,.9),borderWidth:.7});
-  rows.forEach((row,i)=>{const top=y-i*rowH;const bottom=top-rowH;if(i%2===0)page.drawRectangle({x:margin,y:bottom,width:W-2*margin,height:rowH,color:light});if(i<rows.length-1)page.drawLine({start:{x:margin,y:bottom},end:{x:W-margin,y:bottom},thickness:.5,color:rgb(.88,.9,.92)});page.drawLine({start:{x:margin+labelW,y:bottom},end:{x:margin+labelW,y:top},thickness:.5,color:rgb(.88,.9,.92)});page.drawText(row[0],{x:margin+10,y:top-22,size:8.5,font:bold,color:ink});drawWrapped(page,row[1],regular,8.8,margin+labelW+10,top-15,W-margin-(margin+labelW+10),10,2);});
-  const status=clean(r?.Estado).toUpperCase();let ay=y-rows.length*rowH-20;
-  const avisoH=status==='PENDIENTE'?58:42;const avisoColor=status==='PENDIENTE'?cream:rgb(.925,.98,.94);const avisoBorder=status==='PENDIENTE'?gold:green;page.drawRectangle({x:margin,y:ay-avisoH,width:W-2*margin,height:avisoH,color:avisoColor,borderColor:avisoBorder,borderWidth:1,borderRadius:5});
-  if(status==='PENDIENTE'){page.drawText('ESTA RESERVA ESTÁ PENDIENTE DE CONFIRMACIÓN',{x:margin+12,y:ay-20,size:9.5,font:bold,color:ink});drawWrapped(page,'por el restaurante. En cuanto sea confirmada, podrás consultar el estado actual.',regular,8.5,margin+12,ay-36,W-2*margin-24,10,2);}else{page.drawText(`ESTADO DE LA RESERVA: ${statusText(status).toUpperCase()}`,{x:margin+12,y:ay-24,size:9.5,font:bold,color:green});}
-  ay-=avisoH+14;const qh=68;page.drawRectangle({x:margin,y:ay-qh,width:W-2*margin,height:qh,color:rgb(.953,.984,.961),borderColor:green,borderWidth:1,borderRadius:5});page.drawText('PUEDE CONSULTAR EL ESTADO DE SU RESERVA',{x:margin+12,y:ay-19,size:9.5,font:bold,color:green});page.drawText('Teléfono:',{x:margin+12,y:ay-36,size:8.5,font=bold,color:ink});
-  page.drawText(clean(r?.Telefono)||'-',{x:margin+67,y:ay-36,size:8.5,font:regular,color:ink});page.drawText('Código de reserva:',{x:margin+12,y:ay-51,size:8.5,font:bold,color:ink});page.drawText(code,{x:margin+112,y:ay-51,size:8.5,font:bold,color:green});
-  page.drawLine({start:{x:margin,y:47},end:{x:W-margin,y:47},thickness:1,color:green});const thanks='Gracias por reservar en Taberna Camborio.';page.drawText(thanks,{x:W/2-regular.widthOfTextAtSize(thanks,8.5)/2,y:34,size:8.5,font:bold,color:ink});const now=new Intl.DateTimeFormat('es-ES',{timeZone:'Europe/Madrid',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date());page.drawText(`Documento generado el ${now}`,{x:W/2-regular.widthOfTextAtSize(`Documento generado el ${now}`,6.5)/2,y:22,size:6.5,font:regular,color:muted});
-  return pdf.save();
+ const {PDFDocument,StandardFonts,rgb}=await loadPdfLib();const pdf=await PDFDocument.create();const page=pdf.addPage([595.28,841.89]);
+ const regular=await pdf.embedFont(StandardFonts.Helvetica),bold=await pdf.embedFont(StandardFonts.HelveticaBold),serif=await pdf.embedFont(StandardFonts.TimesRomanBold);
+ const W=page.getWidth(),H=page.getHeight(),margin=42;const brown=rgb(.357,.149,.059),green=rgb(.051,.353,.133),gold=rgb(.949,.631,0),ink=rgb(.067,.094,.129),muted=rgb(.42,.45,.49),light=rgb(.984,.984,.984),cream=rgb(.996,.992,.949);
+ page.drawLine({start:{x:margin,y:H-92},end:{x:W-margin,y:H-92},thickness:3,color:gold});
+ try{const bytes=await imageBytes(new URL('./logocamborio_trans.png',location.href).href);const img=await pdf.embedPng(bytes);page.drawImage(img,{x:margin,y:H-78,width:68,height:68});}catch{}
+ page.drawText('TABERNA CAMBORIO',{x:125,y:H-48,size:21,font:serif,color:brown});page.drawText('CERVECERÍA · TAPERÍA',{x:128,y:H-67,size:10.5,font:serif,color:green});page.drawText('Calle Real, 184 · 11100 San Fernando',{x:128,y:H-82,size:8.5,font:regular,color:muted});page.drawText('Teléfono: 956 25 45 32',{x:410,y:H-82,size:8.5,font:regular,color:green});
+ page.drawText('CÓDIGO DE RESERVA',{x:W/2-74,y:H-123,size:12,font:bold,color:ink});const code=clean(r?.CodigoReserva)||'-';page.drawRectangle({x:margin+53,y:H-178,width:W-2*margin-106,height:40,borderColor:green,borderWidth:1.5,color:rgb(.985,.995,.987)});const cw=bold.widthOfTextAtSize(code,22);page.drawText(code,{x:W/2-cw/2,y:H-164,size:22,font:bold,color:green,characterSpacing:2});
+ const rows=[['Nombre',clean(r?.Nombre)||'-'],['Teléfono',clean(r?.Telefono)||'-'],['Email',clean(r?.Email)||'-'],['Fecha',formatDate(r?.FechaReserva)||'-'],['Hora',formatTime(r?.HoraReserva)||'-'],['Personas',clean(r?.Personas)||'-'],['Estado',statusText(r?.Estado)],['Observaciones',clean(r?.Observaciones)||'Sin observaciones']];let y=H-202;const rowH=35,labelW=135;page.drawRectangle({x:margin,y:y-rows.length*rowH,width:W-2*margin,height:rows.length*rowH,borderColor:rgb(.84,.87,.9),borderWidth:.7});
+ rows.forEach((row,i)=>{const top=y-i*rowH,bottom=top-rowH;if(i%2===0)page.drawRectangle({x:margin,y:bottom,width:W-2*margin,height:rowH,color:light});if(i<rows.length-1)page.drawLine({start:{x:margin,y:bottom},end:{x:W-margin,y:bottom},thickness:.5,color:rgb(.88,.9,.92)});page.drawLine({start:{x:margin+labelW,y:bottom},end:{x:margin+labelW,y:top},thickness:.5,color:rgb(.88,.9,.92)});page.drawText(row[0],{x:margin+10,y:top-22,size:8.5,font:bold,color:ink});drawWrapped(page,row[1],regular,8.8,margin+labelW+10,top-15,W-margin-(margin+labelW+10),10,2);});
+ const status=clean(r?.Estado).toUpperCase();let ay=y-rows.length*rowH-20;const avisoH=status==='PENDIENTE'?58:42,avisoColor=status==='PENDIENTE'?cream:rgb(.925,.98,.94),avisoBorder=status==='PENDIENTE'?gold:green;page.drawRectangle({x:margin,y:ay-avisoH,width:W-2*margin,height:avisoH,color:avisoColor,borderColor:avisoBorder,borderWidth:1});
+ if(status==='PENDIENTE'){page.drawText('ESTA RESERVA ESTÁ PENDIENTE DE CONFIRMACIÓN',{x:margin+12,y:ay-20,size:9.5,font:bold,color:ink});drawWrapped(page,'por el restaurante. En cuanto sea confirmada, podrás consultar el estado actual.',regular,8.5,margin+12,ay-36,W-2*margin-24,10,2);}else page.drawText(`ESTADO DE LA RESERVA: ${statusText(status).toUpperCase()}`,{x:margin+12,y:ay-24,size:9.5,font:bold,color:green});
+ ay-=avisoH+14;const qh=68;page.drawRectangle({x:margin,y:ay-qh,width:W-2*margin,height:qh,color:rgb(.953,.984,.961),borderColor:green,borderWidth:1});page.drawText('PUEDE CONSULTAR EL ESTADO DE SU RESERVA',{x:margin+12,y:ay-19,size:9.5,font:bold,color:green});page.drawText('Teléfono:',{x:margin+12,y:ay-36,size:8.5,font:bold,color:ink});page.drawText(clean(r?.Telefono)||'-',{x:margin+67,y:ay-36,size:8.5,font:regular,color:ink});page.drawText('Código de reserva:',{x:margin+12,y:ay-51,size:8.5,font:bold,color:ink});page.drawText(code,{x:margin+112,y:ay-51,size:8.5,font:bold,color:green});
+ page.drawLine({start:{x:margin,y:47},end:{x:W-margin,y:47},thickness:1,color:green});const thanks='Gracias por reservar en Taberna Camborio.';page.drawText(thanks,{x:W/2-regular.widthOfTextAtSize(thanks,8.5)/2,y:34,size:8.5,font:bold,color:ink});const now=new Intl.DateTimeFormat('es-ES',{timeZone:'Europe/Madrid',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date());const footer=`Documento generado el ${now}`;page.drawText(footer,{x:W/2-regular.widthOfTextAtSize(footer,6.5)/2,y:22,size:6.5,font:regular,color:muted});return pdf.save();
 }
 async function downloadPdf(r){const bytes=await createPdf(r);const blob=new Blob([bytes],{type:'application/pdf'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`Reserva_${clean(r?.CodigoReserva)||'Camborio'}.pdf`;a.style.display='none';document.body.appendChild(a);a.click();setTimeout(()=>{a.remove();URL.revokeObjectURL(url);},1500);}
 function run(r){if(!r){alert('No se ha encontrado la reserva para generar el justificante.');return;}const buttons=[...document.querySelectorAll('#received-pdf,#found-pdf,#edit-pdf')];buttons.forEach(b=>b.disabled=true);downloadPdf(r).catch(e=>{console.error(e);alert('No se pudo generar el PDF. Comprueba que tienes conexión a internet e inténtalo de nuevo.');}).finally(()=>buttons.forEach(b=>b.disabled=false));}
 function bind(){const b=$('received-pdf');if(b)b.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();run(window.__publicReservation||window.__v4Reservation)},true);document.addEventListener('click',e=>{const b=e.target.closest('#found-pdf,#edit-pdf');if(!b)return;e.preventDefault();e.stopImmediatePropagation();run(window.__publicReservation||window.__v4Reservation)},true);}
-window.buildReservationPdf=async r=>downloadPdf(r);
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
+window.buildReservationPdf=async r=>downloadPdf(r);if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
 })();
