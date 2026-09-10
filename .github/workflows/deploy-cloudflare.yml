@@ -1,0 +1,61 @@
+name: Deploy Camborio Reservas V4 to Cloudflare
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  deployments: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy V4 and router Worker
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure Cloudflare Pages project exists
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          endpoint="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects"
+          response=$(curl -sS \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -w '\nHTTP_STATUS:%{http_code}' \
+            "$endpoint")
+          body="${response%$'\nHTTP_STATUS:'*}"
+          status="${response##*$'\nHTTP_STATUS:'}"
+          test "$status" = "200"
+          if echo "$body" | jq -e '.result[] | select(.name == "camborio-reservas-v4")' >/dev/null; then
+            echo "Cloudflare Pages project camborio-reservas-v4 already exists."
+          else
+            curl -sS -X POST \
+              -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+              -H "Content-Type: application/json" \
+              "$endpoint" \
+              --data '{"name":"camborio-reservas-v4","production_branch":"main"}' | jq -e '.success == true'
+          fi
+
+      - name: Deploy V4 static site
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy . --project-name=camborio-reservas-v4 --branch=main --commit-message="Deploy Camborio Reservas V4"
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Deploy Camborio router Worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy --config wrangler.router.toml
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
