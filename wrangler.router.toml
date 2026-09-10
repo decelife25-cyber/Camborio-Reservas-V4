@@ -1,0 +1,8 @@
+name = "camborio-reservas-router"
+main = "cloudflare/camborio-reservas-router.js"
+compatibility_date = "2026-09-10"
+workers_dev = false
+
+routes = [
+  { pattern = "www.decelife.com/reservas-camborio*", zone_name = "decelife.com" }
+]
