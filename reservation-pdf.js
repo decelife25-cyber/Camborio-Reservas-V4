@@ -1,30 +1,36 @@
 (function () {
   'use strict';
 
-  const $ = (id) => document.getElementById(id);
-  let libPromise = null;
-
-  function loadLib() {
-    if (window.PDFLib) return Promise.resolve(window.PDFLib);
-    if (!libPromise) {
-      libPromise = import('https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/+esm')
-        .then((module) => module.default || module);
-    }
-    return libPromise;
-  }
-
   const clean = (value) => String(value ?? '').trim();
+  let converterPromise = null;
+
+  function loadConverter() {
+    if (window.html2pdf) return Promise.resolve(window.html2pdf);
+    if (!converterPromise) {
+      converterPromise = new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+        script.onload = () => window.html2pdf ? resolve(window.html2pdf) : reject(new Error('No se pudo cargar el generador PDF.'));
+        script.onerror = () => reject(new Error('No se pudo cargar el generador PDF.'));
+        document.head.appendChild(script);
+      });
+    }
+    return converterPromise;
+  }
 
   function formatDate(value) {
     const text = clean(value);
     const iso = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
     if (iso) return `${iso[3]}-${iso[2]}-${iso[1]}`;
+    const dmy = text.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);
+    if (dmy) return `${dmy[1].padStart(2, '0')}-${dmy[2].padStart(2, '0')}-${dmy[3]}`;
     return text;
   }
 
   function formatTime(value) {
-    const match = clean(value).match(/(?:T|^)(\d{1,2}):(\d{2})/);
-    return match ? `${match[1].padStart(2, '0')}:${match[2]}` : clean(value).slice(0, 5);
+    const text = clean(value);
+    const match = text.match(/(?:T|^)(\d{1,2}):(\d{2})/);
+    return match ? `${match[1].padStart(2, '0')}:${match[2]}` : text.slice(0, 5);
   }
 
   function status(value) {
@@ -34,139 +40,128 @@
       CONFIRMADA: 'Confirmada',
       SENTADA: 'Sentada',
       FINALIZADA: 'Finalizada',
-      CANCELADA_CLIENTE: 'Cancelada por el cliente',
+      CANCELADA_CLIENTE: 'Cancelada (por el cliente)',
       CANCELADA_LOCAL: 'Cancelada por el restaurante',
       NO_PRESENTADO: 'No presentado'
     })[key] || key || 'Pendiente de confirmación';
   }
 
-  function wrap(text, font, size, maxWidth) {
-    const words = clean(text).split(/\s+/);
-    const lines = [];
-    let line = '';
-    words.forEach((word) => {
-      const candidate = line ? `${line} ${word}` : word;
-      if (!line || font.widthOfTextAtSize(candidate, size) <= maxWidth) {
-        line = candidate;
-      } else {
-        lines.push(line);
-        line = word;
-      }
-    });
-    if (line) lines.push(line);
-    return lines.length ? lines : ['-'];
+  function escapeHtml(value) {
+    return clean(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/\"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
-  async function loadLogo(pdf) {
-    const candidates = ['logocamborio_trans.png', 'reservas_pwa.png'];
-    for (const path of candidates) {
-      try {
-        const response = await fetch(`./${path}`, { cache: 'no-store' });
-        if (!response.ok) continue;
-        const bytes = await response.arrayBuffer();
-        return await pdf.embedPng(bytes);
-      } catch (_) {
-        // Se prueba el siguiente recurso.
-      }
-    }
-    return null;
+  function stateClass(value) {
+    const key = clean(value).toUpperCase();
+    if (key === 'PENDIENTE') return 'estadoPendiente';
+    if (key === 'CONFIRMADA') return 'estadoConfirmada';
+    if (key === 'CANCELADA_CLIENTE' || key === 'CANCELADA_LOCAL') return 'estadoCancelada';
+    return 'estadoNeutro';
   }
 
-  async function make(reservation) {
-    const { PDFDocument, StandardFonts, rgb } = await loadLib();
-    const pdf = await PDFDocument.create();
-    const page = pdf.addPage([595.28, 841.89]);
-    const regular = await pdf.embedFont(StandardFonts.Helvetica);
-    const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
-    const serif = await pdf.embedFont(StandardFonts.TimesRomanBold);
-    const logo = await loadLogo(pdf);
-
-    const W = page.getWidth();
-    const H = page.getHeight();
-    const m = 42;
-    const brown = rgb(0.357, 0.149, 0.059);
-    const green = rgb(0.051, 0.353, 0.133);
-    const gold = rgb(0.949, 0.631, 0);
-    const ink = rgb(0.067, 0.094, 0.129);
-    const muted = rgb(0.42, 0.45, 0.49);
-    const light = rgb(0.984, 0.984, 0.984);
-    const cream = rgb(0.996, 0.992, 0.949);
-
-    // Cabecera recuperada visualmente del PDF original de V2.
-    page.drawLine({ start: { x: m, y: H - 92 }, end: { x: W - m, y: H - 92 }, thickness: 3, color: gold });
-    if (logo) {
-      const scaled = logo.scale(0.23);
-      page.drawImage(logo, { x: 58, y: H - 88, width: Math.min(scaled.width, 66), height: Math.min(scaled.height, 66) });
+  function stateNotice(value) {
+    const key = clean(value).toUpperCase();
+    if (key === 'PENDIENTE') {
+      return '<div class="aviso avisoPendiente"><div class="avisoContenido"><div class="avisoTitulo">Esta reserva está <strong>pendiente de confirmación</strong> por el restaurante.</div><div class="avisoTexto">En cuanto sea confirmada, podrás consultar el estado actual.</div></div></div>';
     }
-    page.drawText('TABERNA CAMBORIO', { x: 125, y: H - 48, size: 21, font: serif, color: brown });
-    page.drawText('CERVECERÍA · TAPERÍA', { x: 128, y: H - 67, size: 10.5, font: serif, color: green });
-    page.drawText('Calle Real, 184 · 11100 San Fernando', { x: 128, y: H - 82, size: 8.5, font: regular, color: muted });
-    page.drawText('Teléfono: 956 25 45 32', { x: 410, y: H - 82, size: 8.5, font: regular, color: green });
+    if (key === 'CONFIRMADA') return '<div class="aviso avisoConfirmada"><div class="avisoTitulo">Esta reserva está confirmada.</div></div>';
+    if (key === 'CANCELADA_CLIENTE' || key === 'CANCELADA_LOCAL') return `<div class="aviso avisoCancelada"><div class="avisoTitulo">Reserva cancelada.</div><div class="avisoTexto">${escapeHtml(status(key))}</div></div>`;
+    return `<div class="aviso avisoNeutro"><div class="avisoTitulo">Estado de la reserva: ${escapeHtml(status(key))}</div></div>`;
+  }
 
-    page.drawText('CÓDIGO DE RESERVA', { x: W / 2 - 74, y: H - 123, size: 12, font: bold, color: ink });
-    const code = clean(reservation?.CodigoReserva) || '-';
-    page.drawRectangle({ x: m + 53, y: H - 178, width: W - 2 * m - 106, height: 40, borderColor: green, borderWidth: 1.5, color: rgb(0.985, 0.995, 0.987) });
-    page.drawText(code, { x: W / 2 - bold.widthOfTextAtSize(code, 22) / 2, y: H - 164, size: 22, font: bold, color: green, characterSpacing: 2 });
+  function buildHtml(reservation) {
+    const r = reservation || {};
+    const code = clean(r.CodigoReserva) || '-';
+    const phone = clean(r.Telefono) || '-';
+    const state = clean(r.Estado).toUpperCase();
+    const logo = './logocamborio_trans.png';
+    const fecha = formatDate(r.FechaReserva) || '-';
+    const hora = formatTime(r.HoraReserva) || '-';
+    const observations = clean(r.Observaciones) || 'Sin observaciones';
+    const generated = new Date().toLocaleDateString('es-ES') + ' a las ' + new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
 
-    const rows = [
-      ['Nombre', clean(reservation?.Nombre) || '-'],
-      ['Teléfono', clean(reservation?.Telefono) || '-'],
-      ['Email', clean(reservation?.Email) || '-'],
-      ['Fecha', formatDate(reservation?.FechaReserva) || '-'],
-      ['Hora', formatTime(reservation?.HoraReserva) || '-'],
-      ['Personas', clean(reservation?.Personas) || '-'],
-      ['Estado', status(reservation?.Estado)],
-      ['Observaciones', clean(reservation?.Observaciones) || 'Sin observaciones']
-    ];
-
-    let y = H - 202;
-    const rowH = 35;
-    const labelW = 135;
-    page.drawRectangle({ x: m, y: y - rows.length * rowH, width: W - 2 * m, height: rows.length * rowH, borderColor: rgb(0.84, 0.87, 0.9), borderWidth: 0.7 });
-    rows.forEach((row, index) => {
-      const top = y - index * rowH;
-      const bottom = top - rowH;
-      if (index % 2 === 0) page.drawRectangle({ x: m, y: bottom, width: W - 2 * m, height: rowH, color: light });
-      if (index < rows.length - 1) page.drawLine({ start: { x: m, y: bottom }, end: { x: W - m, y: bottom }, thickness: 0.5, color: rgb(0.88, 0.9, 0.92) });
-      page.drawLine({ start: { x: m + labelW, y: bottom }, end: { x: m + labelW, y: top }, thickness: 0.5, color: rgb(0.88, 0.9, 0.92) });
-      page.drawText(row[0], { x: m + 10, y: top - 22, size: 8.5, font: bold, color: ink });
-      wrap(row[1], regular, 8.8, W - m - (m + labelW + 10)).slice(0, 2).forEach((line, lineIndex) => {
-        page.drawText(line, { x: m + labelW + 10, y: top - 15 - lineIndex * 10, size: 8.8, font: regular, color: ink });
-      });
-    });
-
-    const state = clean(reservation?.Estado).toUpperCase();
-    let ay = y - rows.length * rowH - 20;
-    const ah = state === 'PENDIENTE' ? 58 : 42;
-    page.drawRectangle({ x: m, y: ay - ah, width: W - 2 * m, height: ah, color: state === 'PENDIENTE' ? cream : rgb(0.925, 0.98, 0.94), borderColor: state === 'PENDIENTE' ? gold : green, borderWidth: 1 });
-    page.drawText(state === 'PENDIENTE' ? 'ESTA RESERVA ESTÁ PENDIENTE DE CONFIRMACIÓN' : `ESTADO DE LA RESERVA: ${status(state).toUpperCase()}`, { x: m + 12, y: ay - 20, size: 9.5, font: bold, color: ink });
-    if (state === 'PENDIENTE') page.drawText('El restaurante revisará la disponibilidad y confirmará su reserva lo antes posible.', { x: m + 12, y: ay - 36, size: 8.5, font: regular, color: ink });
-
-    ay -= ah + 14;
-    const qh = 68;
-    page.drawRectangle({ x: m, y: ay - qh, width: W - 2 * m, height: qh, color: rgb(0.953, 0.984, 0.961), borderColor: green, borderWidth: 1 });
-    page.drawText('PUEDE CONSULTAR EL ESTADO DE SU RESERVA', { x: m + 12, y: ay - 19, size: 9.5, font: bold, color: green });
-    page.drawText('Teléfono:', { x: m + 12, y: ay - 36, size: 8.5, font: bold, color: ink });
-    page.drawText(clean(reservation?.Telefono) || '-', { x: m + 67, y: ay - 36, size: 8.5, font: regular, color: ink });
-    page.drawText('Código de reserva:', { x: m + 12, y: ay - 51, size: 8.5, font: bold, color: ink });
-    page.drawText(code, { x: m + 112, y: ay - 51, size: 8.5, font: bold, color: green });
-
-    page.drawLine({ start: { x: m, y: 47 }, end: { x: W - m, y: 47 }, thickness: 1, color: green });
-    const thanks = 'Gracias por reservar en Taberna Camborio.';
-    page.drawText(thanks, { x: W / 2 - regular.widthOfTextAtSize(thanks, 8.5) / 2, y: 34, size: 8.5, font: bold, color: ink });
-    return pdf.save();
+    return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+      @page { margin: 24px; }
+      body { font-family: Arial, Helvetica, sans-serif; color: #111827; margin: 0; padding: 22px 34px 26px; font-size: 14px; background: #ffffff; }
+      .cabecera { border-bottom: 4px solid #f2a100; padding-bottom: 14px; margin-bottom: 20px; }
+      .cabeceraTabla { width: auto; margin: 0 auto; border-collapse: collapse; }
+      .cabeceraLogo { width: 156px; padding-right: 4px; vertical-align: middle; text-align: left; }
+      .cabeceraTexto { vertical-align: middle; text-align: center; }
+      .logo { width: 156px; height: 156px; display: block; object-fit: contain; }
+      .marca { font-family: Georgia, 'Times New Roman', serif; font-size: 34px; line-height: 1; font-weight: bold; letter-spacing: 2px; color: #5b260f; margin: 0; white-space: nowrap; }
+      .submarca { color: #0d5a22; font-family: Georgia, 'Times New Roman', serif; font-size: 21px; font-weight: bold; letter-spacing: 3px; margin-top: 10px; text-transform: uppercase; white-space: nowrap; }
+      .submarca:before, .submarca:after { content: ""; display: inline-block; width: 46px; border-top: 2px solid #c98500; vertical-align: middle; margin: 0 14px; }
+      .direccion, .telefono { font-size: 14px; margin-top: 5px; }
+      .telefono strong { color: #0d5a22; }
+      .tituloCodigo { text-align: center; font-size: 20px; font-weight: 800; letter-spacing: 1.6px; margin: 18px 0 10px; }
+      .codigoCaja { max-width: 520px; margin: 0 auto 16px; border: 2px solid #0d5a22; border-radius: 8px; padding: 10px 16px; text-align: center; color: #0d5a22; font-size: 40px; line-height: 1; font-weight: 900; letter-spacing: 9px; background: #fbfdfb; }
+      .tablaReserva { width: 100%; border-collapse: separate; border-spacing: 0; border: 1px solid #d7dde5; border-radius: 10px; overflow: hidden; margin-top: 12px; }
+      .tablaReserva th, .tablaReserva td { border-bottom: 1px solid #e2e6ec; padding: 11px 14px; text-align: left; vertical-align: middle; }
+      .tablaReserva tr:last-child th, .tablaReserva tr:last-child td { border-bottom: 0; }
+      .tablaReserva th { width: 34%; font-weight: 800; background: #fbfbfb; }
+      .badgeEstado { display: inline-block; border-radius: 8px; padding: 7px 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .4px; }
+      .estadoPendiente { color: #134e22; background: #fff7df; border: 1px solid #f2a100; }
+      .estadoConfirmada { color: #0d5a22; background: #eaf7ee; border: 1px solid #0d5a22; }
+      .estadoCancelada { color: #9f1239; background: #fff1f2; border: 1px solid #e11d48; }
+      .estadoNeutro { color: #1f2937; background: #f3f4f6; border: 1px solid #9ca3af; }
+      .aviso { margin-top: 16px; border-radius: 10px; padding: 14px 18px; line-height: 1.35; overflow: hidden; }
+      .avisoContenido { overflow: hidden; }
+      .avisoTitulo { font-size: 18px; font-weight: 900; text-transform: uppercase; }
+      .avisoTexto { margin-top: 6px; font-size: 14px; font-weight: 400; }
+      .avisoPendiente { background: #fffdf2; border: 1.5px solid #f2a100; color: #111827; }
+      .avisoConfirmada { background: #ecfdf3; border: 1.5px solid #0d5a22; color: #0d5a22; }
+      .avisoCancelada { background: #fff1f2; border: 1.5px solid #dc2626; color: #991b1b; }
+      .avisoNeutro { background: #f9fafb; border: 1.5px solid #9ca3af; color: #1f2937; }
+      .consulta { margin-top: 14px; border: 1.5px solid #0d5a22; border-radius: 10px; padding: 16px 18px; background: #f3fbf5; overflow: hidden; }
+      .consultaContenido { overflow: hidden; }
+      .consultaTitulo { color: #0d5a22; font-size: 17px; font-weight: 900; text-transform: uppercase; margin-bottom: 6px; }
+      .consultaDato { margin-top: 5px; }
+      .consultaDato strong { font-size: 15px; color: #111827; }
+      .consultaDato .codigoConsulta { color: #0d5a22; }
+      .pie { margin-top: 24px; padding-top: 14px; border-top: 1.5px solid #0d5a22; text-align: center; font-size: 15px; font-weight: 800; }
+      .generado { margin-top: 8px; text-align: center; font-size: 11px; color: #6b7280; font-weight: 400; }
+    </style></head><body>
+      <div class="cabecera"><table class="cabeceraTabla" role="presentation"><tr><td class="cabeceraLogo"><img class="logo" src="${logo}" alt="Logo Taberna Camborio"></td><td class="cabeceraTexto"><div class="marca">TABERNA CAMBORIO</div><div class="submarca">Cervecería - Tapería</div><div class="direccion">Calle Real, 184 - 11100 San Fernando</div><div class="telefono">Teléfono: <strong>956 25 45 32</strong></div></td></tr></table></div>
+      <div class="tituloCodigo">CÓDIGO DE RESERVA</div><div class="codigoCaja">${escapeHtml(code)}</div>
+      <table class="tablaReserva" role="presentation"><tr><th>Nombre</th><td>${escapeHtml(r.Nombre || '-')}</td></tr><tr><th>Teléfono</th><td>${escapeHtml(phone)}</td></tr><tr><th>Email</th><td>${escapeHtml(r.Email || '-')}</td></tr><tr><th>Fecha</th><td>${escapeHtml(fecha)}</td></tr><tr><th>Hora</th><td>${escapeHtml(hora)}</td></tr><tr><th>Personas</th><td>${escapeHtml(r.Personas || '-')}</td></tr><tr><th>Estado</th><td><span class="badgeEstado ${stateClass(state)}">${escapeHtml(status(state))}</span></td></tr><tr><th>Observaciones</th><td>${escapeHtml(observations)}</td></tr></table>
+      ${stateNotice(state)}
+      <div class="consulta"><div class="consultaContenido"><div class="consultaTitulo">Puede consultar el estado de su reserva</div><div>Puede consultar el estado actual de su reserva entrando con:</div><div class="consultaDato">Teléfono: <strong>${escapeHtml(phone)}</strong></div><div class="consultaDato">Código de reserva: <strong class="codigoConsulta">${escapeHtml(code)}</strong></div></div></div>
+      <div class="pie">Gracias por reservar en Taberna Camborio.</div><div class="generado">Documento generado el ${escapeHtml(generated)}</div>
+    </body></html>`;
   }
 
   async function download(reservation) {
-    const bytes = await make(reservation);
-    const url = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = `Reserva_${clean(reservation?.CodigoReserva) || 'Camborio'}.pdf`;
-    anchor.style.display = 'none';
-    document.body.appendChild(anchor);
-    anchor.click();
-    setTimeout(() => { anchor.remove(); URL.revokeObjectURL(url); }, 1500);
+    const html2pdf = await loadConverter();
+    const holder = document.createElement('div');
+    holder.innerHTML = buildHtml(reservation);
+    holder.style.position = 'absolute';
+    holder.style.left = '-100000px';
+    holder.style.top = '0';
+    holder.style.width = '794px';
+    holder.style.background = '#fff';
+    document.body.appendChild(holder);
+    try {
+      await new Promise((resolve, reject) => {
+        const image = holder.querySelector('.logo');
+        if (!image || image.complete) return resolve();
+        image.onload = resolve;
+        image.onerror = reject;
+      });
+      await html2pdf().set({
+        margin: 0,
+        filename: `Reserva_${clean(reservation?.CodigoReserva) || 'Camborio'}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+        jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['css', 'legacy'] }
+      }).from(holder).save();
+    } finally {
+      holder.remove();
+    }
   }
 
   function run(reservation) {
@@ -179,22 +174,11 @@
   }
 
   function bind() {
-    const received = $('received-pdf');
-    if (received) received.addEventListener('click', (event) => {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      run(window.__publicReservation || window.__v4Reservation);
-    }, true);
-    document.addEventListener('click', (event) => {
-      const button = event.target.closest('#found-pdf,#edit-pdf');
-      if (!button) return;
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      run(window.__publicReservation || window.__v4Reservation);
-    }, true);
+    const received = document.getElementById('received-pdf');
+    if (received) received.addEventListener('click', (event) => { event.preventDefault(); event.stopImmediatePropagation(); run(window.__publicReservation || window.__v4Reservation); }, true);
+    document.addEventListener('click', (event) => { const button = event.target.closest('#found-pdf,#edit-pdf'); if (!button) return; event.preventDefault(); event.stopImmediatePropagation(); run(window.__publicReservation || window.__v4Reservation); }, true);
   }
 
   window.buildReservationPdf = download;
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind, { once: true });
-  else bind();
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind, { once: true }); else bind();
 })();
