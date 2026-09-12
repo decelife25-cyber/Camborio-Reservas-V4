@@ -1,4 +1,4 @@
-name = "camborio-reservas-router"
+name = "reservas-camborio"
 main = "cloudflare/camborio-reservas-router.js"
 compatibility_date = "2026-09-10"
 workers_dev = false
