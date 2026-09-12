@@ -9,19 +9,22 @@
       <stop offset="1" stop-color="#a96b18"/>
     </linearGradient>
   </defs>
-  <rect x="10" y="10" width="492" height="492" rx="92" fill="url(#bg)" stroke="url(#gold)" stroke-width="16"/>
-  <rect x="130" y="58" width="252" height="190" rx="28" fill="#242321"/>
-  <rect x="151" y="100" width="210" height="116" rx="12" fill="#fff8e9"/>
-  <rect x="172" y="36" width="36" height="82" rx="18" fill="#242321"/>
-  <rect x="304" y="36" width="36" height="82" rx="18" fill="#242321"/>
-  <path d="M185 158 l36 36 91-94" fill="none" stroke="url(#gold)" stroke-width="25" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M112 337 Q256 300 400 337 L382 365 Q256 343 130 365 Z" fill="#fffaf0"/>
-  <path d="M146 337 L366 337 L342 414 L170 414 Z" fill="#fffaf0"/>
-  <path d="M246 414 L266 414 L286 462 L226 462 Z" fill="#242321"/>
-  <path d="M126 331 Q98 322 90 350 L103 432 Q107 449 123 445 L142 350 Q145 335 126 331 Z" fill="#242321"/>
-  <path d="M386 331 Q414 322 422 350 L409 432 Q405 449 389 445 L370 350 Q367 335 386 331 Z" fill="#242321"/>
-  <path d="M111 349 L143 349 L132 381 L121 381 Z M369 349 L401 349 L391 381 L380 381 Z" fill="url(#gold)"/>
-  <path d="M256 264 C238 242 208 253 214 278 C221 296 256 313 256 313 C256 313 291 296 298 278 C304 253 274 242 256 264 Z" fill="#78844a"/>
-  <rect x="236" y="300" width="40" height="13" rx="6" fill="#242321"/>
-  <text x="256" y="475" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="52" font-weight="700" letter-spacing="2" fill="#242321">RESERVA</text>
+  <!-- Safe-area version: all artwork stays inside the central Android icon area. -->
+  <g transform="translate(36 36) scale(.86)">
+    <rect x="10" y="10" width="492" height="492" rx="92" fill="url(#bg)" stroke="url(#gold)" stroke-width="16"/>
+    <rect x="130" y="58" width="252" height="190" rx="28" fill="#242321"/>
+    <rect x="151" y="100" width="210" height="116" rx="12" fill="#fff8e9"/>
+    <rect x="172" y="36" width="36" height="82" rx="18" fill="#242321"/>
+    <rect x="304" y="36" width="36" height="82" rx="18" fill="#242321"/>
+    <path d="M185 158 l36 36 91-94" fill="none" stroke="url(#gold)" stroke-width="25" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M112 337 Q256 300 400 337 L382 365 Q256 343 130 365 Z" fill="#fffaf0"/>
+    <path d="M146 337 L366 337 L342 414 L170 414 Z" fill="#fffaf0"/>
+    <path d="M246 414 L266 414 L286 462 L226 462 Z" fill="#242321"/>
+    <path d="M126 331 Q98 322 90 350 L103 432 Q107 449 123 445 L142 350 Q145 335 126 331 Z" fill="#242321"/>
+    <path d="M386 331 Q414 322 422 350 L409 432 Q405 449 389 445 L370 350 Q367 335 386 331 Z" fill="#242321"/>
+    <path d="M111 349 L143 349 L132 381 L121 381 Z M369 349 L401 349 L391 381 L380 381 Z" fill="url(#gold)"/>
+    <path d="M256 264 C238 242 208 253 214 278 C221 296 256 313 256 313 C256 313 291 296 298 278 C304 253 274 242 256 264 Z" fill="#78844a"/>
+    <rect x="236" y="300" width="40" height="13" rx="6" fill="#242321"/>
+    <text x="256" y="475" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="52" font-weight="700" letter-spacing="2" fill="#242321">RESERVA</text>
+  </g>
 </svg>
