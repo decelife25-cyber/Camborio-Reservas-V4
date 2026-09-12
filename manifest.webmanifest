@@ -11,15 +11,9 @@
   "lang": "es",
   "icons": [
     {
-      "src": "/reservas-camborio/logocamborio_trans.png",
-      "type": "image/png",
-      "sizes": "192x192",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/reservas-camborio/logocamborio_trans.png",
-      "type": "image/png",
-      "sizes": "512x512",
+      "src": "/reservas-camborio/reserva-icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
       "purpose": "any maskable"
     }
   ]
