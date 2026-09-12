@@ -1,9 +1,19 @@
 (function(){'use strict';
 const $=id=>document.getElementById(id);
-function addStyles(){const s=document.createElement('style');s.textContent='.confirm-card .subtitle{font-size:15px!important;line-height:1.35!important;margin-bottom:12px!important}.confirm-highlight strong{font-size:16px!important}.confirm-highlight small{font-size:13px!important}.received-card .status small{font-size:13px!important}.received-card .status b{display:block;font-size:17px!important;line-height:1.35;margin-top:4px}.thanks-card{text-align:center}.thanks-card h1{font-size:25px!important}.thanks-card p{font-size:16px!important;line-height:1.4}.thanks-card .info{margin-top:12px}.thanks-card .secondary{margin-top:8px}';document.head.appendChild(s)}
+function addStyles(){const s=document.createElement('style');s.textContent=''+
+'.confirm-card .subtitle{font-size:18px!important;line-height:1.35!important;margin-bottom:14px!important;color:#aeb7c1!important}'+
+'.confirm-highlight{color:#18202b!important}'+
+'.confirm-highlight strong{font-size:20px!important;line-height:1.2!important;color:#18202b!important}'+
+'.confirm-highlight small{font-size:16px!important;line-height:1.25!important;color:#4d5a66!important}'+
+'.received-card .status{color:#3b3218!important}'+
+'.received-card .status small{font-size:17px!important;line-height:1.2!important;color:#5b4b20!important}'+
+'.received-card .status b{display:block;font-size:22px!important;line-height:1.25!important;margin-top:6px;color:#3b3218!important}'+
+'.thanks-card{text-align:center}'+
+'.thanks-card h1{font-size:25px!important}'+
+'.thanks-card p{font-size:16px!important;line-height:1.4}'+
+'.thanks-card .info{margin-top:12px}'+
+'.thanks-card .secondary{margin-top:8px}';document.head.appendChild(s)}
 function finish(){if($('finish-button'))$('finish-button').onclick=function(){if($('screen-thanks')){const card=$('screen-thanks .thanks-card');if(card&&!$('thanks-menu')){const menu=document.createElement('button');menu.id='thanks-menu';menu.type='button';menu.className='info';menu.textContent='VER CARTA DIGITAL';menu.onclick=function(){window.location.href='https://www.decelife.com/carta-digital/'};card.appendChild(menu)}showScreen('screen-thanks')}}}
-async function makePdf(r){const lib=await import('https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/+esm');const {PDFDocument,StandardFonts,rgb}=lib;const pdf=await PDFDocument.create();const page=pdf.addPage([595,842]);const regular=await pdf.embedFont(StandardFonts.Helvetica);const bold=await pdf.embedFont(StandardFonts.HelveticaBold);let y=790;const text=(v,size=12,font=regular,color=rgb(0.1,0.1,0.1))=>{page.drawText(String(v??'-'),{x:48,y,size,font,color});y-=size+13};text('TABERNA CAMBORIO',24,bold,rgb(.45,.25,.08));text('CERVECERÍA · TAPERÍA',13,regular,rgb(.05,.4,.18));y-=15;text('JUSTIFICANTE DE RESERVA',17,bold);text('Código: '+(r.CodigoReserva||'-'),18,bold,rgb(.05,.5,.2));y-=10;text('Nombre: '+(r.Nombre||'-'));text('Teléfono: '+(r.Telefono||'-'));text('Email: '+(r.Email||'-'));text('Fecha: '+(r.FechaReserva||'-'));text('Hora: '+String(r.HoraReserva||'-').slice(0,5));text('Personas: '+(r.Personas||'-'));text('Estado: '+(r.Estado||'PENDIENTE DE CONFIRMACIÓN'),13,bold);text('Observaciones: '+(r.Observaciones||'Sin observaciones'));y-=20;text('Gracias por reservar en Taberna Camborio.',13,bold);return pdf.save()}
-function pdfCapture(e){const b=e.target.closest&&e.target.closest('#received-pdf,#found-pdf,#edit-pdf');if(!b)return;const r=window.__publicReservation||window.__v4Reservation;if(!r)return;e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();b.disabled=true;makePdf(r).then(bytes=>{const url=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'}));const a=document.createElement('a');a.href=url;a.download='Reserva_'+(r.CodigoReserva||'Camborio')+'.pdf';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000)}).catch(()=>alert('No se pudo generar el PDF. Comprueba la conexión e inténtalo de nuevo.')).finally(()=>b.disabled=false)}
-function init(){addStyles();finish();window.addEventListener('click',pdfCapture,true)}
+function init(){addStyles();finish()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
