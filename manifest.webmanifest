@@ -11,8 +11,8 @@
   "lang": "es",
   "icons": [
     {
-      "src": "/reservas-camborio/reserva-icon.svg",
-      "type": "image/svg+xml",
+      "src": "/reservas-camborio/reservas_pwa.png",
+      "type": "image/png",
       "sizes": "any",
       "purpose": "any"
     }
