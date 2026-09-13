@@ -6,31 +6,33 @@
 
   function loadConverter() {
     if (window.html2pdf) return Promise.resolve(window.html2pdf);
-    if (!converterPromise) {
-      converterPromise = new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-        script.onload = () => window.html2pdf ? resolve(window.html2pdf) : reject(new Error('No se pudo cargar el generador PDF.'));
-        script.onerror = () => reject(new Error('No se pudo cargar el generador PDF.'));
-        document.head.appendChild(script);
-      });
-    }
+    if (converterPromise) return converterPromise;
+    converterPromise = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+      script.onload = () => window.html2pdf ? resolve(window.html2pdf) : reject(new Error('No se pudo cargar el generador PDF.'));
+      script.onerror = () => reject(new Error('No se pudo cargar el generador PDF.'));
+      document.head.appendChild(script);
+    });
     return converterPromise;
   }
 
   function formatDate(value) {
     const text = clean(value);
-    const iso = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
-    if (iso) return `${iso[3]}-${iso[2]}-${iso[1]}`;
-    const dmy = text.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);
-    if (dmy) return `${dmy[1].padStart(2, '0')}-${dmy[2].padStart(2, '0')}-${dmy[3]}`;
-    return text;
+    let match = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (match) return `${match[3]}-${match[2]}-${match[1]}`;
+    match = text.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);
+    return match ? `${match[1].padStart(2, '0')}-${match[2].padStart(2, '0')}-${match[3]}` : text;
   }
 
   function formatTime(value) {
     const text = clean(value);
-    const match = text.match(/(?:T|^)(\d{1,2}):(\d{2})/);
+    const match = text.match(/(?:T|\s|^)(\d{1,2}):(\d{2})/);
     return match ? `${match[1].padStart(2, '0')}:${match[2]}` : text.slice(0, 5);
+  }
+
+  function escapeHtml(value) {
+    return clean(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
   function status(value) {
@@ -46,15 +48,6 @@
     })[key] || key || 'Pendiente de confirmación';
   }
 
-  function escapeHtml(value) {
-    return clean(value)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/\"/g, '&quot;')
-      .replace(/'/g, '&#39;');
-  }
-
   function stateClass(value) {
     const key = clean(value).toUpperCase();
     if (key === 'PENDIENTE') return 'estadoPendiente';
@@ -65,9 +58,7 @@
 
   function stateNotice(value) {
     const key = clean(value).toUpperCase();
-    if (key === 'PENDIENTE') {
-      return '<div class="aviso avisoPendiente"><div class="avisoContenido"><div class="avisoTitulo">Esta reserva está <strong>pendiente de confirmación</strong> por el restaurante.</div><div class="avisoTexto">En cuanto sea confirmada, podrás consultar el estado actual.</div></div></div>';
-    }
+    if (key === 'PENDIENTE') return '<div class="aviso avisoPendiente"><div class="avisoContenido"><div class="avisoTitulo">Esta reserva está <strong>pendiente de confirmación</strong> por el restaurante.</div><div class="avisoTexto">En cuanto sea confirmada, podrás consultar el estado actual.</div></div></div>';
     if (key === 'CONFIRMADA') return '<div class="aviso avisoConfirmada"><div class="avisoTitulo">Esta reserva está confirmada.</div></div>';
     if (key === 'CANCELADA_CLIENTE' || key === 'CANCELADA_LOCAL') return `<div class="aviso avisoCancelada"><div class="avisoTitulo">Reserva cancelada.</div><div class="avisoTexto">${escapeHtml(status(key))}</div></div>`;
     return `<div class="aviso avisoNeutro"><div class="avisoTitulo">Estado de la reserva: ${escapeHtml(status(key))}</div></div>`;
@@ -78,7 +69,6 @@
     const code = clean(r.CodigoReserva) || '-';
     const phone = clean(r.Telefono) || '-';
     const state = clean(r.Estado).toUpperCase();
-    const logo = './logocamborio_trans.png';
     const fecha = formatDate(r.FechaReserva) || '-';
     const hora = formatTime(r.HoraReserva) || '-';
     const observations = clean(r.Observaciones) || 'Sin observaciones';
@@ -86,7 +76,8 @@
 
     return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
       @page { margin: 24px; }
-      body { font-family: Arial, Helvetica, sans-serif; color: #111827; margin: 0; padding: 22px 34px 26px; font-size: 14px; background: #ffffff; }
+      * { box-sizing: border-box; }
+      body { font-family: Arial, Helvetica, sans-serif; color: #111827; margin: 0; padding: 22px 34px 26px; font-size: 14px; background: #ffffff; width: 794px; }
       .cabecera { border-bottom: 4px solid #f2a100; padding-bottom: 14px; margin-bottom: 20px; }
       .cabeceraTabla { width: auto; margin: 0 auto; border-collapse: collapse; }
       .cabeceraLogo { width: 156px; padding-right: 4px; vertical-align: middle; text-align: left; }
@@ -125,7 +116,7 @@
       .pie { margin-top: 24px; padding-top: 14px; border-top: 1.5px solid #0d5a22; text-align: center; font-size: 15px; font-weight: 800; }
       .generado { margin-top: 8px; text-align: center; font-size: 11px; color: #6b7280; font-weight: 400; }
     </style></head><body>
-      <div class="cabecera"><table class="cabeceraTabla" role="presentation"><tr><td class="cabeceraLogo"><img class="logo" src="${logo}" alt="Logo Taberna Camborio"></td><td class="cabeceraTexto"><div class="marca">TABERNA CAMBORIO</div><div class="submarca">Cervecería - Tapería</div><div class="direccion">Calle Real, 184 - 11100 San Fernando</div><div class="telefono">Teléfono: <strong>956 25 45 32</strong></div></td></tr></table></div>
+      <div class="cabecera"><table class="cabeceraTabla" role="presentation"><tr><td class="cabeceraLogo"><img class="logo" src="./logocamborio_trans.png" alt="Logo Taberna Camborio"></td><td class="cabeceraTexto"><div class="marca">TABERNA CAMBORIO</div><div class="submarca">Cervecería - Tapería</div><div class="direccion">Calle Real, 184 - 11100 San Fernando</div><div class="telefono">Teléfono: <strong>956 25 45 32</strong></div></td></tr></table></div>
       <div class="tituloCodigo">CÓDIGO DE RESERVA</div><div class="codigoCaja">${escapeHtml(code)}</div>
       <table class="tablaReserva" role="presentation"><tr><th>Nombre</th><td>${escapeHtml(r.Nombre || '-')}</td></tr><tr><th>Teléfono</th><td>${escapeHtml(phone)}</td></tr><tr><th>Email</th><td>${escapeHtml(r.Email || '-')}</td></tr><tr><th>Fecha</th><td>${escapeHtml(fecha)}</td></tr><tr><th>Hora</th><td>${escapeHtml(hora)}</td></tr><tr><th>Personas</th><td>${escapeHtml(r.Personas || '-')}</td></tr><tr><th>Estado</th><td><span class="badgeEstado ${stateClass(state)}">${escapeHtml(status(state))}</span></td></tr><tr><th>Observaciones</th><td>${escapeHtml(observations)}</td></tr></table>
       ${stateNotice(state)}
@@ -138,24 +129,25 @@
     const html2pdf = await loadConverter();
     const holder = document.createElement('div');
     holder.innerHTML = buildHtml(reservation);
-    holder.style.position = 'absolute';
-    holder.style.left = '-100000px';
+    holder.style.position = 'fixed';
+    holder.style.left = '0';
     holder.style.top = '0';
     holder.style.width = '794px';
-    holder.style.background = '#fff';
+    holder.style.background = '#ffffff';
+    holder.style.zIndex = '-1';
+    holder.style.pointerEvents = 'none';
     document.body.appendChild(holder);
+
     try {
-      await new Promise((resolve, reject) => {
-        const image = holder.querySelector('.logo');
-        if (!image || image.complete) return resolve();
-        image.onload = resolve;
-        image.onerror = reject;
-      });
+      const image = holder.querySelector('.logo');
+      if (image && !image.complete) {
+        await new Promise((resolve) => { image.onload = resolve; image.onerror = resolve; });
+      }
       await html2pdf().set({
         margin: 0,
         filename: `Reserva_${clean(reservation?.CodigoReserva) || 'Camborio'}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+        html2canvas: { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#ffffff', windowWidth: 794, scrollX: 0, scrollY: 0 },
         jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' },
         pagebreak: { mode: ['css', 'legacy'] }
       }).from(holder).save();
