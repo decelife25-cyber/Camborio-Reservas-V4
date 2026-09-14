@@ -426,6 +426,13 @@
     return `Reserva_${code || 'Camborio'}.pdf`;
   }
 
+  function isPdfBytes(bytes) {
+    if (!(bytes instanceof Uint8Array) || bytes.length < 16) return false;
+    const header = String.fromCharCode(...bytes.slice(0, 5));
+    const footer = String.fromCharCode(...bytes.slice(-5));
+    return header === '%PDF-' && footer === '%%EOF';
+  }
+
   async function generate(reservation, button) {
     busy(button, true);
     setProgress('Preparando la reserva para descargarla en PDF.');
@@ -438,7 +445,7 @@
       if (!imageBytes.length) throw new Error('La imagen del PDF está vacía.');
       setProgress('Guardando el archivo PDF.');
       const pdfBytes = buildPdfBytes(imageBytes);
-      if (pdfBytes.length < 1024) throw new Error('El archivo PDF generado es inválido.');
+      if (!isPdfBytes(pdfBytes)) throw new Error('El archivo PDF generado es inválido.');
       downloadPdf(pdfBytes, pdfFilename(reservation));
     } catch (error) {
       console.error(error);
