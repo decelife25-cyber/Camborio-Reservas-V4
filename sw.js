@@ -13,6 +13,20 @@ const PRECACHE = [
   './manifest.webmanifest',
   './logocamborio_trans.png?v=20260907',
 ];
+const VERSIONED_ASSET_PATHS = new Set([
+  '/',
+  '/index.html',
+  '/styles.css',
+  '/app-v4.js',
+  '/theme.js',
+  '/config.js',
+  '/public-api-v4.js',
+  '/reservation-pdf.js',
+  '/v4-fixes.js',
+  '/v4-readable-fixes.js',
+  '/manifest.webmanifest',
+  '/logocamborio_trans.png',
+]);
 
 self.addEventListener('install', event => {
   event.waitUntil(
@@ -38,7 +52,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  const isAsset = /\/(|index\.html|styles\.css|app-v4\.js|theme\.js|config\.js|public-api-v4\.js|reservation-pdf\.js|v4-fixes\.js|v4-readable-fixes\.js|manifest\.webmanifest|logocamborio_trans\.png)$/.test(url.pathname);
+  const isAsset = VERSIONED_ASSET_PATHS.has(url.pathname);
 
   if (isAsset) {
     event.respondWith(

@@ -57,6 +57,9 @@
       node = document.createElement('div');
       node.id = 'pdf-progress';
       node.hidden = true;
+      node.setAttribute('role', 'status');
+      node.setAttribute('aria-live', 'polite');
+      node.setAttribute('aria-atomic', 'true');
       node.innerHTML = '<div class="pdf-progress-card"><div class="pdf-progress-spinner" aria-hidden="true"></div><div class="pdf-progress-title">Generando PDF…</div><div class="pdf-progress-message"></div></div>';
       document.body.appendChild(node);
     }
@@ -113,7 +116,7 @@
         reject(new Error('No se pudo cargar el logo de Camborio.'));
       };
       image.decoding = 'async';
-      image.crossOrigin = 'anonymous';
+      if (new URL(src, document.baseURI).origin !== location.origin) image.crossOrigin = 'anonymous';
       image.src = src;
     });
   }
@@ -179,15 +182,20 @@
     }
   }
 
-  function drawRow(ctx, y, label, value) {
+  function measureRow(ctx, label, value, layout) {
     const x = 90;
     const width = PAGE.widthPx - 180;
-    const labelWidth = 240;
+    const labelWidth = layout.labelWidth;
     const valueX = x + labelWidth;
     const valueWidth = width - labelWidth - 28;
-    ctx.font = '500 28px Arial';
+    ctx.font = `500 ${layout.fontSize}px Arial`;
     const lines = wrapText(ctx, value, valueWidth);
-    const height = Math.max(74, 26 + lines.length * 32);
+    const height = Math.max(layout.minHeight, layout.paddingTop + lines.length * layout.lineHeight);
+    return { label, lines, x, width, valueX, height };
+  }
+
+  function drawRow(ctx, y, measured, layout) {
+    const { label, lines, x, width, valueX, height } = measured;
     fillBox(ctx, x, y, width, height, { fill: '#ffffff', stroke: '#dfe4ea', radius: 16, lineWidth: 2 });
     ctx.strokeStyle = '#dfe4ea';
     ctx.lineWidth = 2;
@@ -196,12 +204,12 @@
     ctx.lineTo(valueX - 14, y + height - 16);
     ctx.stroke();
     ctx.fillStyle = '#202733';
-    ctx.font = '700 28px Arial';
-    ctx.fillText(label, x + 24, y + 45);
+    ctx.font = `700 ${layout.fontSize}px Arial`;
+    ctx.fillText(label, x + 24, y + layout.textTop);
     ctx.fillStyle = '#4d5662';
-    ctx.font = '500 28px Arial';
-    lines.forEach((line, index) => ctx.fillText(line, valueX + 10, y + 45 + index * 32));
-    return y + height + 14;
+    ctx.font = `500 ${layout.fontSize}px Arial`;
+    lines.forEach((line, index) => ctx.fillText(line, valueX + 10, y + layout.textTop + index * layout.lineHeight));
+    return y + height + layout.gap;
   }
 
   function renderCanvas(reservation, logo) {
@@ -239,15 +247,43 @@
     ctx.fillText(text(reservation.CodigoReserva) || '-', PAGE.widthPx / 2, 474);
     ctx.textAlign = 'start';
 
+    const rowData = [
+      ['Nombre', reservation.Nombre || '-'],
+      ['Teléfono', reservation.Telefono || '-'],
+      ['Email', reservation.Email || '-'],
+      ['Fecha', fmtDate(reservation.FechaReserva) || '-'],
+      ['Hora', fmtTime(reservation.HoraReserva) || '-'],
+      ['Personas', reservation.Personas || '-'],
+      ['Estado', reservationStatus(reservation.Estado)],
+      ['Observaciones', reservation.Observaciones || 'Sin observaciones'],
+    ];
+    const maxRowsBottom = PAGE.heightPx - 430;
+    let layout = { fontSize: 28, lineHeight: 32, labelWidth: 240, minHeight: 74, paddingTop: 26, textTop: 45, gap: 14 };
+    let measuredRows = [];
     let y = 542;
-    y = drawRow(ctx, y, 'Nombre', reservation.Nombre || '-');
-    y = drawRow(ctx, y, 'Teléfono', reservation.Telefono || '-');
-    y = drawRow(ctx, y, 'Email', reservation.Email || '-');
-    y = drawRow(ctx, y, 'Fecha', fmtDate(reservation.FechaReserva) || '-');
-    y = drawRow(ctx, y, 'Hora', fmtTime(reservation.HoraReserva) || '-');
-    y = drawRow(ctx, y, 'Personas', reservation.Personas || '-');
-    y = drawRow(ctx, y, 'Estado', reservationStatus(reservation.Estado));
-    y = drawRow(ctx, y, 'Observaciones', reservation.Observaciones || 'Sin observaciones');
+    do {
+      y = 542;
+      measuredRows = rowData.map(([label, value]) => {
+        const measured = measureRow(ctx, label, value, layout);
+        y += measured.height + layout.gap;
+        return measured;
+      });
+      if (y <= maxRowsBottom || layout.fontSize <= 20) break;
+      layout = {
+        fontSize: layout.fontSize - 2,
+        lineHeight: layout.lineHeight - 2,
+        labelWidth: 220,
+        minHeight: Math.max(62, layout.minHeight - 4),
+        paddingTop: Math.max(22, layout.paddingTop - 2),
+        textTop: Math.max(40, layout.textTop - 2),
+        gap: 12,
+      };
+    } while (true);
+
+    y = 542;
+    measuredRows.forEach(row => {
+      y = drawRow(ctx, y, row, layout);
+    });
 
     fillBox(ctx, 90, y + 4, PAGE.widthPx - 180, 114, { fill: '#fff8e8', stroke: '#e7b94b', radius: 18, lineWidth: 2 });
     ctx.fillStyle = '#6f4d00';
