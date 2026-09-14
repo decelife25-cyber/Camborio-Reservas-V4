@@ -315,7 +315,7 @@
     ctx.fillText('Gracias por reservar en Taberna Camborio.', PAGE.widthPx / 2, PAGE.heightPx - 88);
     ctx.fillStyle = '#66717c';
     ctx.font = '500 20px Arial';
-    ctx.fillText(`Documento generado · ${new Date().toLocaleString('es-ES')}`, PAGE.widthPx / 2, PAGE.heightPx - 52);
+    ctx.fillText('Documento generado · Reserva creada', PAGE.widthPx / 2, PAGE.heightPx - 52);
     ctx.textAlign = 'start';
 
     return canvas;
