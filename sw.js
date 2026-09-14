@@ -1,36 +1,32 @@
 const CACHE = 'camborio-public-v4-screens-20';
 const PRECACHE = [
-  './',
-  './index.html',
-  './styles.css?v=20260901',
-  './app-v4.js?v=20260911',
-  './theme.js?v=20260911',
-  './config.js?v=20260911',
-  './public-api-v4.js?v=20260911',
-  './reservation-pdf.js?v=20260915-02',
-  './v4-fixes.js?v=20260915',
-  './v4-readable-fixes.js?v=20260914',
-  './manifest.webmanifest',
-  './logocamborio_trans.png?v=20260907',
+  { key: '/', url: './' },
+  { key: '/index.html', url: './index.html' },
+  { key: '/styles.css', url: './styles.css?v=20260901' },
+  { key: '/app-v4.js', url: './app-v4.js?v=20260911' },
+  { key: '/theme.js', url: './theme.js?v=20260911' },
+  { key: '/config.js', url: './config.js?v=20260911' },
+  { key: '/public-api-v4.js', url: './public-api-v4.js?v=20260911' },
+  { key: '/reservation-pdf.js', url: './reservation-pdf.js?v=20260915-02' },
+  { key: '/v4-fixes.js', url: './v4-fixes.js?v=20260915' },
+  { key: '/v4-readable-fixes.js', url: './v4-readable-fixes.js?v=20260914' },
+  { key: '/manifest.webmanifest', url: './manifest.webmanifest' },
+  { key: '/logocamborio_trans.png', url: './logocamborio_trans.png?v=20260907' },
 ];
-const VERSIONED_ASSET_PATHS = new Set([
-  '/',
-  '/index.html',
-  '/styles.css',
-  '/app-v4.js',
-  '/theme.js',
-  '/config.js',
-  '/public-api-v4.js',
-  '/reservation-pdf.js',
-  '/v4-fixes.js',
-  '/v4-readable-fixes.js',
-  '/manifest.webmanifest',
-  '/logocamborio_trans.png',
-]);
+const VERSIONED_ASSET_PATHS = new Set(PRECACHE.map(asset => asset.key));
+
+function cacheKey(url) {
+  return new Request(new URL(url.pathname || url, self.location.origin).toString());
+}
 
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE).then(cache => cache.addAll(PRECACHE)).then(() => self.skipWaiting())
+    caches.open(CACHE).then(async cache => {
+      await Promise.all(PRECACHE.map(async asset => {
+        const response = await fetch(asset.url, { cache: 'no-store' });
+        if (response.ok) await cache.put(cacheKey(asset.key), response);
+      }));
+    }).then(() => self.skipWaiting())
   );
 });
 
@@ -53,6 +49,7 @@ self.addEventListener('fetch', event => {
   }
 
   const isAsset = VERSIONED_ASSET_PATHS.has(url.pathname);
+  const normalizedRequest = cacheKey(url);
 
   if (isAsset) {
     event.respondWith(
@@ -60,11 +57,11 @@ self.addEventListener('fetch', event => {
         .then(response => {
           if (response.ok) {
             const copy = response.clone();
-            event.waitUntil(caches.open(CACHE).then(cache => cache.put(event.request, copy)));
+            event.waitUntil(caches.open(CACHE).then(cache => cache.put(normalizedRequest, copy)));
           }
           return response;
         })
-        .catch(() => caches.match(event.request))
+        .catch(() => caches.match(normalizedRequest))
     );
     return;
   }

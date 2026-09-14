@@ -428,9 +428,16 @@
 
   function isPdfBytes(bytes) {
     if (!(bytes instanceof Uint8Array) || bytes.length < 16) return false;
-    const header = String.fromCharCode(...bytes.slice(0, 5));
-    const footer = String.fromCharCode(...bytes.slice(-5));
-    return header === '%PDF-' && footer === '%%EOF';
+    return bytes[0] === 37
+      && bytes[1] === 80
+      && bytes[2] === 68
+      && bytes[3] === 70
+      && bytes[4] === 45
+      && bytes[bytes.length - 5] === 37
+      && bytes[bytes.length - 4] === 37
+      && bytes[bytes.length - 3] === 69
+      && bytes[bytes.length - 2] === 79
+      && bytes[bytes.length - 1] === 70;
   }
 
   async function generate(reservation, button) {
