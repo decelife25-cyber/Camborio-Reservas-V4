@@ -12,8 +12,10 @@ function addStyles(){const s=document.createElement('style');s.textContent=''+
 '.thanks-card h1{font-size:25px!important}'+
 '.thanks-card p{font-size:16px!important;line-height:1.4}'+
 '.thanks-card .info{margin-top:12px}'+
-'.thanks-card .secondary{margin-top:8px}';document.head.appendChild(s)}
+'.thanks-card .secondary{margin-top:8px}'+
+'.deployment-version{position:fixed;right:8px;bottom:6px;z-index:9999;font:10px/1 Arial,sans-serif;color:#6b7280;opacity:.8;pointer-events:none}';document.head.appendChild(s)}
+function version(){if(!$('deployment-version')){const v=document.createElement('div');v.id='deployment-version';v.className='deployment-version';v.textContent='Camborio Reservas V4 · despliegue 2026-09-14.2';document.body.appendChild(v)}}
 function finish(){if($('finish-button'))$('finish-button').onclick=function(){if($('screen-thanks')){const card=$('screen-thanks .thanks-card');if(card&&!$('thanks-menu')){const menu=document.createElement('button');menu.id='thanks-menu';menu.type='button';menu.className='info';menu.textContent='VER CARTA DIGITAL';menu.onclick=function(){window.location.href='https://www.decelife.com/carta-digital/'};card.appendChild(menu)}showScreen('screen-thanks')}}}
-function init(){addStyles();finish()}
+function init(){addStyles();version();finish()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
