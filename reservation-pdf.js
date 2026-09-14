@@ -1,71 +1,82 @@
 (function () {
   'use strict';
 
-  let loading = null;
+  const PAGE = {
+    widthPt: 595.28,
+    heightPt: 841.89,
+    widthPx: 1240,
+    heightPx: 1754,
+  };
+
   const text = (value) => String(value == null ? '' : value).trim();
-  const esc = (value) => text(value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/\"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-
-  function addScript(src, ready) {
-    return new Promise((resolve, reject) => {
-      if (ready()) return resolve();
-      const script = document.createElement('script');
-      script.src = src;
-      script.async = true;
-      script.onload = () => ready() ? resolve() : reject(new Error('La librería PDF no se inicializó'));
-      script.onerror = () => reject(new Error('No se pudo cargar la librería PDF'));
-      document.head.appendChild(script);
-    });
-  }
-
-  function load() {
-    if (window.html2canvas && (window.jspdf && window.jspdf.jsPDF || window.jsPDF)) return Promise.resolve();
-    if (loading) return loading;
-    loading = addScript(
-      'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
-      () => typeof window.html2canvas === 'function'
-    ).then(() => addScript(
-      'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
-      () => !!(window.jspdf && window.jspdf.jsPDF || window.jsPDF)
-    ));
-    return loading;
-  }
 
   function fmtDate(value) {
-    const m = text(value).match(/^(\d{4})-(\d{2})-(\d{2})/);
-    return m ? `${m[3]}-${m[2]}-${m[1]}` : text(value);
+    const raw = text(value);
+    const match = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    return match ? `${match[3]}/${match[2]}/${match[1]}` : raw;
   }
 
   function fmtTime(value) {
-    const m = text(value).match(/(?:T|\s|^)(\d{1,2}):(\d{2})/);
-    return m ? `${m[1].padStart(2, '0')}:${m[2]}` : text(value).slice(0, 5);
+    const match = text(value).match(/(?:T|\s|^)(\d{1,2}):(\d{2})/);
+    return match ? `${match[1].padStart(2, '0')}:${match[2]}` : text(value).slice(0, 5);
   }
 
-  function ui() {
+  function reservationStatus(value) {
+    const key = text(value).toUpperCase();
+    const labels = {
+      PENDIENTE: 'PENDIENTE DE CONFIRMACIÓN',
+      CONFIRMADA: 'CONFIRMADA',
+      SENTADA: 'SENTADA',
+      FINALIZADA: 'FINALIZADA',
+      CANCELADA_CLIENTE: 'CANCELADA POR EL CLIENTE',
+      CANCELADA_LOCAL: 'CANCELADA POR EL RESTAURANTE',
+      NO_PRESENTADO: 'NO PRESENTADO',
+    };
+    return labels[key] || key || 'PENDIENTE DE CONFIRMACIÓN';
+  }
+
+  function ensureUi() {
     if (document.getElementById('pdf-runtime-styles')) return;
     const style = document.createElement('style');
     style.id = 'pdf-runtime-styles';
-    style.textContent = '.pdf-progress{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:20000;background:#18202b;color:#fff;padding:12px 18px;border-radius:999px;font:600 14px Arial,sans-serif;box-shadow:0 4px 18px #0003;white-space:nowrap}.pdf-progress[hidden]{display:none}.pdf-progress.error{background:#9f2020}';
+    style.textContent = ''
+      + '#pdf-progress{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(15,18,23,.46)}'
+      + '#pdf-progress[hidden]{display:none}'
+      + '#pdf-progress .pdf-progress-card{width:min(360px,100%);background:#fff;color:#18202b;border-radius:18px;padding:22px 20px;text-align:center;box-shadow:0 18px 45px rgba(0,0,0,.28);font:600 15px Arial,sans-serif}'
+      + '#pdf-progress .pdf-progress-spinner{width:34px;height:34px;margin:0 auto 14px;border-radius:50%;border:4px solid rgba(24,32,43,.15);border-top-color:#1f7a46;animation:camborioPdfSpin .8s linear infinite}'
+      + '#pdf-progress .pdf-progress-title{font-size:18px;font-weight:800;margin-bottom:8px}'
+      + '#pdf-progress .pdf-progress-message{line-height:1.4}'
+      + '@keyframes camborioPdfSpin{to{transform:rotate(360deg)}}';
     document.head.appendChild(style);
   }
 
-  function status(message, error) {
+  function setProgress(message) {
+    ensureUi();
     let node = document.getElementById('pdf-progress');
     if (!node) {
       node = document.createElement('div');
       node.id = 'pdf-progress';
-      node.setAttribute('role', 'status');
-      node.setAttribute('aria-live', 'polite');
+      node.hidden = true;
+      node.innerHTML = '<div class="pdf-progress-card"><div class="pdf-progress-spinner" aria-hidden="true"></div><div class="pdf-progress-title">Generando PDF…</div><div class="pdf-progress-message"></div></div>';
       document.body.appendChild(node);
     }
-    node.className = 'pdf-progress' + (error ? ' error' : '');
-    node.textContent = message;
+    node.querySelector('.pdf-progress-message').textContent = message;
     node.hidden = false;
-    if (!error) setTimeout(() => { node.hidden = true; }, 1800);
+  }
+
+  function clearProgress() {
+    const node = document.getElementById('pdf-progress');
+    if (node) node.hidden = true;
+  }
+
+  function showMessage(message, options) {
+    if (typeof window.__camborioModal === 'function') {
+      try {
+        window.__camborioModal(message, options || {});
+        return;
+      } catch {}
+    }
+    alert(message);
   }
 
   function busy(button, on) {
@@ -74,52 +85,332 @@
       button.dataset.pdfOriginal = button.innerHTML;
       button.disabled = true;
       button.setAttribute('aria-busy', 'true');
-      button.textContent = 'GUARDANDO PDF…';
-    } else {
-      button.disabled = false;
-      button.removeAttribute('aria-busy');
-      button.innerHTML = button.dataset.pdfOriginal || 'DESCARGAR PDF';
+      button.textContent = 'GENERANDO PDF…';
+      return;
+    }
+    button.disabled = false;
+    button.removeAttribute('aria-busy');
+    button.innerHTML = button.dataset.pdfOriginal || 'DESCARGAR PDF';
+  }
+
+  function getLogoUrl() {
+    const brand = document.querySelector('.brand-mark');
+    if (brand?.currentSrc) return brand.currentSrc;
+    if (brand?.src) return brand.src;
+    return new URL('logocamborio_trans.png?v=20260907', document.baseURI).href;
+  }
+
+  function loadImage(src, timeoutMs) {
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+      const timer = setTimeout(() => reject(new Error('El logo de Camborio tardó demasiado en cargarse.')), timeoutMs);
+      image.onload = () => {
+        clearTimeout(timer);
+        resolve(image);
+      };
+      image.onerror = () => {
+        clearTimeout(timer);
+        reject(new Error('No se pudo cargar el logo de Camborio.'));
+      };
+      image.decoding = 'async';
+      image.crossOrigin = 'anonymous';
+      image.src = src;
+    });
+  }
+
+  function wrapText(ctx, value, maxWidth) {
+    const input = text(value) || '-';
+    const paragraphs = input.split(/\r?\n/);
+    const lines = [];
+    const splitWord = word => {
+      if (ctx.measureText(word).width <= maxWidth) return [word];
+      const parts = [];
+      let chunk = '';
+      for (const char of word) {
+        const next = chunk + char;
+        if (chunk && ctx.measureText(next).width > maxWidth) {
+          parts.push(chunk);
+          chunk = char;
+        } else chunk = next;
+      }
+      if (chunk) parts.push(chunk);
+      return parts;
+    };
+    paragraphs.forEach((paragraph, index) => {
+      const words = paragraph.split(/\s+/).filter(Boolean).flatMap(splitWord);
+      if (!words.length) {
+        lines.push('');
+      } else {
+        let line = words.shift();
+        words.forEach(word => {
+          const next = `${line} ${word}`;
+          if (ctx.measureText(next).width <= maxWidth) line = next;
+          else {
+            lines.push(line);
+            line = word;
+          }
+        });
+        lines.push(line);
+      }
+      if (index < paragraphs.length - 1) lines.push('');
+    });
+    return lines.length ? lines : ['-'];
+  }
+
+  function roundRect(ctx, x, y, width, height, radius) {
+    const r = Math.min(radius, width / 2, height / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + width, y, x + width, y + height, r);
+    ctx.arcTo(x + width, y + height, x, y + height, r);
+    ctx.arcTo(x, y + height, x, y, r);
+    ctx.arcTo(x, y, x + width, y, r);
+    ctx.closePath();
+  }
+
+  function fillBox(ctx, x, y, width, height, options) {
+    roundRect(ctx, x, y, width, height, options.radius || 18);
+    ctx.fillStyle = options.fill || '#ffffff';
+    ctx.fill();
+    if (options.stroke) {
+      ctx.lineWidth = options.lineWidth || 2;
+      ctx.strokeStyle = options.stroke;
+      ctx.stroke();
     }
   }
 
-  function markup(r) {
-    const estado = text(r.Estado).toUpperCase();
-    const estados = { PENDIENTE:'PENDIENTE DE CONFIRMACIÓN', CONFIRMADA:'CONFIRMADA', SENTADA:'SENTADA', FINALIZADA:'FINALIZADA', CANCELADA_CLIENTE:'CANCELADA POR EL CLIENTE', CANCELADA_LOCAL:'CANCELADA POR EL RESTAURANTE', NO_PRESENTADO:'NO PRESENTADO' };
-    const estadoTexto = estados[estado] || estado || 'PENDIENTE DE CONFIRMACIÓN';
-    const logo = new URL('logocamborio_trans.png', document.baseURI).href;
-    return `<div class="pdf-page"><div class="head"><img class="logo" src="${esc(logo)}" alt="Taberna Camborio"><div><div class="brand">TABERNA CAMBORIO</div><div class="sub">— CERVECERÍA - TAPERÍA —</div><div class="muted">Calle Real, 184 - 11100 San Fernando</div><div class="muted">Teléfono: <b>956 25 45 32</b></div></div></div><div class="gold-line"></div><div class="code-title">CÓDIGO DE RESERVA</div><div class="code">${esc(r.CodigoReserva || '-')}</div><table class="data"><tr><th>Nombre</th><td>${esc(r.Nombre || '-')}</td></tr><tr><th>Teléfono</th><td>${esc(r.Telefono || '-')}</td></tr><tr><th>Email</th><td>${esc(r.Email || '-')}</td></tr><tr><th>Fecha</th><td>${esc(fmtDate(r.FechaReserva) || '-')}</td></tr><tr><th>Hora</th><td>${esc(fmtTime(r.HoraReserva) || '-')}</td></tr><tr><th>Personas</th><td>${esc(r.Personas || '-')}</td></tr><tr><th>Estado</th><td><span class="badge">${esc(estadoTexto)}</span></td></tr><tr><th>Observaciones</th><td>${esc(r.Observaciones || 'Sin observaciones')}</td></tr></table><div class="notice"><b>ESTA RESERVA ESTÁ ${esc(estadoTexto)}.</b><br>En cuanto sea confirmada, podrás consultar el estado actual.</div><div class="lookup"><b>PUEDE CONSULTAR EL ESTADO DE SU RESERVA</b><br>Teléfono: <b>${esc(r.Telefono || '-')}</b><br>Código de reserva: <b>${esc(r.CodigoReserva || '-')}</b></div><div class="footer">Gracias por reservar en Taberna Camborio.</div><div class="document-date">Documento generado · Reserva creada</div></div>`;
+  function drawRow(ctx, y, label, value) {
+    const x = 90;
+    const width = PAGE.widthPx - 180;
+    const labelWidth = 240;
+    const valueX = x + labelWidth;
+    const valueWidth = width - labelWidth - 28;
+    ctx.font = '500 28px Arial';
+    const lines = wrapText(ctx, value, valueWidth);
+    const height = Math.max(74, 26 + lines.length * 32);
+    fillBox(ctx, x, y, width, height, { fill: '#ffffff', stroke: '#dfe4ea', radius: 16, lineWidth: 2 });
+    ctx.strokeStyle = '#dfe4ea';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(valueX - 14, y + 16);
+    ctx.lineTo(valueX - 14, y + height - 16);
+    ctx.stroke();
+    ctx.fillStyle = '#202733';
+    ctx.font = '700 28px Arial';
+    ctx.fillText(label, x + 24, y + 45);
+    ctx.fillStyle = '#4d5662';
+    ctx.font = '500 28px Arial';
+    lines.forEach((line, index) => ctx.fillText(line, valueX + 10, y + 45 + index * 32));
+    return y + height + 14;
   }
 
-  function styles() {
-    return `*{box-sizing:border-box}.pdf-page{width:794px;height:1123px;overflow:hidden;background:#fff;color:#202733;font:16px Arial,sans-serif;padding:28px 0 20px}.head,.gold-line,.code-title,.data,.notice,.lookup,.footer,.document-date{width:680px;margin-left:auto;margin-right:auto}.head{height:145px;display:flex;align-items:center;justify-content:center;gap:25px}.logo{display:block;width:150px;height:150px;object-fit:contain;flex:0 0 150px}.brand{font:700 31px Georgia,serif;letter-spacing:1.3px;color:#5b260f;white-space:nowrap}.sub{font:700 19px Georgia,serif;letter-spacing:1.4px;color:#0d5a22;margin-top:7px;white-space:nowrap;text-align:center}.muted{margin-top:6px;font-size:15px;text-align:center}.gold-line{height:5px;background:#f2a100;margin-top:22px}.code-title{text-align:center;font-size:24px;font-weight:800;margin-top:23px;margin-bottom:10px}.code{width:520px;margin:0 auto 17px;border:2px solid #236b43;border-radius:9px;color:#126331;text-align:center;font-size:40px;font-weight:900;letter-spacing:8px;padding:10px}.data{border-collapse:separate;border-spacing:0;border:1px solid #dfe3e8;border-radius:12px;overflow:hidden;font-size:16px}.data th,.data td{border-bottom:1px solid #dfe3e8;padding:13px 15px;text-align:left;height:46px;line-height:1.25}.data tr:last-child th,.data tr:last-child td{border-bottom:0}.data th{width:36%;font-weight:700;background:#fff}.data td{color:#505866}.badge{display:inline-block;font-weight:800;color:#23633f;border:1px solid #e6b83f;border-radius:9px;padding:5px 12px}.notice,.lookup{margin-top:16px;padding:16px 20px;border-radius:10px;line-height:1.45}.notice{border:2px solid #e7b94b;background:#fff}.lookup{border:2px solid #6d9d7b;background:#fff}.lookup b:first-child{display:inline-block;color:#236b43;font-size:18px;margin-bottom:5px}.footer{margin-top:25px;padding-top:16px;border-top:2px solid #236b43;text-align:center;font-weight:800;font-size:17px}.document-date{text-align:center;color:#555;font-size:12px;margin-top:7px}`;
+  function renderCanvas(reservation, logo) {
+    const canvas = document.createElement('canvas');
+    canvas.width = PAGE.widthPx;
+    canvas.height = PAGE.heightPx;
+    const ctx = canvas.getContext('2d', { alpha: false });
+    if (!ctx) throw new Error('El navegador no permite dibujar el PDF.');
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.drawImage(logo, 92, 92, 180, 180);
+    ctx.fillStyle = '#5b260f';
+    ctx.font = '700 46px Georgia, serif';
+    ctx.fillText('TABERNA CAMBORIO', 308, 150);
+    ctx.fillStyle = '#0d5a22';
+    ctx.font = '700 32px Georgia, serif';
+    ctx.fillText('CERVECERÍA · TAPERÍA', 308, 196);
+    ctx.fillStyle = '#505866';
+    ctx.font = '500 24px Arial';
+    ctx.fillText('Calle Real, 184 · 11100 San Fernando', 308, 236);
+    ctx.fillText('Teléfono: 956 25 45 32', 308, 268);
+
+    ctx.fillStyle = '#f2a100';
+    ctx.fillRect(90, 310, PAGE.widthPx - 180, 8);
+
+    ctx.fillStyle = '#202733';
+    ctx.font = '800 34px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('CÓDIGO DE RESERVA', PAGE.widthPx / 2, 382);
+    fillBox(ctx, 220, 412, PAGE.widthPx - 440, 92, { fill: '#ffffff', stroke: '#236b43', radius: 18, lineWidth: 3 });
+    ctx.fillStyle = '#126331';
+    ctx.font = '900 54px Arial';
+    ctx.fillText(text(reservation.CodigoReserva) || '-', PAGE.widthPx / 2, 474);
+    ctx.textAlign = 'start';
+
+    let y = 542;
+    y = drawRow(ctx, y, 'Nombre', reservation.Nombre || '-');
+    y = drawRow(ctx, y, 'Teléfono', reservation.Telefono || '-');
+    y = drawRow(ctx, y, 'Email', reservation.Email || '-');
+    y = drawRow(ctx, y, 'Fecha', fmtDate(reservation.FechaReserva) || '-');
+    y = drawRow(ctx, y, 'Hora', fmtTime(reservation.HoraReserva) || '-');
+    y = drawRow(ctx, y, 'Personas', reservation.Personas || '-');
+    y = drawRow(ctx, y, 'Estado', reservationStatus(reservation.Estado));
+    y = drawRow(ctx, y, 'Observaciones', reservation.Observaciones || 'Sin observaciones');
+
+    fillBox(ctx, 90, y + 4, PAGE.widthPx - 180, 114, { fill: '#fff8e8', stroke: '#e7b94b', radius: 18, lineWidth: 2 });
+    ctx.fillStyle = '#6f4d00';
+    ctx.font = '800 29px Arial';
+    ctx.fillText(`ESTADO ACTUAL: ${reservationStatus(reservation.Estado)}`, 118, y + 48);
+    ctx.fillStyle = '#5b533e';
+    ctx.font = '500 24px Arial';
+    ctx.fillText('Puedes usar este documento para consultar o acreditar tu reserva.', 118, y + 84);
+
+    fillBox(ctx, 90, y + 136, PAGE.widthPx - 180, 126, { fill: '#eef8f1', stroke: '#6d9d7b', radius: 18, lineWidth: 2 });
+    ctx.fillStyle = '#236b43';
+    ctx.font = '800 30px Arial';
+    ctx.fillText('CONSULTA DE RESERVA', 118, y + 180);
+    ctx.fillStyle = '#44515f';
+    ctx.font = '500 24px Arial';
+    ctx.fillText(`Teléfono: ${text(reservation.Telefono) || '-'}`, 118, y + 220);
+    ctx.fillText(`Código: ${text(reservation.CodigoReserva) || '-'}`, 118, y + 252);
+
+    ctx.strokeStyle = '#236b43';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(90, PAGE.heightPx - 132);
+    ctx.lineTo(PAGE.widthPx - 90, PAGE.heightPx - 132);
+    ctx.stroke();
+
+    ctx.fillStyle = '#202733';
+    ctx.font = '800 28px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Gracias por reservar en Taberna Camborio.', PAGE.widthPx / 2, PAGE.heightPx - 88);
+    ctx.fillStyle = '#66717c';
+    ctx.font = '500 20px Arial';
+    ctx.fillText(`Documento generado · ${new Date().toLocaleString('es-ES')}`, PAGE.widthPx / 2, PAGE.heightPx - 52);
+    ctx.textAlign = 'start';
+
+    return canvas;
+  }
+
+  function canvasToJpegBytes(canvas) {
+    return new Promise((resolve, reject) => {
+      if (typeof canvas.toBlob === 'function') {
+        canvas.toBlob(async blob => {
+          if (!blob) {
+            reject(new Error('No se pudo componer la imagen del PDF.'));
+            return;
+          }
+          resolve(new Uint8Array(await blob.arrayBuffer()));
+        }, 'image/jpeg', 0.92);
+        return;
+      }
+      try {
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+        const base64 = dataUrl.split(',')[1] || '';
+        const binary = atob(base64);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+        resolve(bytes);
+      } catch (error) {
+        reject(new Error('No se pudo exportar el PDF.'));
+      }
+    });
+  }
+
+  function buildPdfBytes(imageBytes) {
+    const encoder = new TextEncoder();
+    const chunks = [];
+    const offsets = [0];
+    let position = 0;
+
+    function pushString(value) {
+      const bytes = encoder.encode(value);
+      chunks.push(bytes);
+      position += bytes.length;
+    }
+
+    function pushBytes(bytes) {
+      chunks.push(bytes);
+      position += bytes.length;
+    }
+
+    function addObject(id, value) {
+      offsets[id] = position;
+      pushString(`${id} 0 obj\n`);
+      if (typeof value === 'string') pushString(value);
+      else pushBytes(value);
+      pushString('\nendobj\n');
+    }
+
+    pushString('%PDF-1.4\n%\xFF\xFF\xFF\xFF\n');
+    addObject(1, '<< /Type /Catalog /Pages 2 0 R >>');
+    addObject(2, '<< /Type /Pages /Kids [3 0 R] /Count 1 >>');
+    addObject(3, `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${PAGE.widthPt.toFixed(2)} ${PAGE.heightPt.toFixed(2)}] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>`);
+    addObject(4, (() => {
+      const start = encoder.encode(`<< /Type /XObject /Subtype /Image /Width ${PAGE.widthPx} /Height ${PAGE.heightPx} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${imageBytes.length} >>\nstream\n`);
+      const end = encoder.encode('\nendstream');
+      const bytes = new Uint8Array(start.length + imageBytes.length + end.length);
+      bytes.set(start, 0);
+      bytes.set(imageBytes, start.length);
+      bytes.set(end, start.length + imageBytes.length);
+      return bytes;
+    })());
+    addObject(5, (() => {
+      const stream = `q\n${PAGE.widthPt.toFixed(2)} 0 0 ${PAGE.heightPt.toFixed(2)} 0 0 cm\n/Im0 Do\nQ\n`;
+      return `<< /Length ${encoder.encode(stream).length} >>\nstream\n${stream}endstream`;
+    })());
+
+    const xrefOffset = position;
+    pushString(`xref\n0 ${offsets.length}\n`);
+    pushString('0000000000 65535 f \n');
+    for (let id = 1; id < offsets.length; id += 1) {
+      pushString(`${String(offsets[id]).padStart(10, '0')} 00000 n \n`);
+    }
+    pushString(`trailer\n<< /Size ${offsets.length} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`);
+
+    const size = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+    const output = new Uint8Array(size);
+    let cursor = 0;
+    chunks.forEach(chunk => {
+      output.set(chunk, cursor);
+      cursor += chunk.length;
+    });
+    return output;
+  }
+
+  function downloadPdf(bytes, filename) {
+    const blob = new Blob([bytes], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.rel = 'noopener';
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  }
+
+  function pdfFilename(reservation) {
+    const code = text(reservation?.CodigoReserva).replace(/[^0-9A-Za-z_-]+/g, '').slice(0, 40);
+    return `Reserva_${code || 'Camborio'}.pdf`;
   }
 
   async function generate(reservation, button) {
-    ui(); busy(button, true); status('Preparando el PDF…');
-    let holder = null;
+    busy(button, true);
+    setProgress('Preparando la reserva para descargarla en PDF.');
     try {
-      if (!reservation) throw new Error('No se ha encontrado la reserva');
-      await load();
-      holder = document.createElement('div');
-      holder.innerHTML = `<style>${styles()}</style>${markup(reservation)}`;
-      Object.assign(holder.style, { position:'absolute', left:'-10000px', top:'0', width:'794px', height:'1123px', overflow:'hidden', pointerEvents:'none' });
-      document.body.appendChild(holder);
-      const image = holder.querySelector('.logo');
-      if (image && !image.complete) await new Promise(resolve => { image.onload = resolve; image.onerror = resolve; });
-      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-      status('Componiendo el PDF…');
-      const canvas = await window.html2canvas(holder.querySelector('.pdf-page'), { scale:2, backgroundColor:'#fff', useCORS:true, allowTaint:false, logging:false, width:794, height:1123, windowWidth:794, windowHeight:1123, scrollX:0, scrollY:0 });
-      if (!canvas || canvas.width < 10 || canvas.height < 10) throw new Error('La captura del PDF está vacía');
-      const JsPDF = window.jspdf && window.jspdf.jsPDF ? window.jspdf.jsPDF : window.jsPDF;
-      if (!JsPDF) throw new Error('jsPDF no disponible');
-      const pdf = new JsPDF({ unit:'px', format:[794,1123], orientation:'portrait' });
-      pdf.addImage(canvas.toDataURL('image/jpeg',1), 'JPEG', 0, 0, 794, 1123, undefined, 'FAST');
-      status('Guardando el PDF…');
-      pdf.save(`Reserva_${text(reservation.CodigoReserva) || 'Camborio'}.pdf`);
-      status('PDF guardado correctamente.');
+      if (!reservation) throw new Error('No se ha encontrado la reserva.');
+      const logo = await loadImage(getLogoUrl(), 12000);
+      setProgress('Componiendo el PDF con los datos de la reserva.');
+      const canvas = renderCanvas(reservation, logo);
+      const imageBytes = await canvasToJpegBytes(canvas);
+      if (!imageBytes.length) throw new Error('La imagen del PDF está vacía.');
+      setProgress('Guardando el archivo PDF.');
+      const pdfBytes = buildPdfBytes(imageBytes);
+      if (pdfBytes.length < 1024) throw new Error('El archivo PDF generado es inválido.');
+      downloadPdf(pdfBytes, pdfFilename(reservation));
     } catch (error) {
-      console.error(error); status(`No se pudo guardar el PDF: ${error.message || 'Error'}`, true); alert(`No se pudo generar el PDF. ${error.message || 'Error'}`);
-    } finally { if (holder) holder.remove(); busy(button, false); }
+      console.error(error);
+      showMessage(`No se pudo generar el PDF. ${error?.message || 'Error inesperado.'}`, { title: 'PDF no disponible', icon: '⚠️' });
+    } finally {
+      clearProgress();
+      busy(button, false);
+    }
   }
 
   function bind() {
@@ -127,11 +418,13 @@
     document.addEventListener('click', event => {
       const button = event.target.closest('#received-pdf,#found-pdf,#edit-pdf');
       if (!button) return;
-      event.preventDefault(); event.stopImmediatePropagation();
+      event.preventDefault();
+      event.stopImmediatePropagation();
       if (!button.disabled) generate(reservation(), button);
     }, true);
   }
 
   window.buildReservationPdf = generate;
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind, { once:true }); else bind();
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind, { once: true });
+  else bind();
 })();
