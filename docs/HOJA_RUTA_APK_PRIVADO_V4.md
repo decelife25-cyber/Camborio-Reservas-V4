@@ -82,9 +82,13 @@ También son referencia:
 
 # 4. TRABAJO YA REALIZADO
 
-## 4.1. Auditoría V2 → V4
+## 4.1. Auditoría exhaustiva previa a cualquier implementación
 
-Se realizó la auditoría que dio lugar a los 13 documentos anteriores.
+**Este punto es especialmente importante para la continuidad del proyecto.** Antes de que Jules empezara a tocar la implementación de V4, se le pidió expresamente realizar una **auditoría exhaustiva/forense del proyecto existente** y dejar por escrito en el repositorio todo lo descubierto, para que el conocimiento del proyecto no dependiera de una conversación concreta.
+
+La auditoría fue tan amplia que Jules la estructuró en **13 documentos técnicos**, almacenados en `docs/auditoria-v4/`. Estos 13 archivos NO son una documentación que apareciera después de desarrollar el APK: son el resultado documentado de aquella auditoría previa y constituyen la base técnica que debía guiar la construcción de V4.
+
+Por tanto, cuando se indique a Jules que revise la auditoría, debe entenderse que debe consultar **los 13 documentos completos como un único trabajo de auditoría**, no como trece tareas independientes.
 
 La conclusión arquitectónica es:
 
