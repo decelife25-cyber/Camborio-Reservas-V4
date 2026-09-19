@@ -1,0 +1,51 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: app/package-lock.json
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install Dependencies
+        working-directory: ./app
+        run: npm ci
+
+      - name: Build Web App
+        working-directory: ./app
+        run: npm run build
+
+      - name: Sync Capacitor
+        working-directory: ./app
+        run: npx cap sync android
+
+      - name: Build APK (Debug)
+        working-directory: ./app/android
+        run: ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: camborio-privado-apk
+          path: app/android/app/build/outputs/apk/debug/app-debug.apk
