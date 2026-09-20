@@ -15,14 +15,17 @@ export default function Inicio() {
   useEffect(() => {
     async function fetchStats() {
       try {
-        const today = new Date().toISOString().split('T')[0];
+        const today = new Date().toLocaleDateString('en-CA', {
+          timeZone: 'Europe/Madrid',
+        });
 
-        // Fetch all non-cancelled reservations for today
+        // Supabase V4 uses the existing business schema: public."Reservas"
+        // and its original column names.
         const { data, error } = await supabase
-          .from('reservas')
-          .select('*')
-          .eq('fecha_reserva', today)
-          .not('estado', 'in', '("CANCELADA_CLIENTE","CANCELADA_LOCAL")');
+          .from('Reservas')
+          .select('ReservaID, Estado, Personas, FechaReserva')
+          .eq('FechaReserva', today)
+          .not('Estado', 'in', '("CANCELADA_CLIENTE","CANCELADA_LOCAL")');
 
         if (error) throw error;
 
@@ -33,9 +36,9 @@ export default function Inicio() {
 
         if (data) {
           hoy = data.length;
-          pendientes = data.filter(r => r.estado === 'PENDIENTE').length;
-          comensalesHoy = data.reduce((acc, r) => acc + (r.personas || 0), 0);
-          porLlegar = data.filter(r => ['PENDIENTE', 'CONFIRMADA'].includes(r.estado)).length;
+          pendientes = data.filter(r => r.Estado === 'PENDIENTE').length;
+          comensalesHoy = data.reduce((acc, r) => acc + (r.Personas || 0), 0);
+          porLlegar = data.filter(r => ['PENDIENTE', 'CONFIRMADA'].includes(r.Estado)).length;
         }
 
         setStats({ hoy, pendientes, comensalesHoy, porLlegar });
@@ -47,7 +50,6 @@ export default function Inicio() {
     }
 
     fetchStats();
-    // In a real scenario we could subscribe to real-time changes here
   }, []);
 
   if (loading) {
@@ -64,7 +66,6 @@ export default function Inicio() {
       </div>
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        {/* Total Reservas Hoy */}
         <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
           <div className="flex items-center space-x-3 mb-2">
             <div className="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-lg text-blue-600 dark:text-blue-400">
@@ -75,7 +76,6 @@ export default function Inicio() {
           <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.hoy}</p>
         </div>
 
-        {/* Total Comensales Hoy */}
         <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
           <div className="flex items-center space-x-3 mb-2">
             <div className="bg-green-100 dark:bg-green-900/30 p-2 rounded-lg text-green-600 dark:text-green-400">
@@ -86,7 +86,6 @@ export default function Inicio() {
           <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.comensalesHoy}</p>
         </div>
 
-        {/* Pendientes Confirmar */}
         <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-yellow-100 dark:border-yellow-900/30">
           <div className="flex items-center space-x-3 mb-2">
             <div className="bg-yellow-100 dark:bg-yellow-900/30 p-2 rounded-lg text-yellow-600 dark:text-yellow-500">
@@ -97,7 +96,6 @@ export default function Inicio() {
           <p className="text-3xl font-bold text-yellow-600 dark:text-yellow-500">{stats.pendientes}</p>
         </div>
 
-        {/* Por Llegar */}
         <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
           <div className="flex items-center space-x-3 mb-2">
             <div className="bg-purple-100 dark:bg-purple-900/30 p-2 rounded-lg text-purple-600 dark:text-purple-400">
@@ -105,7 +103,7 @@ export default function Inicio() {
             </div>
             <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Por Llegar</h3>
           </div>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.porLlegar}</p>
+          <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">{stats.porLlegar}</p>
         </div>
       </div>
 
