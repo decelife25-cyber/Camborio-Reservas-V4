@@ -24,8 +24,7 @@ export default function Inicio() {
         const { data, error } = await supabase
           .from('Reservas')
           .select('ReservaID, Estado, Personas, FechaReserva')
-          .eq('FechaReserva', today)
-          .not('Estado', 'in', '("CANCELADA_CLIENTE","CANCELADA_LOCAL")');
+          .eq('FechaReserva', today);
 
         if (error) throw error;
 
@@ -35,10 +34,13 @@ export default function Inicio() {
         let porLlegar = 0;
 
         if (data) {
-          hoy = data.length;
-          pendientes = data.filter(r => r.Estado === 'PENDIENTE').length;
-          comensalesHoy = data.reduce((acc, r) => acc + (r.Personas || 0), 0);
-          porLlegar = data.filter(r => ['PENDIENTE', 'CONFIRMADA'].includes(r.Estado)).length;
+          const activas = data.filter(
+            r => !['CANCELADA_CLIENTE', 'CANCELADA_LOCAL'].includes(r.Estado)
+          );
+          hoy = activas.length;
+          pendientes = activas.filter(r => r.Estado === 'PENDIENTE').length;
+          comensalesHoy = activas.reduce((acc, r) => acc + (r.Personas || 0), 0);
+          porLlegar = activas.filter(r => ['PENDIENTE', 'CONFIRMADA'].includes(r.Estado)).length;
         }
 
         setStats({ hoy, pendientes, comensalesHoy, porLlegar });
