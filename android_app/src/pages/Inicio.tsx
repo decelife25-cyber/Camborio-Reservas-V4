@@ -103,7 +103,7 @@ export default function Inicio() {
             </div>
             <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Por Llegar</h3>
           </div>
-          <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">{stats.porLlegar}</p>
+          <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.porLlegar}</p>
         </div>
       </div>
 
