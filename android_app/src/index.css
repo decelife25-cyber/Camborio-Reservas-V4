@@ -1288,3 +1288,62 @@ html.light .calendar-reservations .status-pendiente {
   color: #a86b00;
   border-color: #a86b00;
 }
+
+
+/* V4.1 — Confirmar: mismo contraste de modo día que Reservas Hoy + teléfono/código reforzados. */
+html.light .confirm-card {
+  border-color: #c5beb2;
+  background: linear-gradient(#fff, #f3f1ec);
+}
+html.light .confirm-card > * {
+  border-color: #c5beb2;
+}
+html.light .confirm-date {
+  background: #eeeae2;
+}
+html.light .confirm-date strong {
+  color: #a86b00;
+}
+html.light .confirm-date span,
+html.light .confirm-day span {
+  color: #3f3f3f;
+}
+html.light .confirm-day strong {
+  color: #202020;
+}
+html.light .confirm-client strong {
+  color: #202020;
+}
+html.light .confirm-client span {
+  color: #555;
+}
+html.light .confirm-client b {
+  color: #a86b00;
+}
+html.light .confirm-check {
+  border-color: #a86b00;
+  color: #a86b00;
+  background: #fff;
+}
+html.light .pending-badge {
+  background: #c87800;
+  color: #fff;
+  box-shadow: 0 0 0 2px rgba(90,55,0,.22);
+}
+
+/* Teléfono y código de reserva: más visibles en Confirmar. */
+.confirm-client span {
+  font-size: 19px;
+}
+.confirm-client b {
+  font-size: 20px;
+  font-weight: 1000;
+}
+@media (max-width: 620px) {
+  .confirm-client span {
+    font-size: 19px;
+  }
+  .confirm-client b {
+    font-size: 20px;
+  }
+}
