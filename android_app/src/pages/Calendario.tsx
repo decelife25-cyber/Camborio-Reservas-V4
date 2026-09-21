@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import ReservationCard from '../components/ReservationCard';
 
 type Reserva = {
   ReservaID: string;
@@ -13,6 +14,7 @@ type Reserva = {
   Estado: string;
   Mesa: string | null;
   Turno: string | null;
+  Observaciones: string | null;
 };
 
 const CANCELADAS = new Set(['CANCELADA_CLIENTE', 'CANCELADA_LOCAL']);
@@ -63,7 +65,7 @@ export default function Calendario() {
 
       const { data, error } = await supabase
         .from('Reservas')
-        .select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,Turno')
+        .select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,Turno,Observaciones')
         .gte('FechaReserva', start)
         .lte('FechaReserva', end)
         .order('FechaReserva', { ascending: true })
@@ -169,29 +171,7 @@ export default function Calendario() {
             <div className="calendar-empty-message">No hay reservas para esta fecha.</div>
           ) : (
             reservasSeleccionadas.map(reserva => (
-              <article className="reservation-card" key={reserva.ReservaID}>
-                <div className="reservation-time">
-                  <span className={'status-pill status-' + reserva.Estado.toLowerCase().replaceAll('_', '-')}>
-                    {reserva.Estado.replaceAll('_', ' ')}
-                  </span>
-                  <strong>{formatTime(reserva.HoraReserva)}</strong>
-                </div>
-                <div className="reservation-main">
-                  <div className="customer-name"><span>👤</span>{reserva.Nombre || 'SIN NOMBRE'}</div>
-                  <div className="customer-meta">
-                    <span className="phone-icon">☎</span>
-                    <span>{reserva.Telefono || '—'}</span>
-                    <span>•</span>
-                    <span className="reservation-code">{reserva.CodigoReserva || '—'}</span>
-                  </div>
-                </div>
-                <div className="reservation-party">
-                  <div className="pax"><span>👥</span> {reserva.Personas || 0} PAX</div>
-                  <button className="table-button" type="button">
-                    {reserva.Mesa ? 'MESA ' + reserva.Mesa : 'SIN ASIGNAR'}
-                  </button>
-                </div>
-              </article>
+              <ReservationCard key={reserva.ReservaID} reserva={reserva} />
             ))
           )}
         </div>
