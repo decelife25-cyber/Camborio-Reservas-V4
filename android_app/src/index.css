@@ -812,3 +812,154 @@ html.light .calendar-empty-message { color:#444; border-color:#bbb; }
   .calendar-day { min-height: 55px; }
   .calendar-day strong { font-size: 23px; }
 }
+
+
+/* V2 TYPOGRAPHY LOCK — CONFIRMAR + CALENDARIO
+   Valores copiados del CSS final de Camborio-Reservas-V2.
+   No reducir tipografías en estos dos módulos mediante reglas responsive.
+*/
+.subscreen-header h1 {
+  font-size: 30px;
+}
+.confirm-card {
+  grid-template-columns: 115px 108px 78px 1fr 82px;
+  min-height: 112px;
+}
+.confirm-date strong {
+  font-size: 30px;
+}
+.confirm-date span {
+  font-size: 16px;
+}
+.confirm-day span {
+  font-size: 14px;
+}
+.confirm-day strong {
+  font-size: 30px;
+}
+.confirm-pax {
+  font-size: 22px;
+}
+.confirm-client strong {
+  font-size: 30px;
+}
+.confirm-client span {
+  font-size: 16px;
+}
+.confirm-check {
+  width: 50px;
+  height: 50px;
+}
+
+/* Calendario: geometría y tipografía V2 exactas */
+.calendar-month-header {
+  min-height: 50px;
+  gap: 8px;
+}
+.calendar-month-header strong {
+  font-size: clamp(26px, 6vw, 34px);
+}
+.calendar-month-header button {
+  width: 48px;
+  height: 50px;
+  min-height: 50px;
+}
+.calendar-weekdays span {
+  padding: 7px 0;
+  font-size: 14px;
+}
+.calendar-day {
+  min-height: 74px;
+  padding: 7px 6px 6px;
+}
+.calendar-day strong {
+  font-size: clamp(30px, 7.2vw, 40px);
+}
+.calendar-reservation-mark {
+  right: 11px;
+  bottom: 11px;
+  width: 20px;
+  height: 20px;
+  font-size: 13px;
+}
+
+/* Tarjetas de reservas bajo el calendario: valores V2 */
+.calendar-reservations .reservation-card {
+  min-height: 98px;
+  grid-template-columns: 162px 1fr 138px;
+}
+.calendar-reservations .reservation-time strong {
+  font-size: 30px;
+}
+.calendar-reservations .status-pill {
+  font-size: 13px;
+  padding: 4px 10px;
+}
+.calendar-reservations .customer-name {
+  font-size: 21px;
+}
+.calendar-reservations .customer-meta {
+  font-size: 16px;
+}
+.calendar-reservations .pax {
+  font-size: 19px;
+}
+.calendar-reservations .table-button {
+  min-width: 112px;
+  height: 35px;
+  font-size: 13px;
+}
+
+/* Importante: en el ancho móvil del APK se conservan los valores V2,
+   no los overrides pequeños anteriores. */
+@media (max-width: 620px) {
+  .confirm-card {
+    grid-template-columns: 115px 108px 78px 1fr 82px;
+    min-height: 112px;
+  }
+  .confirm-date strong { font-size: 30px; }
+  .confirm-date span { font-size: 16px; }
+  .confirm-day span { font-size: 14px; }
+  .confirm-day strong { font-size: 30px; }
+  .confirm-pax { font-size: 22px; }
+  .confirm-client strong { font-size: 30px; }
+  .confirm-client span { font-size: 16px; }
+  .confirm-check { width: 50px; height: 50px; }
+
+  .calendar-month-header {
+    min-height: 50px;
+  }
+  .calendar-month-header strong {
+    font-size: 30px;
+  }
+  .calendar-month-header button {
+    width: 48px;
+    height: 50px;
+  }
+  .calendar-weekdays span {
+    font-size: 14px;
+  }
+  .calendar-day {
+    min-height: 74px;
+  }
+  .calendar-day strong {
+    font-size: 30px;
+  }
+  .calendar-reservation-mark {
+    right: 9px;
+    bottom: 9px;
+    width: 20px;
+    height: 20px;
+    font-size: 13px;
+  }
+  .calendar-reservations .reservation-card {
+    grid-template-columns: 162px 1fr 138px;
+    min-height: 98px;
+  }
+  .calendar-reservations .customer-name { font-size: 21px; }
+  .calendar-reservations .customer-meta { font-size: 16px; }
+  .calendar-reservations .reservation-time strong { font-size: 30px; }
+  .calendar-reservations .status-pill { font-size: 13px; }
+  .calendar-reservations .pax { font-size: 19px; }
+  .calendar-reservations .table-button { font-size: 13px; }
+}
