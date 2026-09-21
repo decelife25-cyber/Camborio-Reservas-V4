@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ChevronLeft, ChevronRight, User, Phone, Users, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, User, Phone, X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { getTurnoFromHora } from '../utils/shifts';
 
