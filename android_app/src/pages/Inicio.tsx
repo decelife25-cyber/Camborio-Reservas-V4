@@ -113,9 +113,11 @@ export default function Inicio() {
         ) : visibles.length === 0 ? (
           <div className="empty-message">No hay reservas para esta fecha.</div>
         ) : (
-          visibles.map(reserva => (
-            <ReservationCard key={reserva.ReservaID} reserva={reserva} />
-          ))
+          <div className="calendar-reservations">
+            {visibles.map(reserva => (
+              <ReservationCard key={reserva.ReservaID} reserva={reserva} />
+            ))}
+          </div>
         )}
       </div>
     </section>

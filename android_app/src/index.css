@@ -1137,3 +1137,154 @@ html.light .calendar-empty-message { color:#444; border-color:#bbb; }
 }
 html.light .observation-modal { background: linear-gradient(180deg,#fff,#f1efea); }
 html.light .observation-text { color:#222; }
+
+
+/* V4.1 — Reservas Hoy usa exactamente la misma tarjeta que Calendario. */
+.reservation-scroll .calendar-reservations {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 0;
+}
+.reservation-scroll .reservation-card {
+  grid-template-columns: 168px minmax(0, 1fr) 150px;
+  min-height: 104px;
+}
+.reservation-scroll .reservation-time {
+  align-items: center;
+  justify-content: center;
+  padding: 10px 10px;
+  gap: 7px;
+}
+.reservation-scroll .status-pill {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 32px;
+  padding: 5px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+}
+.reservation-scroll .reservation-time strong { font-size: 34px; }
+.reservation-scroll .reservation-main {
+  padding: 10px 12px 10px 14px;
+  gap: 6px;
+}
+.reservation-scroll .customer-name { font-size: 24px; }
+.reservation-scroll .customer-meta {
+  font-size: 19px;
+  gap: 7px;
+}
+.reservation-scroll .reservation-code { font-size: 19px; }
+.reservation-scroll .reservation-party {
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 8px;
+}
+.reservation-scroll .pax {
+  width: 100%;
+  font-size: 22px;
+  text-align: center;
+  white-space: nowrap;
+}
+.reservation-scroll .table-button {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 7px 6px;
+  font-size: 17px;
+  box-sizing: border-box;
+}
+@media (max-width: 620px) {
+  .reservation-scroll .reservation-card {
+    grid-template-columns: 168px minmax(0, 1fr) 150px;
+    min-height: 104px;
+  }
+  .reservation-scroll .reservation-main { padding: 10px 10px 10px 12px; }
+  .reservation-scroll .customer-name { font-size: 24px; }
+  .reservation-scroll .customer-meta,
+  .reservation-scroll .reservation-code { font-size: 19px; }
+  .reservation-scroll .reservation-time strong { font-size: 34px; }
+  .reservation-scroll .status-pill { font-size: 16px; min-height: 32px; }
+  .reservation-scroll .pax { font-size: 22px; }
+  .reservation-scroll .table-button { min-height: 40px; font-size: 17px; }
+}
+
+/* V4.1 — modo día: más contraste, menos líneas negras y amarillo convertido a ámbar/cobre legible. */
+html.light .private-app {
+  color: #202020;
+}
+html.light .private-header::after {
+  background: linear-gradient(90deg, transparent, rgba(145,88,0,.32) 20%, rgba(145,88,0,.12) 80%, transparent);
+}
+html.light .menu-card {
+  border-color: #c8c1b5;
+}
+html.light .menu-card.active {
+  border-color: #a86b00;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.8), 0 0 0 2px rgba(168,107,0,.16);
+}
+html.light .today-date {
+  color: #a86b00;
+}
+html.light .today-screen {
+  border-color: #c5beb2;
+}
+html.light .date-turn-header {
+  border-color: #d0c9be;
+}
+html.light .filter-button {
+  border-color: #a86b00;
+  color: #a86b00;
+}
+html.light .reservation-card {
+  border-color: #c5beb2;
+}
+html.light .reservation-time,
+html.light .reservation-card > * {
+  border-color: #c5beb2;
+}
+html.light .status-pendiente {
+  color: #a86b00;
+  border-color: #a86b00;
+}
+html.light .status-confirmada {
+  color: #157447;
+  border-color: #157447;
+}
+html.light .reservation-code,
+html.light .table-button,
+html.light .observation-button {
+  color: #a86b00;
+}
+html.light .reservation-code,
+html.light .table-button {
+  border-color: #a86b00;
+}
+html.light .calendar-month-header strong {
+  color: #a86b00;
+}
+html.light .calendar-day.selected {
+  box-shadow: inset 0 0 0 2px #a86b00;
+}
+html.light .calendar-weekdays,
+html.light .calendar-grid {
+  border-color: #d0c9be;
+}
+html.light .calendar-day,
+html.light .calendar-empty {
+  border-color: #d0c9be;
+}
+html.light .calendar-reservation-mark {
+  background: #c87800;
+  color: #fff;
+}
+html.light .calendar-reservations .status-pendiente {
+  color: #a86b00;
+  border-color: #a86b00;
+}
