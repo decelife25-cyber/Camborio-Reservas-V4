@@ -32,10 +32,11 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 .private-header {
+  position:relative;
   box-sizing:border-box;
   width:100%;
-  min-height:78px;
-  padding:6px 8px 5px;
+  min-height:86px;
+  padding:22px 8px 5px;
   display:flex;
   align-items:center;
   gap:6px;
@@ -45,37 +46,37 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .brand-lockup {
   display:flex;
   align-items:center;
-  gap:9px;
+  gap:3px;
   min-width:0;
-  flex:1 1 auto;
+  flex:0 1 auto;
   overflow:visible;
 }
 .brand-emblem {
   display:block;
-  width:69px;
-  min-width:69px;
-  max-width:69px;
-  height:69px;
-  min-height:69px;
-  max-height:69px;
+  width:68px;
+  min-width:68px;
+  max-width:68px;
+  height:68px;
+  min-height:68px;
+  max-height:68px;
   object-fit:contain;
-  flex:0 0 69px;
+  flex:0 0 68px;
 }
 .brand-copy {
   display:flex;
   flex-direction:column;
   justify-content:center;
-  flex:1 1 auto;
+  flex:0 1 auto;
   min-width:0;
   text-align:center;
 }
 .brand-name {
   font-family:Georgia,'Times New Roman',serif;
-  font-size:clamp(21px,6.3vw,24px);
+  font-size:clamp(23px,6.8vw,29px);
   font-weight:900;
   color:#b0772d;
   line-height:.96;
-  letter-spacing:.15px;
+  letter-spacing:.25px;
   white-space:nowrap;
   overflow:visible;
 }
@@ -132,7 +133,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
   gap:7px;
-  width:100%;
+  width:calc(100% - 16px);
+  margin-left:8px;
+  margin-right:8px;
   margin-bottom:12px;
   padding:0;
   flex:0 0 auto;
@@ -321,28 +324,29 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 @media (max-width: 620px) {
-  .private-header { min-height:78px; }
-  .brand-emblem { width:69px; min-width:69px; max-width:69px; height:69px; min-height:69px; max-height:69px; flex-basis:69px; }
-  .brand-name { font-size:clamp(21px,6.3vw,24px); }
+  .private-header { min-height:90px; padding-top:22px; }
+  .brand-emblem { width:68px; min-width:68px; max-width:68px; height:68px; min-height:68px; max-height:68px; flex-basis:68px; }
+  .brand-name { font-size:clamp(23px,6.8vw,29px); }
   .brand-line { font-size:clamp(15px,4.35vw,16px); letter-spacing:1.25px; }
   .header-icon { width:44px; min-width:44px; height:44px; }
   .logout-button { min-height:56px; height:56px; padding:0 12px; font-size:14px; }
   .menu-card { min-height:144px; padding:12px 4px; gap:10px; font-size:clamp(18px,5.4vw,22px); }
   .menu-icon { font-size:46px; }
-  .date-turn-header { min-height:60px; padding:8px 4px; gap:4px; }
-  .today-title { font-size:clamp(19px,4.9vw,23px); gap:4px; }
-  .today-calendar { font-size:19px; }
+  .date-turn-header { min-height:64px; padding:8px 4px; gap:4px; }
+  .today-title { font-size:clamp(20px,5.1vw,24px); gap:4px; }
+  .today-calendar { font-size:20px; }
   .turn-actions { gap:3px; }
-  .turn-button { flex-basis:126px; width:126px; min-width:126px; min-height:40px; height:40px; font-size:15px; }
+  .turn-button { flex-basis:130px; width:130px; min-width:130px; min-height:44px; height:44px; font-size:15px; }
   .filter-button { width:32px; min-width:32px; height:38px; min-height:38px; }
 
-  .private-header { min-height: 76px; }
-  .brand-emblem { width: 55px; height: 55px; flex-basis: 55px; }
-  .brand-name { font-size: clamp(20px, 5.7vw, 27px); }
-  .brand-line { font-size: clamp(10px, 2.8vw, 14px); }
+  .private-header { min-height:86px; padding-top:18px; }
+  .brand-emblem { width:68px; min-width:68px; max-width:68px; height:68px; min-height:68px; max-height:68px; flex-basis:68px; }
+  .brand-name { font-size: clamp(23px, 6.8vw, 29px); }
+  .brand-line { font-size: clamp(13px, 3.6vw, 15px); }
   .header-actions { gap: 4px; }
-  .header-icon { width: 34px; height: 34px; }
-  .logout-button { height: 34px; padding: 0 9px; font-size: 10px; }
+  .header-icon { width:42px; min-width:42px; height:38px; min-height:38px; }
+  .header-icon svg { width:24px; height:24px; }
+  .logout-button { width:128px; min-width:128px; height:38px; min-height:38px; padding: 0 10px; font-size:12px; }
   .menu-card { min-height: 66px; }
   .reservation-card { grid-template-columns: 162px 1fr 145px; }
 }
@@ -368,143 +372,995 @@ html.light .date-turn-header { background: linear-gradient(#fff, #f1efea); borde
 html.light .reservation-card { background: linear-gradient(#fff, #f3f1ec); border-color: #d4d0c8; color: #171717; }
 html.light .customer-meta { color: #555; }
 html.light .filter-button { background: #fff; }
+html.light .today-title { color:#222; }
+html.light .today-day { color:#222; }
+html.light .today-date { color:#b88700; }
+html.light .empty-message { color:#333; }
+html.light .today-calendar { filter:none; }
+html.light .app-version { color: rgba(0,0,0,.58); }
 
 
 
 
-/* V2 REAL RESPONSIVE LAYOUT
-   No se usa zoom/transform para corregir el tamaño. El panel se dimensiona
-   proporcionalmente al viewport CSS real del WebView, manteniendo el ancho
-   completo y las proporciones de V2 en móviles de distintas densidades. */
-:root { --v2s: clamp(.43, 0.0667vw, .70); }
 
+
+/* V2 calibration for the Android WebView viewport.
+   The V2 panel is rendered at the compact mobile scale; this APK WebView
+   reports a wider CSS viewport than the same physical device. */
 .private-app {
-  min-height: 100svh;
-  height: 100svh;
-  overflow: hidden;
+  transform: scale(0.57);
+  transform-origin: top left;
+  width: 175.44%;
+  min-height: 175.44svh;
+  height: 175.44svh;
+  padding-top: max(12px, env(safe-area-inset-top, 12px));
+  box-sizing: border-box;
+}
+.app-version {
+  position: absolute;
+  right: 8px;
+  bottom: 1px;
+  z-index: 9999;
+  font: 700 11px/1 Arial, sans-serif;
+  color: rgba(255,255,255,.62);
+  pointer-events: none;
 }
 
-.private-header {
-  min-height: calc(76px * var(--v2s));
-  padding: calc(6px * var(--v2s)) calc(8px * var(--v2s)) calc(5px * var(--v2s));
-  gap: calc(6px * var(--v2s));
-  margin-bottom: calc(8px * var(--v2s));
-}
-.brand-lockup { gap: calc(7px * var(--v2s)); }
-.brand-emblem {
-  width: calc(55px * var(--v2s));
-  min-width: calc(55px * var(--v2s));
-  max-width: calc(55px * var(--v2s));
-  height: calc(55px * var(--v2s));
-  min-height: calc(55px * var(--v2s));
-  max-height: calc(55px * var(--v2s));
-  flex-basis: calc(55px * var(--v2s));
-}
-.brand-name { font-size: calc(27px * var(--v2s)); }
-.brand-line {
-  gap: calc(5px * var(--v2s));
-  margin-top: calc(3px * var(--v2s));
-  font-size: calc(14px * var(--v2s));
-  letter-spacing: calc(1px * var(--v2s));
-}
-.brand-line span { min-width: calc(18px * var(--v2s)); height: calc(1px * var(--v2s)); }
-.header-actions { gap: calc(5px * var(--v2s)); }
-.header-icon {
-  width: calc(44px * var(--v2s));
-  min-width: calc(44px * var(--v2s));
-  height: calc(44px * var(--v2s));
-  border-radius: calc(8px * var(--v2s));
-}
-.logout-button {
-  min-height: calc(56px * var(--v2s));
-  height: calc(56px * var(--v2s));
-  padding: 0 calc(12px * var(--v2s));
-  font-size: calc(14px * var(--v2s));
-}
+/* Header/logo geometry copied from V2: short fixed decorative lines, not flex-fill lines. */
+.brand-copy { overflow: visible; }
+.brand-line { width: auto; min-width: 0; }
+.brand-line span { flex: 0 0 34px; min-width:34px; }
 
-.private-menu {
-  gap: calc(7px * var(--v2s));
-  margin-bottom: calc(10px * var(--v2s));
+/* Ajustes finos V4 respecto al referente visual V2: margen lateral, cabecera compacta y marca unificada. */
+.private-header::after {
+  content:"";
+  position:absolute;
+  left:8px;
+  right:8px;
+  bottom:1px;
+  height:1px;
+  background:linear-gradient(90deg, transparent, rgba(176,119,45,.5) 20%, rgba(176,119,45,.18) 80%, transparent);
+  pointer-events:none;
 }
-.menu-card {
-  min-height: calc(90px * var(--v2s));
-  padding: calc(8px * var(--v2s)) calc(4px * var(--v2s));
-  border-radius: calc(8px * var(--v2s));
-  gap: calc(5px * var(--v2s));
-  font-size: calc(22px * var(--v2s));
+.today-day { color:#f3f3f3; }
+.today-date { color:#ffc400; }
+
+/* FASE 1: pantallas privadas principales. La cabecera y los seis botones siguen siendo comunes. */
+.menu-card { position: relative; }
+.menu-label { display: block; }
+.pending-badge {
+  position: absolute;
+  top: 15px;
+  right: 24%;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 7px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #ffc400;
+  color: #111;
+  font-size: 18px;
+  font-weight: 1000;
+  line-height: 1;
+  box-shadow: 0 0 0 2px rgba(0,0,0,.35);
+}
+.subscreen-header {
+  min-height: 66px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 12px;
+  border: 1px solid #242424;
+  border-radius: 7px 7px 0 0;
+  background: linear-gradient(180deg,#060606,#010101);
+}
+.subscreen-header h1 {
+  margin: 0;
+  color: #f5f5f5;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: clamp(22px, 5.2vw, 29px);
+  font-weight: 1000;
   line-height: 1.05;
 }
-.menu-icon { font-size: calc(42px * var(--v2s)); }
+.subscreen-back {
+  width: 45px;
+  min-width: 45px;
+  height: 45px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #555;
+  border-radius: 7px;
+  background: #171717;
+  color: #fff;
+}
+.confirm-screen {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: #000;
+}
+.confirm-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 6px 12px;
+}
+.confirm-card {
+  min-height: 112px;
+  display: grid;
+  grid-template-columns: 115px 108px 78px 1fr 82px;
+  align-items: stretch;
+  border: 1px solid #292929;
+  border-top: 0;
+  background: linear-gradient(180deg,#101010,#080808);
+}
+.confirm-card > * {
+  min-width: 0;
+  border-right: 1px solid #242424;
+}
+.confirm-date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #141414;
+  color: #ffc400;
+}
+.confirm-date strong { font-size: 30px; line-height: 1; }
+.confirm-date span { color:#f3f3f3; font-size:16px; font-weight:900; margin-top:5px; }
+.confirm-day {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+}
+.confirm-day span { color:#f0f0f0; font-size:14px; font-weight:900; }
+.confirm-day strong { font-size:30px; line-height:1; color:#fff; }
+.confirm-pax {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#4da6ff;
+  font-size:22px;
+  font-weight:1000;
+}
+.confirm-client {
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:7px;
+  padding:8px 12px;
+}
+.confirm-client strong { font-size:22px; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.confirm-client span { color:#bbb; font-size:16px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.confirm-client b { color:#ffc400; }
+.confirm-check {
+  align-self:center;
+  justify-self:center;
+  width:50px;
+  height:50px;
+  border:2px solid #ffc400;
+  border-radius:7px;
+  background:#070707;
+  color:#ffc400;
+  display:grid;
+  place-items:center;
+}
+.confirm-check:disabled { opacity:.6; }
+.confirm-empty {
+  margin: 7px 6px;
+  border: 1px dashed #333;
+  padding: 20px 10px;
+  text-align: center;
+  color: #eee;
+  font-size: 18px;
+  font-weight: 800;
+}
+.confirm-error { color:#ffb5b5; }
+.calendar-screen {
+  height:100%;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  border:1px solid #2b2c30;
+  border-radius:8px;
+  background:#000;
+  overflow:hidden;
+}
+.calendar-scroll {
+  flex:1;
+  min-height:0;
+  overflow-y:auto;
+  padding:7px 6px 12px;
+}
+.calendar-month-header {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  min-height:52px;
+}
+.calendar-month-header strong {
+  color:#ffc400;
+  font-size:25px;
+  font-weight:1000;
+}
+.calendar-month-header button {
+  width:40px;
+  height:40px;
+  display:grid;
+  place-items:center;
+  border:1px solid #333;
+  border-radius:7px;
+  background:#151515;
+  color:#fff;
+}
+.calendar-weekdays {
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  border:1px solid #242424;
+  border-bottom:0;
+}
+.calendar-weekdays span {
+  min-height:30px;
+  display:grid;
+  place-items:center;
+  border-right:1px solid #242424;
+  color:#bcbcbc;
+  font-size:11px;
+  font-weight:900;
+}
+.calendar-weekdays span:last-child { border-right:0; color:#ff6675; }
+.calendar-grid {
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  border-left:1px solid #242424;
+  border-top:1px solid #242424;
+}
+.calendar-day,.calendar-empty {
+  position:relative;
+  min-height:58px;
+  box-sizing:border-box;
+  border-right:1px solid #242424;
+  border-bottom:1px solid #242424;
+  background:#030303;
+}
+.calendar-day {
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:0;
+}
+.calendar-day strong { font-size:23px; font-weight:1000; }
+.calendar-day.past { color:#555; }
+.calendar-day.today { box-shadow:inset 0 0 0 2px #20dc83; }
+.calendar-day.selected { box-shadow:inset 0 0 0 2px #ffc400; }
+.calendar-day:disabled { cursor:default; }
+.calendar-reservation-mark {
+  position:absolute;
+  right:6px;
+  bottom:6px;
+  width:15px;
+  height:15px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:#ff9f1a;
+  color:#151515;
+  font-size:9px;
+  font-weight:1000;
+}
+.calendar-reservations {
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  margin-top:7px;
+}
+.calendar-empty-message {
+  border:1px dashed #333;
+  padding:16px 10px;
+  text-align:center;
+  color:#eee;
+  font-size:18px;
+  font-weight:800;
+}
+html.light .subscreen-header,
+html.light .confirm-screen,
+html.light .calendar-screen { background:#fff; color:#222; }
+html.light .subscreen-header h1 { color:#222; }
+html.light .subscreen-back { background:#fff; color:#222; border-color:#bbb; }
+html.light .confirm-card { background:linear-gradient(#fff,#f3f1ec); border-color:#d4d0c8; }
+html.light .confirm-date { background:#f3f1ec; }
+html.light .confirm-client strong,
+html.light .confirm-day strong { color:#222; }
+html.light .confirm-day span,
+html.light .confirm-date span { color:#444; }
+html.light .confirm-check { background:#fff; }
+html.light .calendar-day,.light .calendar-empty { background:#fff; color:#222; }
+html.light .calendar-day.past { color:#aaa; }
+html.light .calendar-weekdays,
+html.light .calendar-grid { border-color:#ddd; }
+html.light .calendar-weekdays span { border-color:#ddd; color:#777; }
+html.light .calendar-month-header button { background:#fff; color:#222; border-color:#ccc; }
+html.light .confirm-empty,
+html.light .calendar-empty-message { color:#444; border-color:#bbb; }
+@media (max-width: 500px) {
+  .pending-badge { top: 9px; right: 19%; width: 31px; min-width:31px; height:31px; font-size:17px; }
+  .confirm-card { grid-template-columns: 88px 82px 65px 1fr 58px; min-height:96px; }
+  .confirm-date strong { font-size:22px; }
+  .confirm-date span { font-size:12px; }
+  .confirm-day span { font-size:10px; }
+  .confirm-day strong { font-size:22px; }
+  .confirm-pax { font-size:17px; }
+  .confirm-client { padding:7px 8px; gap:5px; }
+  .confirm-client strong { font-size:17px; }
+  .confirm-client span { font-size:12px; }
+  .confirm-check { width:43px; height:43px; }
+  .calendar-month-header strong { font-size:21px; }
+  .calendar-day { min-height:54px; }
+  .calendar-day strong { font-size:21px; }
+  .calendar-reservation-mark { right:4px; bottom:4px; }
+}
 
-.private-content { padding: 0 calc(6px * var(--v2s)) calc(5px * var(--v2s)); }
 
-.date-turn-header {
-  min-height: calc(60px * var(--v2s));
-  padding: calc(8px * var(--v2s)) calc(4px * var(--v2s));
-  gap: calc(4px * var(--v2s));
+/* V2 CALENDAR CARD: keep reservation data on one horizontal row, as in the reference. */
+.calendar-reservations .reservation-card {
+  min-height: 98px;
+  grid-template-columns: 162px 1fr 138px;
 }
-.today-title {
-  gap: calc(4px * var(--v2s));
-  font-size: calc(23px * var(--v2s));
+.calendar-reservations .reservation-time {
+  gap: 4px;
 }
-.today-calendar { font-size: calc(19px * var(--v2s)); }
-.turn-actions { gap: calc(3px * var(--v2s)); }
-.turn-button {
-  flex-basis: calc(126px * var(--v2s));
-  width: calc(126px * var(--v2s));
-  min-width: calc(126px * var(--v2s));
-  min-height: calc(40px * var(--v2s));
-  height: calc(40px * var(--v2s));
-  padding: 0 calc(5px * var(--v2s));
-  border-width: calc(2px * var(--v2s));
-  border-radius: calc(8px * var(--v2s));
-  gap: calc(5px * var(--v2s));
-  font-size: calc(15px * var(--v2s));
+.calendar-reservations .reservation-time strong {
+  font-size: 30px;
 }
-.filter-button {
-  width: calc(38px * var(--v2s));
-  min-width: calc(38px * var(--v2s));
-  height: calc(42px * var(--v2s));
-  min-height: calc(42px * var(--v2s));
-  border-radius: calc(7px * var(--v2s));
+.calendar-reservations .status-pill {
+  font-size: 13px;
+  padding: 4px 10px;
 }
-.filter-button svg {
-  width: calc(22px * var(--v2s));
-  height: calc(22px * var(--v2s));
+.calendar-reservations .reservation-main {
+  padding: 10px 12px;
+  gap: 5px;
 }
-.reservation-scroll { padding: calc(7px * var(--v2s)) calc(6px * var(--v2s)) calc(12px * var(--v2s)); }
-.empty-message {
-  padding: calc(20px * var(--v2s)) calc(12px * var(--v2s));
-  font-size: calc(34px * var(--v2s));
-  line-height: 1.15;
+.calendar-reservations .customer-name {
+  font-size: 21px;
 }
-
-.reservation-card {
-  min-height: calc(96px * var(--v2s));
-  grid-template-columns: calc(148px * var(--v2s)) 1fr calc(138px * var(--v2s));
+.calendar-reservations .customer-meta {
+  font-size: 16px;
 }
-.reservation-time { gap: calc(4px * var(--v2s)); }
-.reservation-time strong { font-size: calc(42px * var(--v2s)); }
-.status-pill {
-  padding: calc(3px * var(--v2s)) calc(6px * var(--v2s));
-  font-size: calc(15px * var(--v2s));
+.calendar-reservations .reservation-party {
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  border-top: 0;
+  gap: 8px;
+  padding: 8px 10px;
 }
-.reservation-main { padding: calc(13px * var(--v2s)) calc(10px * var(--v2s)); gap: calc(6px * var(--v2s)); }
-.customer-name { font-size: calc(22px * var(--v2s)); gap: calc(7px * var(--v2s)); }
-.customer-meta { gap: calc(7px * var(--v2s)); font-size: calc(16px * var(--v2s)); }
-.reservation-party { gap: calc(9px * var(--v2s)); padding: calc(9px * var(--v2s)) calc(10px * var(--v2s)); }
-.pax { font-size: calc(19px * var(--v2s)); gap: calc(5px * var(--v2s)); }
-.table-button {
-  min-width: calc(112px * var(--v2s));
-  height: calc(35px * var(--v2s));
-  border-radius: calc(5px * var(--v2s));
-  font-size: calc(13px * var(--v2s));
+.calendar-reservations .pax {
+  font-size: 19px;
+}
+.calendar-reservations .table-button {
+  min-width: 112px;
+  height: 35px;
+  font-size: 13px;
 }
 
-/* En pantallas realmente estrechas, conservamos la estructura de V2 sin
-   permitir que texto/iconos fuercen el ancho de las columnas. */
-@media (max-width: 380px) {
-  .menu-card { font-size: calc(20px * var(--v2s)); }
-  .menu-icon { font-size: calc(38px * var(--v2s)); }
-  .logout-button { font-size: calc(12px * var(--v2s)); padding-inline: calc(9px * var(--v2s)); }
+/* V2 calendar typography/geometry. */
+.calendar-month-header {
+  min-height: 46px;
+  gap: 12px;
+}
+.calendar-month-header strong {
+  font-size: 23px;
+}
+.calendar-month-header button {
+  width: 40px;
+  height: 40px;
+}
+.calendar-day {
+  min-height: 55px;
+}
+.calendar-day strong {
+  font-size: 23px;
+}
+
+@media (max-width: 500px) {
+  .confirm-card {
+    grid-template-columns: 115px 108px 78px 1fr 82px;
+    min-height: 112px;
+  }
+  .confirm-date strong { font-size: 30px; }
+  .confirm-date span { font-size: 16px; }
+  .confirm-day span { font-size: 14px; }
+  .confirm-day strong { font-size: 30px; }
+  .confirm-pax { font-size: 22px; }
+  .confirm-client strong { font-size: 22px; }
+  .confirm-client span { font-size: 16px; }
+  .confirm-check { width: 50px; height: 50px; }
+
+  .calendar-reservations .reservation-card {
+    grid-template-columns: 162px 1fr 138px;
+    min-height: 98px;
+  }
+  .calendar-reservations .reservation-party {
+    grid-column: auto;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    border-top: 0;
+  }
+  .calendar-reservations .reservation-time {
+    grid-row: auto;
+  }
+  .calendar-reservations .reservation-main {
+    padding: 10px 12px;
+  }
+  .calendar-reservations .customer-name { font-size: 21px; }
+  .calendar-reservations .customer-meta { font-size: 16px; }
+  .calendar-reservations .reservation-time strong { font-size: 30px; }
+  .calendar-reservations .status-pill { font-size: 13px; }
+  .calendar-month-header { min-height: 46px; }
+  .calendar-month-header strong { font-size: 23px; }
+  .calendar-day { min-height: 55px; }
+  .calendar-day strong { font-size: 23px; }
+}
+
+
+/* V2 TYPOGRAPHY LOCK — CONFIRMAR + CALENDARIO
+   Valores copiados del CSS final de Camborio-Reservas-V2.
+   No reducir tipografías en estos dos módulos mediante reglas responsive.
+*/
+.subscreen-header h1 {
+  font-size: 30px;
+}
+.confirm-card {
+  grid-template-columns: 115px 108px 78px 1fr 82px;
+  min-height: 112px;
+}
+.confirm-date strong {
+  font-size: 30px;
+}
+.confirm-date span {
+  font-size: 16px;
+}
+.confirm-day span {
+  font-size: 14px;
+}
+.confirm-day strong {
+  font-size: 30px;
+}
+.confirm-pax {
+  font-size: 22px;
+}
+.confirm-client strong {
+  font-size: 30px;
+}
+.confirm-client span {
+  font-size: 16px;
+}
+.confirm-check {
+  width: 50px;
+  height: 50px;
+}
+
+/* Calendario: geometría y tipografía V2 exactas */
+.calendar-month-header {
+  min-height: 50px;
+  gap: 8px;
+}
+.calendar-month-header strong {
+  font-size: clamp(26px, 6vw, 34px);
+}
+.calendar-month-header button {
+  width: 48px;
+  height: 50px;
+  min-height: 50px;
+}
+.calendar-weekdays span {
+  padding: 7px 0;
+  font-size: 14px;
+}
+.calendar-day {
+  min-height: 74px;
+  padding: 7px 6px 6px;
+}
+.calendar-day strong {
+  font-size: clamp(30px, 7.2vw, 40px);
+}
+.calendar-reservation-mark {
+  right: 11px;
+  bottom: 11px;
+  width: 20px;
+  height: 20px;
+  font-size: 13px;
+}
+
+/* Tarjetas de reservas bajo el calendario: valores V2 */
+.calendar-reservations .reservation-card {
+  min-height: 98px;
+  grid-template-columns: 162px 1fr 138px;
+}
+.calendar-reservations .reservation-time strong {
+  font-size: 30px;
+}
+.calendar-reservations .status-pill {
+  font-size: 13px;
+  padding: 4px 10px;
+}
+.calendar-reservations .customer-name {
+  font-size: 21px;
+}
+.calendar-reservations .customer-meta {
+  font-size: 16px;
+}
+.calendar-reservations .pax {
+  font-size: 19px;
+}
+.calendar-reservations .table-button {
+  min-width: 112px;
+  height: 35px;
+  font-size: 13px;
+}
+
+/* Importante: en el ancho móvil del APK se conservan los valores V2,
+   no los overrides pequeños anteriores. */
+@media (max-width: 620px) {
+  .confirm-card {
+    grid-template-columns: 115px 108px 78px 1fr 82px;
+    min-height: 112px;
+  }
+  .confirm-date strong { font-size: 30px; }
+  .confirm-date span { font-size: 16px; }
+  .confirm-day span { font-size: 14px; }
+  .confirm-day strong { font-size: 30px; }
+  .confirm-pax { font-size: 22px; }
+  .confirm-client strong { font-size: 30px; }
+  .confirm-client span { font-size: 16px; }
+  .confirm-check { width: 50px; height: 50px; }
+
+  .calendar-month-header {
+    min-height: 50px;
+  }
+  .calendar-month-header strong {
+    font-size: 30px;
+  }
+  .calendar-month-header button {
+    width: 48px;
+    height: 50px;
+  }
+  .calendar-weekdays span {
+    font-size: 14px;
+  }
+  .calendar-day {
+    min-height: 74px;
+  }
+  .calendar-day strong {
+    font-size: 30px;
+  }
+  .calendar-reservation-mark {
+    right: 9px;
+    bottom: 9px;
+    width: 20px;
+    height: 20px;
+    font-size: 13px;
+  }
+  .calendar-reservations .reservation-card {
+    grid-template-columns: 162px 1fr 138px;
+    min-height: 98px;
+  }
+  .calendar-reservations .customer-name { font-size: 21px; }
+  .calendar-reservations .customer-meta { font-size: 16px; }
+  .calendar-reservations .reservation-time strong { font-size: 30px; }
+  .calendar-reservations .status-pill { font-size: 13px; }
+  .calendar-reservations .pax { font-size: 19px; }
+  .calendar-reservations .table-button { font-size: 13px; }
+}
+
+
+/* CALENDARIO — ajuste final tomando como referencia directa el CSS de V2
+   y las capturas V2/V4 del mismo dispositivo. */
+.calendar-weekdays span {
+  font-size: 16px;
+  padding: 7px 0;
+}
+.calendar-day {
+  min-height: 74px;
+  padding: 7px 6px 6px;
+}
+.calendar-day strong {
+  position: absolute;
+  top: 50%;
+  left: 38%;
+  transform: translate(-50%, -50%);
+  font-size: 34px;
+  line-height: .9;
+}
+.calendar-reservation-mark {
+  position: absolute;
+  top: 50%;
+  right: 11px;
+  bottom: auto;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+}
+
+/* Tarjeta de reserva bajo el calendario: misma jerarquía visual de V2,
+   aprovechando el espacio disponible del ancho móvil. */
+.calendar-reservations .reservation-card {
+  grid-template-columns: 168px minmax(0, 1fr) 150px;
+  min-height: 104px;
+}
+.calendar-reservations .reservation-time {
+  align-items: center;
+  justify-content: center;
+  padding: 10px 10px;
+  gap: 7px;
+}
+.calendar-reservations .status-pill {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 32px;
+  padding: 5px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+}
+.calendar-reservations .reservation-time strong {
+  font-size: 34px;
+}
+.calendar-reservations .reservation-main {
+  padding: 10px 12px 10px 14px;
+  gap: 6px;
+}
+.calendar-reservations .customer-name {
+  font-size: 24px;
+}
+.calendar-reservations .customer-meta {
+  font-size: 19px;
+  gap: 7px;
+}
+.calendar-reservations .reservation-code {
+  font-size: 19px;
+}
+.calendar-reservations .reservation-party {
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 8px;
+}
+.calendar-reservations .pax {
+  width: 100%;
+  font-size: 22px;
+  text-align: center;
+  white-space: nowrap;
+}
+.calendar-reservations .table-button {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 7px 6px;
+  font-size: 17px;
+  box-sizing: border-box;
+}
+
+/* No reducir estos valores en la vista móvil del APK. */
+@media (max-width: 620px) {
+  .calendar-weekdays span {
+    font-size: 16px;
+  }
+  .calendar-day {
+    min-height: 74px;
+  }
+  .calendar-day strong {
+    left: 38%;
+    font-size: 34px;
+  }
+  .calendar-reservation-mark {
+    top: 50%;
+    right: 9px;
+    bottom: auto;
+    width: 20px;
+    height: 20px;
+    font-size: 13px;
+  }
+  .calendar-reservations .reservation-card {
+    grid-template-columns: 168px minmax(0, 1fr) 150px;
+    min-height: 104px;
+  }
+  .calendar-reservations .reservation-main {
+    padding: 10px 10px 10px 12px;
+  }
+  .calendar-reservations .customer-name {
+    font-size: 24px;
+  }
+  .calendar-reservations .customer-meta,
+  .calendar-reservations .reservation-code {
+    font-size: 19px;
+  }
+  .calendar-reservations .reservation-time strong {
+    font-size: 34px;
+  }
+  .calendar-reservations .status-pill {
+    font-size: 16px;
+    min-height: 32px;
+  }
+  .calendar-reservations .pax {
+    font-size: 22px;
+  }
+  .calendar-reservations .table-button {
+    min-height: 40px;
+    font-size: 17px;
+  }
+}
+
+/* OBSERVACIONES — ojo y modal siguiendo la referencia V2. */
+.observation-button {
+  width: 40px; min-width: 40px; height: 34px; margin-left: 2px; padding: 0;
+  border: 1px solid #8c7100; border-radius: 7px;
+  background: linear-gradient(180deg,#ffd42a,#e3a900); color: #111;
+  display: inline-grid; place-items: center; font-size: 18px; line-height: 1;
+}
+.observation-overlay {
+  position: fixed; inset: 0; z-index: 100000; display: flex; align-items: center;
+  justify-content: center; padding: 18px; background: rgba(0,0,0,.86);
+}
+.observation-modal {
+  width: min(490px, calc(100vw - 36px)); box-sizing: border-box;
+  padding: 18px 18px 16px; border: 2px solid #ffc400; border-radius: 10px;
+  background: linear-gradient(180deg,#181818,#070707);
+  box-shadow: 0 12px 40px rgba(0,0,0,.7); text-align: center;
+}
+.observation-modal h2 { margin: 0 0 10px; color: #ffc400; font-size: 30px; line-height: 1; font-weight: 1000; }
+.observation-text {
+  color: #fff; font-size: 24px; line-height: 1.2; font-weight: 800;
+  white-space: pre-wrap; overflow-wrap: anywhere; max-height: 45vh; overflow-y: auto;
+}
+.observation-close {
+  width: 100%; min-height: 48px; margin-top: 18px; border: 0; border-radius: 8px;
+  background: linear-gradient(180deg,#ffd42a,#f0aa00); color: #111; font-size: 16px; font-weight: 1000;
+}
+html.light .observation-modal { background: linear-gradient(180deg,#fff,#f1efea); }
+html.light .observation-text { color:#222; }
+
+
+/* V4.1 — Reservas Hoy usa exactamente la misma tarjeta que Calendario. */
+.reservation-scroll .calendar-reservations {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 0;
+}
+.reservation-scroll .reservation-card {
+  grid-template-columns: 168px minmax(0, 1fr) 150px;
+  min-height: 104px;
+}
+.reservation-scroll .reservation-time {
+  align-items: center;
+  justify-content: center;
+  padding: 10px 10px;
+  gap: 7px;
+}
+.reservation-scroll .status-pill {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 32px;
+  padding: 5px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+}
+.reservation-scroll .reservation-time strong { font-size: 34px; }
+.reservation-scroll .reservation-main {
+  padding: 10px 12px 10px 14px;
+  gap: 6px;
+}
+.reservation-scroll .customer-name { font-size: 24px; }
+.reservation-scroll .customer-meta {
+  font-size: 19px;
+  gap: 7px;
+}
+.reservation-scroll .reservation-code { font-size: 19px; }
+.reservation-scroll .reservation-party {
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 8px;
+}
+.reservation-scroll .pax {
+  width: 100%;
+  font-size: 22px;
+  text-align: center;
+  white-space: nowrap;
+}
+.reservation-scroll .table-button {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 7px 6px;
+  font-size: 17px;
+  box-sizing: border-box;
+}
+@media (max-width: 620px) {
+  .reservation-scroll .reservation-card {
+    grid-template-columns: 168px minmax(0, 1fr) 150px;
+    min-height: 104px;
+  }
+  .reservation-scroll .reservation-main { padding: 10px 10px 10px 12px; }
+  .reservation-scroll .customer-name { font-size: 24px; }
+  .reservation-scroll .customer-meta,
+  .reservation-scroll .reservation-code { font-size: 19px; }
+  .reservation-scroll .reservation-time strong { font-size: 34px; }
+  .reservation-scroll .status-pill { font-size: 16px; min-height: 32px; }
+  .reservation-scroll .pax { font-size: 22px; }
+  .reservation-scroll .table-button { min-height: 40px; font-size: 17px; }
+}
+
+/* V4.1 — modo día: más contraste, menos líneas negras y amarillo convertido a ámbar/cobre legible. */
+html.light .private-app {
+  color: #202020;
+}
+html.light .private-header::after {
+  background: linear-gradient(90deg, transparent, rgba(145,88,0,.32) 20%, rgba(145,88,0,.12) 80%, transparent);
+}
+html.light .menu-card {
+  border-color: #c8c1b5;
+}
+html.light .menu-card.active {
+  border-color: #a86b00;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.8), 0 0 0 2px rgba(168,107,0,.16);
+}
+html.light .today-date {
+  color: #a86b00;
+}
+html.light .today-screen {
+  border-color: #c5beb2;
+}
+html.light .date-turn-header {
+  border-color: #d0c9be;
+}
+html.light .filter-button {
+  border-color: #a86b00;
+  color: #a86b00;
+}
+html.light .reservation-card {
+  border-color: #c5beb2;
+}
+html.light .reservation-time,
+html.light .reservation-card > * {
+  border-color: #c5beb2;
+}
+html.light .status-pendiente {
+  color: #a86b00;
+  border-color: #a86b00;
+}
+html.light .status-confirmada {
+  color: #157447;
+  border-color: #157447;
+}
+html.light .reservation-code,
+html.light .table-button,
+html.light .observation-button {
+  color: #a86b00;
+}
+html.light .reservation-code,
+html.light .table-button {
+  border-color: #a86b00;
+}
+html.light .calendar-month-header strong {
+  color: #a86b00;
+}
+html.light .calendar-day.selected {
+  box-shadow: inset 0 0 0 2px #a86b00;
+}
+html.light .calendar-weekdays,
+html.light .calendar-grid {
+  border-color: #d0c9be;
+}
+html.light .calendar-day,
+html.light .calendar-empty {
+  border-color: #d0c9be;
+}
+html.light .calendar-reservation-mark {
+  background: #c87800;
+  color: #fff;
+}
+html.light .calendar-reservations .status-pendiente {
+  color: #a86b00;
+  border-color: #a86b00;
+}
+
+
+/* V4.1 — Confirmar: mismo contraste de modo día que Reservas Hoy + teléfono/código reforzados. */
+html.light .confirm-card {
+  border-color: #c5beb2;
+  background: linear-gradient(#fff, #f3f1ec);
+}
+html.light .confirm-card > * {
+  border-color: #c5beb2;
+}
+html.light .confirm-date {
+  background: #eeeae2;
+}
+html.light .confirm-date strong {
+  color: #a86b00;
+}
+html.light .confirm-date span,
+html.light .confirm-day span {
+  color: #3f3f3f;
+}
+html.light .confirm-day strong {
+  color: #202020;
+}
+html.light .confirm-client strong {
+  color: #202020;
+}
+html.light .confirm-client span {
+  color: #555;
+}
+html.light .confirm-client b {
+  color: #a86b00;
+}
+html.light .confirm-check {
+  border-color: #a86b00;
+  color: #a86b00;
+  background: #fff;
+}
+html.light .pending-badge {
+  background: #c87800;
+  color: #fff;
+  box-shadow: 0 0 0 2px rgba(90,55,0,.22);
+}
+
+/* Teléfono y código de reserva: más visibles en Confirmar. */
+.confirm-client span {
+  font-size: 19px;
+}
+.confirm-client b {
+  font-size: 20px;
+  font-weight: 1000;
+}
+@media (max-width: 620px) {
+  .confirm-client span {
+    font-size: 19px;
+  }
+  .confirm-client b {
+    font-size: 20px;
+  }
+}
+
+
+/* V4.2 — Calendario compacto: misma densidad visual que V2. El calendario informa; las fichas necesitan el espacio. */
+.calendar-month-header { min-height: 48px; }
+.calendar-month-header strong { font-size: 24px; }
+.calendar-month-header button { width: 38px; height: 38px; }
+.calendar-weekdays span { min-height: 30px; font-size: 11px; padding: 0; }
+.calendar-day,
+.calendar-empty { min-height: 58px; padding: 0; }
+.calendar-day strong { position: static; transform: none; font-size: 23px; line-height: 1; }
+.calendar-reservation-mark {
+  right: 4px;
+  bottom: 4px;
+  width: 15px;
+  height: 15px;
+  font-size: 9px;
 }

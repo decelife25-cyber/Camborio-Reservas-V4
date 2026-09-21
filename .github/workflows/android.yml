@@ -84,8 +84,16 @@ jobs:
         chmod +x gradlew
         ./gradlew assembleDebug
 
+    - name: Rename APK with app version
+      id: version
+      run: |
+        set -euo pipefail
+        VERSION="$(node -p 'require("./android_app/package.json").version')"
+        echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+        cp android_app/android/app/build/outputs/apk/debug/app-debug.apk "android_app/android/app/build/outputs/apk/debug/reservas-$VERSION.apk"
+
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: app-debug
-        path: android_app/android/app/build/outputs/apk/debug/app-debug.apk
+        name: reservas-${{ steps.version.outputs.version }}
+        path: android_app/android/app/build/outputs/apk/debug/reservas-${{ steps.version.outputs.version }}.apk

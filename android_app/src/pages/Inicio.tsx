@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import ReservationCard from '../components/ReservationCard';
 
 type Reserva = {
   ReservaID: string;
@@ -12,29 +13,17 @@ type Reserva = {
   Estado: string;
   Mesa: string | null;
   Turno: 'COMIDA' | 'CENA' | string | null;
+  Observaciones: string | null;
 };
 
 const CANCELADAS = new Set(['CANCELADA_CLIENTE', 'CANCELADA_LOCAL']);
 
-function formatDate(value: Date) {
+function formatDateParts(value: Date) {
   const day = value.toLocaleDateString('es-ES', { weekday: 'long', timeZone: 'Europe/Madrid' });
   const dayNumber = value.toLocaleDateString('es-ES', { day: 'numeric', timeZone: 'Europe/Madrid' });
   const month = value.toLocaleDateString('es-ES', { month: 'long', timeZone: 'Europe/Madrid' });
   const year = value.toLocaleDateString('es-ES', { year: 'numeric', timeZone: 'Europe/Madrid' });
-  return day.toUpperCase() + ' ' + dayNumber + ' ' + month.toUpperCase() + ' ' + year;
-}
-
-function formatTime(value: string) {
-  return String(value || '').slice(0, 5);
-}
-
-function statusLabel(status: string) {
-  if (status === 'CONFIRMADA') return 'CONFIRMADA';
-  if (status === 'PENDIENTE') return 'PENDIENTE';
-  if (status === 'SENTADA') return 'SENTADA';
-  if (status === 'FINALIZADA') return 'FINALIZADA';
-  if (status === 'NO_PRESENTADO') return 'NO PRESENTADO';
-  return status;
+  return { day: day.toUpperCase(), date: dayNumber + ' ' + month.toUpperCase() + ' ' + year };
 }
 
 export default function Inicio() {
@@ -50,7 +39,7 @@ export default function Inicio() {
 
     const { data, error: queryError } = await supabase
       .from('Reservas')
-      .select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,Turno')
+      .select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,Turno,Observaciones')
       .eq('FechaReserva', today)
       .order('HoraReserva', { ascending: true });
 
@@ -89,7 +78,8 @@ export default function Inicio() {
       <header className="date-turn-header">
         <div className="today-title">
           <span className="today-calendar" aria-hidden="true">📅</span>
-          <span>{formatDate(new Date())}</span>
+          <span className="today-day">{formatDateParts(new Date()).day}</span>
+          <span className="today-date">{formatDateParts(new Date()).date}</span>
         </div>
 
         <div className="turn-actions">
@@ -123,31 +113,11 @@ export default function Inicio() {
         ) : visibles.length === 0 ? (
           <div className="empty-message">No hay reservas para esta fecha.</div>
         ) : (
-          visibles.map(reserva => (
-            <article className="reservation-card" key={reserva.ReservaID}>
-              <div className="reservation-time">
-                <span className={'status-pill status-' + reserva.Estado.toLowerCase().replaceAll('_', '-')}>
-                  {statusLabel(reserva.Estado)}
-                </span>
-                <strong>{formatTime(reserva.HoraReserva)}</strong>
-              </div>
-              <div className="reservation-main">
-                <div className="customer-name"><span>👤</span>{reserva.Nombre || 'SIN NOMBRE'}</div>
-                <div className="customer-meta">
-                  <span className="phone-icon">☎</span>
-                  <span>{reserva.Telefono || '—'}</span>
-                  <span>•</span>
-                  <span className="reservation-code">{reserva.CodigoReserva || '—'}</span>
-                </div>
-              </div>
-              <div className="reservation-party">
-                <div className="pax"><span>👥</span> {reserva.Personas || 0} PAX</div>
-                <button className="table-button" type="button">
-                  {reserva.Mesa ? 'MESA ' + reserva.Mesa : 'SIN ASIGNAR'}
-                </button>
-              </div>
-            </article>
-          ))
+          <div className="calendar-reservations">
+            {visibles.map(reserva => (
+              <ReservationCard key={reserva.ReservaID} reserva={reserva} />
+            ))}
+          </div>
         )}
       </div>
     </section>
