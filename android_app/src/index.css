@@ -372,139 +372,23 @@ html.light .filter-button { background: #fff; }
 
 
 
-/* V2 REAL RESPONSIVE LAYOUT
-   No se usa zoom/transform para corregir el tamaño. El panel se dimensiona
-   proporcionalmente al viewport CSS real del WebView, manteniendo el ancho
-   completo y las proporciones de V2 en móviles de distintas densidades. */
-:root { --v2s: clamp(.43, 0.0667vw, .70); }
 
+
+/* V2 calibration for the Android WebView viewport.
+   The V2 panel is rendered at the compact mobile scale; this APK WebView
+   reports a wider CSS viewport than the same physical device. */
 .private-app {
-  min-height: 100svh;
-  height: 100svh;
-  overflow: hidden;
+  zoom: 0.42;
+  width: 238.095238%;
+  min-height: 238.095238svh;
+  height: 238.095238svh;
 }
-
-.private-header {
-  min-height: calc(76px * var(--v2s));
-  padding: calc(6px * var(--v2s)) calc(8px * var(--v2s)) calc(5px * var(--v2s));
-  gap: calc(6px * var(--v2s));
-  margin-bottom: calc(8px * var(--v2s));
-}
-.brand-lockup { gap: calc(7px * var(--v2s)); }
-.brand-emblem {
-  width: calc(55px * var(--v2s));
-  min-width: calc(55px * var(--v2s));
-  max-width: calc(55px * var(--v2s));
-  height: calc(55px * var(--v2s));
-  min-height: calc(55px * var(--v2s));
-  max-height: calc(55px * var(--v2s));
-  flex-basis: calc(55px * var(--v2s));
-}
-.brand-name { font-size: calc(27px * var(--v2s)); }
-.brand-line {
-  gap: calc(5px * var(--v2s));
-  margin-top: calc(3px * var(--v2s));
-  font-size: calc(14px * var(--v2s));
-  letter-spacing: calc(1px * var(--v2s));
-}
-.brand-line span { min-width: calc(18px * var(--v2s)); height: calc(1px * var(--v2s)); }
-.header-actions { gap: calc(5px * var(--v2s)); }
-.header-icon {
-  width: calc(44px * var(--v2s));
-  min-width: calc(44px * var(--v2s));
-  height: calc(44px * var(--v2s));
-  border-radius: calc(8px * var(--v2s));
-}
-.logout-button {
-  min-height: calc(56px * var(--v2s));
-  height: calc(56px * var(--v2s));
-  padding: 0 calc(12px * var(--v2s));
-  font-size: calc(14px * var(--v2s));
-}
-
-.private-menu {
-  gap: calc(7px * var(--v2s));
-  margin-bottom: calc(10px * var(--v2s));
-}
-.menu-card {
-  min-height: calc(90px * var(--v2s));
-  padding: calc(8px * var(--v2s)) calc(4px * var(--v2s));
-  border-radius: calc(8px * var(--v2s));
-  gap: calc(5px * var(--v2s));
-  font-size: calc(22px * var(--v2s));
-  line-height: 1.05;
-}
-.menu-icon { font-size: calc(42px * var(--v2s)); }
-
-.private-content { padding: 0 calc(6px * var(--v2s)) calc(5px * var(--v2s)); }
-
-.date-turn-header {
-  min-height: calc(60px * var(--v2s));
-  padding: calc(8px * var(--v2s)) calc(4px * var(--v2s));
-  gap: calc(4px * var(--v2s));
-}
-.today-title {
-  gap: calc(4px * var(--v2s));
-  font-size: calc(23px * var(--v2s));
-}
-.today-calendar { font-size: calc(19px * var(--v2s)); }
-.turn-actions { gap: calc(3px * var(--v2s)); }
-.turn-button {
-  flex-basis: calc(126px * var(--v2s));
-  width: calc(126px * var(--v2s));
-  min-width: calc(126px * var(--v2s));
-  min-height: calc(40px * var(--v2s));
-  height: calc(40px * var(--v2s));
-  padding: 0 calc(5px * var(--v2s));
-  border-width: calc(2px * var(--v2s));
-  border-radius: calc(8px * var(--v2s));
-  gap: calc(5px * var(--v2s));
-  font-size: calc(15px * var(--v2s));
-}
-.filter-button {
-  width: calc(38px * var(--v2s));
-  min-width: calc(38px * var(--v2s));
-  height: calc(42px * var(--v2s));
-  min-height: calc(42px * var(--v2s));
-  border-radius: calc(7px * var(--v2s));
-}
-.filter-button svg {
-  width: calc(22px * var(--v2s));
-  height: calc(22px * var(--v2s));
-}
-.reservation-scroll { padding: calc(7px * var(--v2s)) calc(6px * var(--v2s)) calc(12px * var(--v2s)); }
-.empty-message {
-  padding: calc(20px * var(--v2s)) calc(12px * var(--v2s));
-  font-size: calc(34px * var(--v2s));
-  line-height: 1.15;
-}
-
-.reservation-card {
-  min-height: calc(96px * var(--v2s));
-  grid-template-columns: calc(148px * var(--v2s)) 1fr calc(138px * var(--v2s));
-}
-.reservation-time { gap: calc(4px * var(--v2s)); }
-.reservation-time strong { font-size: calc(42px * var(--v2s)); }
-.status-pill {
-  padding: calc(3px * var(--v2s)) calc(6px * var(--v2s));
-  font-size: calc(15px * var(--v2s));
-}
-.reservation-main { padding: calc(13px * var(--v2s)) calc(10px * var(--v2s)); gap: calc(6px * var(--v2s)); }
-.customer-name { font-size: calc(22px * var(--v2s)); gap: calc(7px * var(--v2s)); }
-.customer-meta { gap: calc(7px * var(--v2s)); font-size: calc(16px * var(--v2s)); }
-.reservation-party { gap: calc(9px * var(--v2s)); padding: calc(9px * var(--v2s)) calc(10px * var(--v2s)); }
-.pax { font-size: calc(19px * var(--v2s)); gap: calc(5px * var(--v2s)); }
-.table-button {
-  min-width: calc(112px * var(--v2s));
-  height: calc(35px * var(--v2s));
-  border-radius: calc(5px * var(--v2s));
-  font-size: calc(13px * var(--v2s));
-}
-
-/* En pantallas realmente estrechas, conservamos la estructura de V2 sin
-   permitir que texto/iconos fuercen el ancho de las columnas. */
-@media (max-width: 380px) {
-  .menu-card { font-size: calc(20px * var(--v2s)); }
-  .menu-icon { font-size: calc(38px * var(--v2s)); }
-  .logout-button { font-size: calc(12px * var(--v2s)); padding-inline: calc(9px * var(--v2s)); }
+.app-version {
+  position: fixed;
+  right: 8px;
+  bottom: 4px;
+  z-index: 9999;
+  font: 700 10px/1 Arial, sans-serif;
+  color: rgba(255,255,255,.48);
+  pointer-events: none;
 }
