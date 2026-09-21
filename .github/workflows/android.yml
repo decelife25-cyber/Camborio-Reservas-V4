@@ -44,6 +44,32 @@ jobs:
         distribution: 'zulu'
         java-version: '21'
 
+    - name: Apply official private APK icon
+      run: |
+        set -euo pipefail
+        sudo apt-get update
+        sudo apt-get install -y imagemagick
+
+        SRC="reservas_apk.png"
+        RES="android_app/android/app/src/main/res"
+
+        # Use the official private-app icon from the repository for every
+        # Android launcher density and for the adaptive-icon foreground.
+        declare -A SIZES=(
+          [mipmap-mdpi]=48
+          [mipmap-hdpi]=72
+          [mipmap-xhdpi]=96
+          [mipmap-xxhdpi]=144
+          [mipmap-xxxhdpi]=192
+        )
+
+        for DIR in "${!SIZES[@]}"; do
+          SIZE="${SIZES[$DIR]}"
+          convert "$SRC" -resize "${SIZE}x${SIZE}" "$RES/$DIR/ic_launcher.png"
+          convert "$SRC" -resize "${SIZE}x${SIZE}" "$RES/$DIR/ic_launcher_round.png"
+          convert "$SRC" -resize "${SIZE}x${SIZE}" "$RES/$DIR/ic_launcher_foreground.png"
+        done
+
     - name: Build APK
       run: |
         cd android_app/android
