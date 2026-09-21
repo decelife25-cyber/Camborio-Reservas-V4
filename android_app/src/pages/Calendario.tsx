@@ -156,7 +156,7 @@ export default function Calendario() {
                 onClick={() => setSelectedDate(key)}
               >
                 <strong>{day}</strong>
-                {count > 0 && <span className="calendar-reservation-mark">R</span>}
+                {count > 0 && !isPast && <span className="calendar-reservation-mark">R</span>}
               </button>
             );
           })}
