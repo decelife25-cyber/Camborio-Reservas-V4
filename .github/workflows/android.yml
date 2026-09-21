@@ -74,6 +74,10 @@ jobs:
           convert "$SRC" -resize "${SIZE}x${SIZE}" "$RES/$DIR/ic_launcher_foreground.png"
         done
 
+    - name: Verify stable signing key
+      run: |
+        test -f android_app/android/app/camborio-debug.keystore
+
     - name: Build APK
       run: |
         cd android_app/android
