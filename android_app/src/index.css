@@ -1364,3 +1364,47 @@ html.light .pending-badge {
   height: 15px;
   font-size: 9px;
 }
+
+/* V4.3 — HACER RESERVA + BUSCAR RESERVA */
+.action-screen{height:100%;min-height:0;display:flex;flex-direction:column;background:#000;border:1px solid #2b2c30;border-radius:8px;overflow:hidden;color:#f5f5f5;}
+.action-screen-header{min-height:58px;display:flex;align-items:center;gap:10px;padding:6px 10px;border-bottom:1px solid #292929;background:linear-gradient(#090909,#020202);flex:0 0 auto;}
+.action-screen-header h1{margin:0;color:#ffc400;font-size:25px;font-weight:1000;line-height:1;}
+.action-back{width:42px;height:42px;display:grid;place-items:center;border:1px solid #444;border-radius:7px;background:#171717;color:#fff;}
+.new-reservation-form{overflow-y:auto;padding:10px 12px 18px;display:flex;flex-direction:column;gap:9px;}
+.new-reservation-form label,.field-block>span{font-size:16px;font-weight:900;color:#ddd;display:flex;flex-direction:column;gap:5px;}
+.new-reservation-form input,.new-reservation-form textarea{box-sizing:border-box;width:100%;border:1px solid #555;border-radius:7px;background:#111;color:#fff;padding:10px 11px;font-size:18px;font-weight:700;outline:none;}
+.new-reservation-form textarea{resize:none;line-height:1.2;}
+.new-reservation-form input:focus,.new-reservation-form textarea:focus{border-color:#ffc400;box-shadow:0 0 0 1px rgba(255,196,0,.2);}
+.optional{font-size:12px;color:#999;font-weight:700;}
+.new-reservation-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.field-block{display:flex;flex-direction:column;gap:5px;}
+.people-control{height:44px;display:grid;grid-template-columns:44px 1fr 44px;border:1px solid #555;border-radius:7px;background:#111;overflow:hidden;}
+.people-control button{border:0;background:#1d1d1d;color:#ffc400;display:grid;place-items:center;}
+.people-control strong{display:grid;place-items:center;font-size:18px;}
+.wheel-control{height:86px;display:grid;grid-template-rows:25px 36px 25px;border:1px solid #555;border-radius:7px;background:#0b0b0b;overflow:hidden;}
+.wheel-control button{border:0;background:#171717;color:#999;font-size:13px;}
+.wheel-control strong{display:grid;place-items:center;border-top:1px solid #333;border-bottom:1px solid #333;color:#ffc400;font-size:28px;}
+.create-reservation-button,.search-button{min-height:48px;border:1px solid #9a7200;border-radius:8px;background:linear-gradient(#ffd42a,#e6a900);color:#111;font-size:18px;font-weight:1000;}
+.form-message{padding:10px;border-radius:7px;text-align:center;font-weight:800;}
+.form-error{border:1px solid #a33;background:#351010;color:#ffb0b0;}
+.form-success{border:1px solid #8b6b00;background:#251d00;color:#ffd52a;}
+.search-reservation-form{padding:12px;display:grid;grid-template-columns:1fr 120px;gap:8px;flex:0 0 auto;}
+.search-input-wrap{display:flex;align-items:center;gap:8px;border:1px solid #555;border-radius:7px;background:#111;padding:0 10px;color:#aaa;}
+.search-input-wrap input{width:100%;border:0;outline:0;background:transparent;color:#fff;font-size:18px;padding:12px 0;}
+.search-button{min-height:48px;}
+.search-results{overflow-y:auto;padding:0 8px 14px;display:flex;flex-direction:column;gap:6px;}
+.search-count{color:#ffc400;font-size:15px;font-weight:1000;padding:3px 4px;}
+.search-empty{margin:10px 12px;padding:20px;text-align:center;border:1px dashed #444;color:#ddd;font-weight:800;}
+.search-results .reservation-card{grid-template-columns:168px minmax(0,1fr) 150px;min-height:104px;}
+html.light .action-screen{background:#fff;color:#222;border-color:#c5beb2;}
+html.light .action-screen-header{background:linear-gradient(#fff,#f1efea);border-color:#d0c9be;}
+html.light .action-screen-header h1{color:#a86b00;}
+html.light .action-back{background:#fff;color:#222;border-color:#bbb;}
+html.light .new-reservation-form label,.light .field-block>span{color:#333;}
+html.light .new-reservation-form input,.light .new-reservation-form textarea,.light .people-control,.light .wheel-control{background:#fff;color:#222;border-color:#bbb;}
+html.light .people-control button,.light .wheel-control button{background:#f2f0eb;color:#8d6100;}
+html.light .wheel-control strong{color:#a86b00;border-color:#ddd;}
+html.light .search-input-wrap{background:#fff;border-color:#bbb;color:#666;}
+html.light .search-input-wrap input{color:#222;}
+html.light .search-empty{color:#444;border-color:#bbb;}
+@media(max-width:620px){.action-screen-header{min-height:58px}.action-screen-header h1{font-size:24px}.new-reservation-form{padding:9px 10px 16px}.new-reservation-form label,.field-block>span{font-size:15px}.new-reservation-form input,.new-reservation-form textarea{font-size:17px;padding:9px}.search-reservation-form{grid-template-columns:1fr 105px;padding:10px}.search-input-wrap input{font-size:16px}.search-button{font-size:16px}.search-results .reservation-card{grid-template-columns:168px minmax(0,1fr) 150px;min-height:104px}}
