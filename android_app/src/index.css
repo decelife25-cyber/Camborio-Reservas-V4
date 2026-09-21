@@ -492,9 +492,9 @@ html.light .app-version { color: rgba(0,0,0,.58); }
   padding: 0 6px 12px;
 }
 .confirm-card {
-  min-height: 105px;
+  min-height: 112px;
   display: grid;
-  grid-template-columns: 118px 118px 90px 1fr 66px;
+  grid-template-columns: 115px 108px 78px 1fr 82px;
   align-items: stretch;
   border: 1px solid #292929;
   border-top: 0;
@@ -512,8 +512,8 @@ html.light .app-version { color: rgba(0,0,0,.58); }
   background: #141414;
   color: #ffc400;
 }
-.confirm-date strong { font-size: 28px; line-height: 1; }
-.confirm-date span { color:#f3f3f3; font-size:15px; font-weight:900; margin-top:5px; }
+.confirm-date strong { font-size: 30px; line-height: 1; }
+.confirm-date span { color:#f3f3f3; font-size:16px; font-weight:900; margin-top:5px; }
 .confirm-day {
   display:flex;
   flex-direction:column;
@@ -521,14 +521,14 @@ html.light .app-version { color: rgba(0,0,0,.58); }
   justify-content:center;
   gap:5px;
 }
-.confirm-day span { color:#f0f0f0; font-size:13px; font-weight:900; }
-.confirm-day strong { font-size:28px; line-height:1; color:#fff; }
+.confirm-day span { color:#f0f0f0; font-size:14px; font-weight:900; }
+.confirm-day strong { font-size:30px; line-height:1; color:#fff; }
 .confirm-pax {
   display:flex;
   align-items:center;
   justify-content:center;
   color:#4da6ff;
-  font-size:20px;
+  font-size:22px;
   font-weight:1000;
 }
 .confirm-client {
@@ -538,14 +538,14 @@ html.light .app-version { color: rgba(0,0,0,.58); }
   gap:7px;
   padding:8px 12px;
 }
-.confirm-client strong { font-size:20px; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.confirm-client span { color:#bbb; font-size:15px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.confirm-client strong { font-size:22px; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.confirm-client span { color:#bbb; font-size:16px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .confirm-client b { color:#ffc400; }
 .confirm-check {
   align-self:center;
   justify-self:center;
-  width:48px;
-  height:48px;
+  width:50px;
+  height:50px;
   border:2px solid #ffc400;
   border-radius:7px;
   background:#070707;
@@ -708,4 +708,107 @@ html.light .calendar-empty-message { color:#444; border-color:#bbb; }
   .calendar-day { min-height:54px; }
   .calendar-day strong { font-size:21px; }
   .calendar-reservation-mark { right:4px; bottom:4px; }
+}
+
+
+/* V2 CALENDAR CARD: keep reservation data on one horizontal row, as in the reference. */
+.calendar-reservations .reservation-card {
+  min-height: 98px;
+  grid-template-columns: 162px 1fr 138px;
+}
+.calendar-reservations .reservation-time {
+  gap: 4px;
+}
+.calendar-reservations .reservation-time strong {
+  font-size: 30px;
+}
+.calendar-reservations .status-pill {
+  font-size: 13px;
+  padding: 4px 10px;
+}
+.calendar-reservations .reservation-main {
+  padding: 10px 12px;
+  gap: 5px;
+}
+.calendar-reservations .customer-name {
+  font-size: 21px;
+}
+.calendar-reservations .customer-meta {
+  font-size: 16px;
+}
+.calendar-reservations .reservation-party {
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  border-top: 0;
+  gap: 8px;
+  padding: 8px 10px;
+}
+.calendar-reservations .pax {
+  font-size: 19px;
+}
+.calendar-reservations .table-button {
+  min-width: 112px;
+  height: 35px;
+  font-size: 13px;
+}
+
+/* V2 calendar typography/geometry. */
+.calendar-month-header {
+  min-height: 46px;
+  gap: 12px;
+}
+.calendar-month-header strong {
+  font-size: 23px;
+}
+.calendar-month-header button {
+  width: 40px;
+  height: 40px;
+}
+.calendar-day {
+  min-height: 55px;
+}
+.calendar-day strong {
+  font-size: 23px;
+}
+
+@media (max-width: 500px) {
+  .confirm-card {
+    grid-template-columns: 115px 108px 78px 1fr 82px;
+    min-height: 112px;
+  }
+  .confirm-date strong { font-size: 30px; }
+  .confirm-date span { font-size: 16px; }
+  .confirm-day span { font-size: 14px; }
+  .confirm-day strong { font-size: 30px; }
+  .confirm-pax { font-size: 22px; }
+  .confirm-client strong { font-size: 22px; }
+  .confirm-client span { font-size: 16px; }
+  .confirm-check { width: 50px; height: 50px; }
+
+  .calendar-reservations .reservation-card {
+    grid-template-columns: 162px 1fr 138px;
+    min-height: 98px;
+  }
+  .calendar-reservations .reservation-party {
+    grid-column: auto;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    border-top: 0;
+  }
+  .calendar-reservations .reservation-time {
+    grid-row: auto;
+  }
+  .calendar-reservations .reservation-main {
+    padding: 10px 12px;
+  }
+  .calendar-reservations .customer-name { font-size: 21px; }
+  .calendar-reservations .customer-meta { font-size: 16px; }
+  .calendar-reservations .reservation-time strong { font-size: 30px; }
+  .calendar-reservations .status-pill { font-size: 13px; }
+  .calendar-month-header { min-height: 46px; }
+  .calendar-month-header strong { font-size: 23px; }
+  .calendar-day { min-height: 55px; }
+  .calendar-day strong { font-size: 23px; }
 }
