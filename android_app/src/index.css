@@ -377,6 +377,7 @@ html.light .today-day { color:#222; }
 html.light .today-date { color:#b88700; }
 html.light .empty-message { color:#333; }
 html.light .today-calendar { filter:none; }
+html.light .app-version { color: rgba(0,0,0,.58); }
 
 
 
@@ -400,8 +401,8 @@ html.light .today-calendar { filter:none; }
   right: 8px;
   bottom: 1px;
   z-index: 9999;
-  font: 700 10px/1 Arial, sans-serif;
-  color: rgba(255,255,255,.48);
+  font: 700 11px/1 Arial, sans-serif;
+  color: rgba(255,255,255,.62);
   pointer-events: none;
 }
 
