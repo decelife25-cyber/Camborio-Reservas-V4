@@ -1,3 +1,4 @@
+import { supabase } from '../lib/supabase';
 import { useState } from 'react';
 import { ArrowLeft, Search } from 'lucide-react';
 import ReservationCard from '../components/ReservationCard';
