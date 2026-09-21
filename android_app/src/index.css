@@ -36,7 +36,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   box-sizing:border-box;
   width:100%;
   min-height:86px;
-  padding:18px 8px 5px;
+  padding:22px 8px 5px;
   display:flex;
   align-items:center;
   gap:6px;
@@ -324,7 +324,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 @media (max-width: 620px) {
-  .private-header { min-height:86px; padding-top:18px; }
+  .private-header { min-height:90px; padding-top:22px; }
   .brand-emblem { width:68px; min-width:68px; max-width:68px; height:68px; min-height:68px; max-height:68px; flex-basis:68px; }
   .brand-name { font-size:clamp(23px,6.8vw,29px); }
   .brand-line { font-size:clamp(15px,4.35vw,16px); letter-spacing:1.25px; }
@@ -344,8 +344,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .brand-name { font-size: clamp(23px, 6.8vw, 29px); }
   .brand-line { font-size: clamp(13px, 3.6vw, 15px); }
   .header-actions { gap: 4px; }
-  .header-icon { width:40px; min-width:40px; height:36px; min-height:36px; }
-  .logout-button { width:124px; min-width:124px; height:36px; min-height:36px; padding: 0 10px; font-size:11px; }
+  .header-icon { width:42px; min-width:42px; height:38px; min-height:38px; }
+  .header-icon svg { width:24px; height:24px; }
+  .logout-button { width:128px; min-width:128px; height:38px; min-height:38px; padding: 0 10px; font-size:12px; }
   .menu-card { min-height: 66px; }
   .reservation-card { grid-template-columns: 162px 1fr 145px; }
 }
@@ -371,6 +372,11 @@ html.light .date-turn-header { background: linear-gradient(#fff, #f1efea); borde
 html.light .reservation-card { background: linear-gradient(#fff, #f3f1ec); border-color: #d4d0c8; color: #171717; }
 html.light .customer-meta { color: #555; }
 html.light .filter-button { background: #fff; }
+html.light .today-title { color:#222; }
+html.light .today-day { color:#222; }
+html.light .today-date { color:#b88700; }
+html.light .empty-message { color:#333; }
+html.light .today-calendar { filter:none; }
 
 
 
@@ -405,5 +411,15 @@ html.light .filter-button { background: #fff; }
 .brand-line span { flex: 0 0 34px; min-width:34px; }
 
 /* Ajustes finos V4 respecto al referente visual V2: margen lateral, cabecera compacta y marca unificada. */
+.private-header::after {
+  content:"";
+  position:absolute;
+  left:8px;
+  right:8px;
+  bottom:1px;
+  height:1px;
+  background:linear-gradient(90deg, transparent, rgba(176,119,45,.5) 20%, rgba(176,119,45,.18) 80%, transparent);
+  pointer-events:none;
+}
 .today-day { color:#f3f3f3; }
 .today-date { color:#ffc400; }
