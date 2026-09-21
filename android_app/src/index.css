@@ -1108,3 +1108,32 @@ html.light .calendar-empty-message { color:#444; border-color:#bbb; }
     font-size: 17px;
   }
 }
+
+/* OBSERVACIONES — ojo y modal siguiendo la referencia V2. */
+.observation-button {
+  width: 40px; min-width: 40px; height: 34px; margin-left: 2px; padding: 0;
+  border: 1px solid #8c7100; border-radius: 7px;
+  background: linear-gradient(180deg,#ffd42a,#e3a900); color: #111;
+  display: inline-grid; place-items: center; font-size: 18px; line-height: 1;
+}
+.observation-overlay {
+  position: fixed; inset: 0; z-index: 100000; display: flex; align-items: center;
+  justify-content: center; padding: 18px; background: rgba(0,0,0,.86);
+}
+.observation-modal {
+  width: min(490px, calc(100vw - 36px)); box-sizing: border-box;
+  padding: 18px 18px 16px; border: 2px solid #ffc400; border-radius: 10px;
+  background: linear-gradient(180deg,#181818,#070707);
+  box-shadow: 0 12px 40px rgba(0,0,0,.7); text-align: center;
+}
+.observation-modal h2 { margin: 0 0 10px; color: #ffc400; font-size: 30px; line-height: 1; font-weight: 1000; }
+.observation-text {
+  color: #fff; font-size: 24px; line-height: 1.2; font-weight: 800;
+  white-space: pre-wrap; overflow-wrap: anywhere; max-height: 45vh; overflow-y: auto;
+}
+.observation-close {
+  width: 100%; min-height: 48px; margin-top: 18px; border: 0; border-radius: 8px;
+  background: linear-gradient(180deg,#ffd42a,#f0aa00); color: #111; font-size: 16px; font-weight: 1000;
+}
+html.light .observation-modal { background: linear-gradient(180deg,#fff,#f1efea); }
+html.light .observation-text { color:#222; }
