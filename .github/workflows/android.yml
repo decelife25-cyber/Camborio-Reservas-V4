@@ -5,10 +5,14 @@ on:
     branches: [ main ]
     paths:
       - 'android_app/**'
+      - 'reservas_apk.png'
+      - '.github/workflows/android.yml'
   pull_request:
     branches: [ main ]
     paths:
       - 'android_app/**'
+      - 'reservas_apk.png'
+      - '.github/workflows/android.yml'
 
 jobs:
   build:
