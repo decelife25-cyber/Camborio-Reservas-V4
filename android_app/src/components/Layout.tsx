@@ -23,12 +23,14 @@ export default function Layout() {
     const isDark = savedTheme ? savedTheme === 'dark' : true;
     setDarkMode(isDark);
     document.documentElement.classList.toggle('dark', isDark);
+    document.documentElement.classList.toggle('light', !isDark);
   }, []);
 
   const toggleDarkMode = () => {
     const next = !darkMode;
     setDarkMode(next);
     document.documentElement.classList.toggle('dark', next);
+    document.documentElement.classList.toggle('light', !next);
     localStorage.setItem('theme', next ? 'dark' : 'light');
   };
 
