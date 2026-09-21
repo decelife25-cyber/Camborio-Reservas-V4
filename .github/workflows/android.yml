@@ -85,12 +85,15 @@ jobs:
         ./gradlew assembleDebug
 
     - name: Rename APK with app version
+      id: version
       run: |
         set -euo pipefail
-        cp android_app/android/app/build/outputs/apk/debug/app-debug.apk android_app/android/app/build/outputs/apk/debug/reservas-1.0.003.apk
+        VERSION="$(node -p 'require("./android_app/package.json").version')"
+        echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+        cp android_app/android/app/build/outputs/apk/debug/app-debug.apk "android_app/android/app/build/outputs/apk/debug/reservas-$VERSION.apk"
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: reservas-1.0.003
-        path: android_app/android/app/build/outputs/apk/debug/reservas-1.0.003.apk
+        name: reservas-${{ steps.version.outputs.version }}
+        path: android_app/android/app/build/outputs/apk/debug/reservas-${{ steps.version.outputs.version }}.apk
