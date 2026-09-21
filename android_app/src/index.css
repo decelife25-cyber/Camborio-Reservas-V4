@@ -339,13 +339,13 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .turn-button { flex-basis:130px; width:130px; min-width:130px; min-height:44px; height:44px; font-size:15px; }
   .filter-button { width:32px; min-width:32px; height:38px; min-height:38px; }
 
-  .private-header { min-height: 76px; }
-  .brand-emblem { width: 62px; min-width:62px; max-width:62px; height:62px; min-height:62px; max-height:62px; flex-basis:62px; }
-  .brand-name { font-size: clamp(22px, 6.1vw, 27px); }
-  .brand-line { font-size: clamp(12px, 3.4vw, 15px); }
+  .private-header { min-height:86px; padding-top:18px; }
+  .brand-emblem { width:68px; min-width:68px; max-width:68px; height:68px; min-height:68px; max-height:68px; flex-basis:68px; }
+  .brand-name { font-size: clamp(23px, 6.8vw, 29px); }
+  .brand-line { font-size: clamp(13px, 3.6vw, 15px); }
   .header-actions { gap: 4px; }
-  .header-icon { width: 34px; height: 34px; }
-  .logout-button { height: 34px; padding: 0 9px; font-size: 10px; }
+  .header-icon { width:40px; min-width:40px; height:36px; min-height:36px; }
+  .logout-button { width:124px; min-width:124px; height:36px; min-height:36px; padding: 0 10px; font-size:11px; }
   .menu-card { min-height: 66px; }
   .reservation-card { grid-template-columns: 162px 1fr 145px; }
 }
