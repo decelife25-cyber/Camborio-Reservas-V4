@@ -35,8 +35,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
   position:relative;
   box-sizing:border-box;
   width:100%;
-  min-height:78px;
-  padding:6px 8px 5px;
+  min-height:86px;
+  padding:18px 8px 5px;
   display:flex;
   align-items:center;
   gap:6px;
@@ -53,14 +53,14 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 .brand-emblem {
   display:block;
-  width:69px;
-  min-width:69px;
-  max-width:69px;
-  height:69px;
-  min-height:69px;
-  max-height:69px;
+  width:68px;
+  min-width:68px;
+  max-width:68px;
+  height:68px;
+  min-height:68px;
+  max-height:68px;
   object-fit:contain;
-  flex:0 0 69px;
+  flex:0 0 68px;
 }
 .brand-copy {
   display:flex;
@@ -72,11 +72,11 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 .brand-name {
   font-family:Georgia,'Times New Roman',serif;
-  font-size:clamp(21px,6.3vw,24px);
+  font-size:clamp(23px,6.8vw,29px);
   font-weight:900;
   color:#b0772d;
   line-height:.96;
-  letter-spacing:.15px;
+  letter-spacing:.25px;
   white-space:nowrap;
   overflow:visible;
 }
@@ -324,9 +324,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 @media (max-width: 620px) {
-  .private-header { min-height:78px; }
-  .brand-emblem { width:69px; min-width:69px; max-width:69px; height:69px; min-height:69px; max-height:69px; flex-basis:69px; }
-  .brand-name { font-size:clamp(21px,6.3vw,24px); }
+  .private-header { min-height:86px; padding-top:18px; }
+  .brand-emblem { width:68px; min-width:68px; max-width:68px; height:68px; min-height:68px; max-height:68px; flex-basis:68px; }
+  .brand-name { font-size:clamp(23px,6.8vw,29px); }
   .brand-line { font-size:clamp(15px,4.35vw,16px); letter-spacing:1.25px; }
   .header-icon { width:44px; min-width:44px; height:44px; }
   .logout-button { min-height:56px; height:56px; padding:0 12px; font-size:14px; }
