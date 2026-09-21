@@ -133,9 +133,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
   gap:7px;
-  width:calc(100% - 12px);
-  margin-left:6px;
-  margin-right:6px;
+  width:calc(100% - 16px);
+  margin-left:8px;
+  margin-right:8px;
   margin-bottom:12px;
   padding:0;
   flex:0 0 auto;
