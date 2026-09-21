@@ -396,3 +396,8 @@ html.light .filter-button { background: #fff; }
   color: rgba(255,255,255,.48);
   pointer-events: none;
 }
+
+/* Header/logo geometry copied from V2: short fixed decorative lines, not flex-fill lines. */
+.brand-copy { overflow: visible; }
+.brand-line { width: auto; min-width: 0; }
+.brand-line span { flex: 0 0 34px; min-width:34px; }
