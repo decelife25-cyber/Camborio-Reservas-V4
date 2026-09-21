@@ -368,3 +368,27 @@ html.light .date-turn-header { background: linear-gradient(#fff, #f1efea); borde
 html.light .reservation-card { background: linear-gradient(#fff, #f3f1ec); border-color: #d4d0c8; color: #171717; }
 html.light .customer-meta { color: #555; }
 html.light .filter-button { background: #fff; }
+
+
+/* V2: escala responsive del panel privado.
+   El APK Android estaba renderizando el mismo CSS aproximadamente al doble
+   del tamaño visual de V2. Estas reglas conservan el ancho completo y aplican
+   la misma escala visual que el panel V2 según el ancho disponible del dispositivo. */
+.private-app {
+  transform-origin: top left;
+}
+@media (min-width: 401px) and (max-width: 500px) {
+  .private-app { zoom: 80%; width: 125%; height: 125svh; min-height: 125svh; }
+}
+@media (min-width: 501px) and (max-width: 600px) {
+  .private-app { zoom: 67%; width: 149.2538%; height: 149.2538svh; min-height: 149.2538svh; }
+}
+@media (min-width: 601px) and (max-width: 800px) {
+  .private-app { zoom: 50%; width: 200%; height: 200svh; min-height: 200svh; }
+}
+@media (min-width: 801px) and (max-width: 1000px) {
+  .private-app { zoom: 40%; width: 250%; height: 250svh; min-height: 250svh; }
+}
+@media (min-width: 1001px) {
+  .private-app { zoom: 33.3333%; width: 300%; height: 300svh; min-height: 300svh; }
+}
