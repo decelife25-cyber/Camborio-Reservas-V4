@@ -1347,3 +1347,20 @@ html.light .pending-badge {
     font-size: 20px;
   }
 }
+
+
+/* V4.2 — Calendario compacto: misma densidad visual que V2. El calendario informa; las fichas necesitan el espacio. */
+.calendar-month-header { min-height: 48px; }
+.calendar-month-header strong { font-size: 24px; }
+.calendar-month-header button { width: 38px; height: 38px; }
+.calendar-weekdays span { min-height: 30px; font-size: 11px; padding: 0; }
+.calendar-day,
+.calendar-empty { min-height: 58px; padding: 0; }
+.calendar-day strong { position: static; transform: none; font-size: 23px; line-height: 1; }
+.calendar-reservation-mark {
+  right: 4px;
+  bottom: 4px;
+  width: 15px;
+  height: 15px;
+  font-size: 9px;
+}
