@@ -57,9 +57,9 @@ jobs:
         SRC="reservas_apk.png"
         RES="android_app/android/app/src/main/res"
 
-        # Keep the official source image unchanged for the launcher asset.
-        # Android adaptive icons mask the foreground, so the foreground needs
-        # a safe margin to keep the complete artwork visible on the launcher.
+        # Use the complete official artwork as the native launcher icon.
+        # Do NOT generate an adaptive foreground: Android's adaptive-icon
+        # treatment was cropping the artwork on the Xiaomi launcher.
         declare -A SIZES=(
           [mipmap-mdpi]=48
           [mipmap-hdpi]=72
@@ -70,14 +70,8 @@ jobs:
 
         for DIR in "${!SIZES[@]}"; do
           SIZE="${SIZES[$DIR]}"
-
-          # Legacy launcher resources: preserve the complete official artwork.
           convert "$SRC" -resize "${SIZE}x${SIZE}" "$RES/$DIR/ic_launcher.png"
           convert "$SRC" -resize "${SIZE}x${SIZE}" "$RES/$DIR/ic_launcher_round.png"
-
-          # Adaptive-icon foreground: inset the complete artwork so the
-          # launcher mask does not crop the outer frame or the book.
-          convert "$SRC"             -resize "70%x70%"             -gravity center             -background "#f7f1e5"             -extent "${SIZE}x${SIZE}"             "$RES/$DIR/ic_launcher_foreground.png"
         done
 
     - name: Verify stable signing key
