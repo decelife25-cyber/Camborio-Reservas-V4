@@ -9,12 +9,13 @@ const menuItems = [
   { to: '/calendario', icon: '📅', label: 'CALENDARIO' },
   { to: '/reservas', icon: '🔎', label: 'BUSCAR RESERVA' },
   { to: '/', icon: '📖', label: 'RESERVAS HOY' },
-  { to: '/reservas', icon: '✅', label: 'CONFIRMAR' },
+  { to: '/confirmar', icon: '✅', label: 'CONFIRMAR' },
   { to: '/mesas', icon: '🗺️', label: 'PLANOS DE MESAS' },
 ];
 
 export default function Layout() {
   const [darkMode, setDarkMode] = useState(true);
+  const [pendingCount, setPendingCount] = useState(0);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -25,6 +26,20 @@ export default function Layout() {
     document.documentElement.classList.toggle('dark', isDark);
     document.documentElement.classList.toggle('light', !isDark);
   }, []);
+
+  useEffect(() => {
+    async function fetchPendingCount() {
+      const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
+      const { count, error } = await supabase
+        .from('Reservas')
+        .select('ReservaID', { count: 'exact', head: true })
+        .eq('Estado', 'PENDIENTE')
+        .gte('FechaReserva', today);
+      if (!error) setPendingCount(count || 0);
+    }
+
+    if (user) fetchPendingCount();
+  }, [user]);
 
   const toggleDarkMode = () => {
     const next = !darkMode;
@@ -72,10 +87,22 @@ export default function Layout() {
           <NavLink
             key={index}
             to={item.to}
-            className={({ isActive }) => 'menu-card ' + (isActive && item.label === 'RESERVAS HOY' ? 'active' : '')}
+            className={({ isActive }) => {
+              const active = item.label === 'RESERVAS HOY'
+                ? isActive && window.location.pathname === '/'
+                : item.label === 'CONFIRMAR'
+                  ? isActive && window.location.pathname === '/confirmar'
+                  : item.label === 'CALENDARIO'
+                    ? isActive && window.location.pathname === '/calendario'
+                    : false;
+              return 'menu-card ' + (active ? 'active' : '');
+            }}
           >
             <span className="menu-icon" aria-hidden="true">{item.icon}</span>
-            <span>{item.label}</span>
+            <span className="menu-label">{item.label}</span>
+            {item.label === 'CONFIRMAR' && pendingCount > 0 && (
+              <span className="pending-badge" aria-label={pendingCount + ' reservas por confirmar'}>{pendingCount}</span>
+            )}
           </NavLink>
         ))}
       </nav>
