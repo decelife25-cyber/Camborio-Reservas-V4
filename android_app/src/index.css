@@ -963,3 +963,148 @@ html.light .calendar-empty-message { color:#444; border-color:#bbb; }
   .calendar-reservations .pax { font-size: 19px; }
   .calendar-reservations .table-button { font-size: 13px; }
 }
+
+
+/* CALENDARIO — ajuste final tomando como referencia directa el CSS de V2
+   y las capturas V2/V4 del mismo dispositivo. */
+.calendar-weekdays span {
+  font-size: 16px;
+  padding: 7px 0;
+}
+.calendar-day {
+  min-height: 74px;
+  padding: 7px 6px 6px;
+}
+.calendar-day strong {
+  position: absolute;
+  top: 50%;
+  left: 38%;
+  transform: translate(-50%, -50%);
+  font-size: 34px;
+  line-height: .9;
+}
+.calendar-reservation-mark {
+  position: absolute;
+  top: 50%;
+  right: 11px;
+  bottom: auto;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+}
+
+/* Tarjeta de reserva bajo el calendario: misma jerarquía visual de V2,
+   aprovechando el espacio disponible del ancho móvil. */
+.calendar-reservations .reservation-card {
+  grid-template-columns: 168px minmax(0, 1fr) 150px;
+  min-height: 104px;
+}
+.calendar-reservations .reservation-time {
+  align-items: center;
+  justify-content: center;
+  padding: 10px 10px;
+  gap: 7px;
+}
+.calendar-reservations .status-pill {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 32px;
+  padding: 5px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+}
+.calendar-reservations .reservation-time strong {
+  font-size: 34px;
+}
+.calendar-reservations .reservation-main {
+  padding: 10px 12px 10px 14px;
+  gap: 6px;
+}
+.calendar-reservations .customer-name {
+  font-size: 24px;
+}
+.calendar-reservations .customer-meta {
+  font-size: 19px;
+  gap: 7px;
+}
+.calendar-reservations .reservation-code {
+  font-size: 19px;
+}
+.calendar-reservations .reservation-party {
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 8px;
+}
+.calendar-reservations .pax {
+  width: 100%;
+  font-size: 22px;
+  text-align: center;
+  white-space: nowrap;
+}
+.calendar-reservations .table-button {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 7px 6px;
+  font-size: 17px;
+  box-sizing: border-box;
+}
+
+/* No reducir estos valores en la vista móvil del APK. */
+@media (max-width: 620px) {
+  .calendar-weekdays span {
+    font-size: 16px;
+  }
+  .calendar-day {
+    min-height: 74px;
+  }
+  .calendar-day strong {
+    left: 38%;
+    font-size: 34px;
+  }
+  .calendar-reservation-mark {
+    top: 50%;
+    right: 9px;
+    bottom: auto;
+    width: 20px;
+    height: 20px;
+    font-size: 13px;
+  }
+  .calendar-reservations .reservation-card {
+    grid-template-columns: 168px minmax(0, 1fr) 150px;
+    min-height: 104px;
+  }
+  .calendar-reservations .reservation-main {
+    padding: 10px 10px 10px 12px;
+  }
+  .calendar-reservations .customer-name {
+    font-size: 24px;
+  }
+  .calendar-reservations .customer-meta,
+  .calendar-reservations .reservation-code {
+    font-size: 19px;
+  }
+  .calendar-reservations .reservation-time strong {
+    font-size: 34px;
+  }
+  .calendar-reservations .status-pill {
+    font-size: 16px;
+    min-height: 32px;
+  }
+  .calendar-reservations .pax {
+    font-size: 22px;
+  }
+  .calendar-reservations .table-button {
+    min-height: 40px;
+    font-size: 17px;
+  }
+}
