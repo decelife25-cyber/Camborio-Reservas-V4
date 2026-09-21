@@ -4,7 +4,6 @@ import Login from './pages/Login';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 import Inicio from './pages/Inicio';
-import Reservas from './pages/Reservas';
 import NuevaReserva from './pages/NuevaReserva';
 import BuscarReserva from './pages/BuscarReserva';
 import Confirmar from './pages/Confirmar';
