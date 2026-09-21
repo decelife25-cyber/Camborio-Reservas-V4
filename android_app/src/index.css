@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+html { font-size:16px; text-size-adjust:100%; -webkit-text-size-adjust:100%; -moz-text-size-adjust:100%; }
+
 :root {
   font-family: Arial, Helvetica, sans-serif;
   color: #f5f5f5;
@@ -372,139 +374,71 @@ html.light .filter-button { background: #fff; }
 
 
 
-/* V2 REAL RESPONSIVE LAYOUT
-   No se usa zoom/transform para corregir el tamaño. El panel se dimensiona
-   proporcionalmente al viewport CSS real del WebView, manteniendo el ancho
-   completo y las proporciones de V2 en móviles de distintas densidades. */
-:root { --v2s: clamp(.43, 0.0667vw, .70); }
-
-.private-app {
-  min-height: 100svh;
-  height: 100svh;
-  overflow: hidden;
+/* V2 RESPONSIVE COPY — direct values and breakpoints from V2. */
+.private-app{min-height:100svh;height:100svh;overflow:hidden}
+.private-header{min-height:78px;padding:6px 8px 5px;gap:6px;margin-bottom:8px}
+.brand-lockup{gap:9px}
+.brand-emblem{width:69px;min-width:69px;max-width:69px;height:69px;min-height:69px;max-height:69px;flex-basis:69px}
+.brand-name{font-size:clamp(21px,6.3vw,24px)}
+.brand-line{gap:7px;margin-top:4px;font-size:clamp(15px,4.35vw,16px);letter-spacing:1.25px}
+.header-actions{gap:6px}
+.header-icon{width:44px;min-width:44px;height:44px;border-radius:8px}
+.logout-button{min-height:56px;height:56px;padding:0 12px;font-size:14px}
+.private-menu{gap:7px;margin-bottom:12px}
+.menu-card{min-height:150px;padding:14px 8px;border-radius:8px;gap:12px;font-size:24px;line-height:1.12}
+.menu-icon{font-size:50px;line-height:1}
+.private-content{padding:0 6px 5px}
+.date-turn-header{min-height:78px;padding:18px 26px 16px;gap:14px}
+.today-title{gap:12px;font-size:30px}
+.today-calendar{font-size:31px}
+.turn-actions{gap:10px}
+.turn-button{flex-basis:126px;width:126px;min-width:126px;min-height:40px;height:40px;font-size:15px}
+.filter-button{width:52px;min-width:52px;height:48px;min-height:48px}
+.filter-button svg{width:30px;height:30px}
+.empty-message{margin:12px 8px;padding:20px;font-size:clamp(24px,5.6vw,34px)}
+.reservation-scroll{padding:0 8px 8px}
+.reservation-card{grid-template-columns:216px minmax(0,1fr) 212px 60px;min-height:118px}
+.reservation-time{padding:16px 17px 14px}
+.reservation-time strong{font-size:55px}
+.status-pill{font-size:20px;padding-left:25px}
+.reservation-main{padding:18px 20px 16px 44px;gap:13px}
+.customer-name{font-size:29px}
+.customer-meta{font-size:26px;gap:14px}
+.reservation-party{gap:13px;padding:18px 12px}
+.pax{font-size:28px}
+.table-button{min-width:174px;height:auto;padding:9px 17px 8px;font-size:24px}
+@media(max-width:720px){
+ .date-turn-header{min-height:66px;padding:15px 17px}
+ .today-title{font-size:24px}
+ .today-calendar{font-size:25px}
+ .turn-actions{gap:6px}
+ .turn-button{width:126px;min-width:126px;min-height:44px;height:44px}
+ .filter-button{width:48px;min-width:48px;height:44px;min-height:44px}
+ .filter-button svg{width:28px;height:28px}
+ .reservation-card{grid-template-columns:148px minmax(0,1fr) 138px 45px;min-height:92px}
+ .reservation-time{padding:12px}
+ .reservation-time strong{font-size:42px}
+ .status-pill{font-size:15px;padding:3px 6px}
+ .reservation-main{padding:13px 10px 12px 22px;gap:10px}
+ .customer-name{font-size:22px}
+ .customer-meta{font-size:20px}
+ .reservation-party{gap:9px;padding:13px 7px}
+ .pax{font-size:21px}
+ .table-button{min-width:128px;padding:8px;font-size:18px}
 }
-
-.private-header {
-  min-height: calc(76px * var(--v2s));
-  padding: calc(6px * var(--v2s)) calc(8px * var(--v2s)) calc(5px * var(--v2s));
-  gap: calc(6px * var(--v2s));
-  margin-bottom: calc(8px * var(--v2s));
+@media(max-width:620px){
+ .menu-card{min-height:144px;padding:12px 4px;gap:10px;font-size:clamp(18px,5.4vw,22px)}
+ .menu-icon{font-size:46px}
+ .header-icon{width:44px;min-width:44px;height:44px}
+ .logout-button{min-height:56px;height:56px;padding:0 12px;font-size:14px}
 }
-.brand-lockup { gap: calc(7px * var(--v2s)); }
-.brand-emblem {
-  width: calc(55px * var(--v2s));
-  min-width: calc(55px * var(--v2s));
-  max-width: calc(55px * var(--v2s));
-  height: calc(55px * var(--v2s));
-  min-height: calc(55px * var(--v2s));
-  max-height: calc(55px * var(--v2s));
-  flex-basis: calc(55px * var(--v2s));
-}
-.brand-name { font-size: calc(27px * var(--v2s)); }
-.brand-line {
-  gap: calc(5px * var(--v2s));
-  margin-top: calc(3px * var(--v2s));
-  font-size: calc(14px * var(--v2s));
-  letter-spacing: calc(1px * var(--v2s));
-}
-.brand-line span { min-width: calc(18px * var(--v2s)); height: calc(1px * var(--v2s)); }
-.header-actions { gap: calc(5px * var(--v2s)); }
-.header-icon {
-  width: calc(44px * var(--v2s));
-  min-width: calc(44px * var(--v2s));
-  height: calc(44px * var(--v2s));
-  border-radius: calc(8px * var(--v2s));
-}
-.logout-button {
-  min-height: calc(56px * var(--v2s));
-  height: calc(56px * var(--v2s));
-  padding: 0 calc(12px * var(--v2s));
-  font-size: calc(14px * var(--v2s));
-}
-
-.private-menu {
-  gap: calc(7px * var(--v2s));
-  margin-bottom: calc(10px * var(--v2s));
-}
-.menu-card {
-  min-height: calc(90px * var(--v2s));
-  padding: calc(8px * var(--v2s)) calc(4px * var(--v2s));
-  border-radius: calc(8px * var(--v2s));
-  gap: calc(5px * var(--v2s));
-  font-size: calc(22px * var(--v2s));
-  line-height: 1.05;
-}
-.menu-icon { font-size: calc(42px * var(--v2s)); }
-
-.private-content { padding: 0 calc(6px * var(--v2s)) calc(5px * var(--v2s)); }
-
-.date-turn-header {
-  min-height: calc(60px * var(--v2s));
-  padding: calc(8px * var(--v2s)) calc(4px * var(--v2s));
-  gap: calc(4px * var(--v2s));
-}
-.today-title {
-  gap: calc(4px * var(--v2s));
-  font-size: calc(23px * var(--v2s));
-}
-.today-calendar { font-size: calc(19px * var(--v2s)); }
-.turn-actions { gap: calc(3px * var(--v2s)); }
-.turn-button {
-  flex-basis: calc(126px * var(--v2s));
-  width: calc(126px * var(--v2s));
-  min-width: calc(126px * var(--v2s));
-  min-height: calc(40px * var(--v2s));
-  height: calc(40px * var(--v2s));
-  padding: 0 calc(5px * var(--v2s));
-  border-width: calc(2px * var(--v2s));
-  border-radius: calc(8px * var(--v2s));
-  gap: calc(5px * var(--v2s));
-  font-size: calc(15px * var(--v2s));
-}
-.filter-button {
-  width: calc(38px * var(--v2s));
-  min-width: calc(38px * var(--v2s));
-  height: calc(42px * var(--v2s));
-  min-height: calc(42px * var(--v2s));
-  border-radius: calc(7px * var(--v2s));
-}
-.filter-button svg {
-  width: calc(22px * var(--v2s));
-  height: calc(22px * var(--v2s));
-}
-.reservation-scroll { padding: calc(7px * var(--v2s)) calc(6px * var(--v2s)) calc(12px * var(--v2s)); }
-.empty-message {
-  padding: calc(20px * var(--v2s)) calc(12px * var(--v2s));
-  font-size: calc(34px * var(--v2s));
-  line-height: 1.15;
-}
-
-.reservation-card {
-  min-height: calc(96px * var(--v2s));
-  grid-template-columns: calc(148px * var(--v2s)) 1fr calc(138px * var(--v2s));
-}
-.reservation-time { gap: calc(4px * var(--v2s)); }
-.reservation-time strong { font-size: calc(42px * var(--v2s)); }
-.status-pill {
-  padding: calc(3px * var(--v2s)) calc(6px * var(--v2s));
-  font-size: calc(15px * var(--v2s));
-}
-.reservation-main { padding: calc(13px * var(--v2s)) calc(10px * var(--v2s)); gap: calc(6px * var(--v2s)); }
-.customer-name { font-size: calc(22px * var(--v2s)); gap: calc(7px * var(--v2s)); }
-.customer-meta { gap: calc(7px * var(--v2s)); font-size: calc(16px * var(--v2s)); }
-.reservation-party { gap: calc(9px * var(--v2s)); padding: calc(9px * var(--v2s)) calc(10px * var(--v2s)); }
-.pax { font-size: calc(19px * var(--v2s)); gap: calc(5px * var(--v2s)); }
-.table-button {
-  min-width: calc(112px * var(--v2s));
-  height: calc(35px * var(--v2s));
-  border-radius: calc(5px * var(--v2s));
-  font-size: calc(13px * var(--v2s));
-}
-
-/* En pantallas realmente estrechas, conservamos la estructura de V2 sin
-   permitir que texto/iconos fuercen el ancho de las columnas. */
-@media (max-width: 380px) {
-  .menu-card { font-size: calc(20px * var(--v2s)); }
-  .menu-icon { font-size: calc(38px * var(--v2s)); }
-  .logout-button { font-size: calc(12px * var(--v2s)); padding-inline: calc(9px * var(--v2s)); }
+@media(max-width:500px){
+ .reservation-card{grid-template-columns:120px 1fr}
+ .reservation-party{grid-column:2;flex-direction:row;align-items:center;justify-content:space-between;border-top:1px solid #222}
+ .reservation-time{grid-row:span 2}
+ .reservation-main{padding:9px}
+ .customer-name{font-size:18px}
+ .customer-meta{font-size:13px}
+ .reservation-time strong{font-size:27px}
+ .status-pill{font-size:11px;padding:3px 6px}
 }
