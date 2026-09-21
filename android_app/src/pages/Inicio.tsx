@@ -1,122 +1,136 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { Filter, Users, Phone } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { Users, UserCheck, Calendar as CalendarIcon, Clock } from 'lucide-react';
-import { Link } from 'react-router-dom';
+
+type Reserva = {
+  ReservaID: string;
+  CodigoReserva: string | null;
+  FechaReserva: string;
+  HoraReserva: string;
+  Nombre: string | null;
+  Telefono: string | null;
+  Personas: number | null;
+  Estado: string;
+  Mesa: string | null;
+  Turno: 'COMIDA' | 'CENA' | string | null;
+};
+
+const CANCELADAS = new Set(['CANCELADA_CLIENTE', 'CANCELADA_LOCAL']);
+
+function formatTime(value: string) {
+  return String(value || '').slice(0, 5);
+}
+
+function formatDate(value: Date) {
+  return value.toLocaleDateString('es-ES', {
+    weekday: 'long',
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'Europe/Madrid',
+  }).toUpperCase();
+}
+
+function statusLabel(status: string) {
+  if (status === 'CONFIRMADA') return 'CONFIRMADA';
+  if (status === 'PENDIENTE') return 'PENDIENTE';
+  if (status === 'SENTADA') return 'SENTADA';
+  if (status === 'FINALIZADA') return 'FINALIZADA';
+  if (status === 'NO_PRESENTADO') return 'NO PRESENTADO';
+  return status;
+}
 
 export default function Inicio() {
-  const [stats, setStats] = useState({
-    hoy: 0,
-    pendientes: 0,
-    comensalesHoy: 0,
-    porLlegar: 0,
-  });
+  const [reservas, setReservas] = useState<Reserva[]>([]);
+  const [turno, setTurno] = useState<'COMIDA' | 'CENA'>('CENA');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  useEffect(() => {
-    async function fetchStats() {
-      try {
-        const today = new Date().toLocaleDateString('en-CA', {
-          timeZone: 'Europe/Madrid',
-        });
+  async function fetchReservas() {
+    setLoading(true);
+    setError('');
+    const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
+    const { data, error: queryError } = await supabase
+      .from('Reservas')
+      .select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,Turno')
+      .eq('FechaReserva', today)
+      .order('HoraReserva', { ascending: true });
 
-        // Supabase V4 uses the existing business schema: public."Reservas"
-        // and its original column names.
-        const { data, error } = await supabase
-          .from('Reservas')
-          .select('ReservaID, Estado, Personas, FechaReserva')
-          .eq('FechaReserva', today);
-
-        if (error) throw error;
-
-        let hoy = 0;
-        let pendientes = 0;
-        let comensalesHoy = 0;
-        let porLlegar = 0;
-
-        if (data) {
-          const activas = data.filter(
-            r => !['CANCELADA_CLIENTE', 'CANCELADA_LOCAL'].includes(r.Estado)
-          );
-          hoy = activas.length;
-          pendientes = activas.filter(r => r.Estado === 'PENDIENTE').length;
-          comensalesHoy = activas.reduce((acc, r) => acc + (r.Personas || 0), 0);
-          porLlegar = activas.filter(r => ['PENDIENTE', 'CONFIRMADA'].includes(r.Estado)).length;
-        }
-
-        setStats({ hoy, pendientes, comensalesHoy, porLlegar });
-      } catch (error) {
-        console.error('Error fetching stats', error);
-      } finally {
-        setLoading(false);
-      }
+    if (queryError) {
+      console.error('Error cargando reservas de hoy', queryError);
+      setError('No se pudieron cargar las reservas.');
+      setReservas([]);
+    } else {
+      setReservas((data || []).filter((r: Reserva) => !CANCELADAS.has(r.Estado)));
     }
-
-    fetchStats();
-  }, []);
-
-  if (loading) {
-    return <div className="p-8 text-center text-gray-500">Cargando resumen...</div>;
+    setLoading(false);
   }
 
+  useEffect(() => {
+    fetchReservas();
+  }, []);
+
+  const comida = useMemo(() => reservas.filter(r => r.Turno === 'COMIDA'), [reservas]);
+  const cena = useMemo(() => reservas.filter(r => r.Turno === 'CENA'), [reservas]);
+  const visibles = turno === 'COMIDA' ? comida : cena;
+
+  useEffect(() => {
+    if (cena.length === 0 && comida.length > 0) setTurno('COMIDA');
+    else if (cena.length > 0) setTurno('CENA');
+  }, [comida.length, cena.length]);
+
+  const today = new Date();
+
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Resumen de Hoy</h2>
-        <div className="text-sm text-gray-500 dark:text-gray-400">
-          {new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+    <section className="today-screen" aria-label="Reservas de hoy">
+      <div className="date-turn-header">
+        <div className="today-title"><span>📅</span> {formatDate(today)}</div>
+        <div className="turn-actions">
+          <button className={'turn-button ' + (turno === 'COMIDA' ? 'selected' : '')} onClick={() => setTurno('COMIDA')}>
+            ☀ COMIDA ({comida.length})
+          </button>
+          <button className={'turn-button ' + (turno === 'CENA' ? 'selected' : '')} onClick={() => setTurno('CENA')}>
+            🌙 CENA ({cena.length})
+          </button>
+          <button className="filter-button" aria-label="Filtros" title="Filtros"><Filter size={22} /></button>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-          <div className="flex items-center space-x-3 mb-2">
-            <div className="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-lg text-blue-600 dark:text-blue-400">
-              <CalendarIcon size={20} />
-            </div>
-            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Reservas</h3>
-          </div>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.hoy}</p>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-          <div className="flex items-center space-x-3 mb-2">
-            <div className="bg-green-100 dark:bg-green-900/30 p-2 rounded-lg text-green-600 dark:text-green-400">
-              <Users size={20} />
-            </div>
-            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Comensales</h3>
-          </div>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.comensalesHoy}</p>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-yellow-100 dark:border-yellow-900/30">
-          <div className="flex items-center space-x-3 mb-2">
-            <div className="bg-yellow-100 dark:bg-yellow-900/30 p-2 rounded-lg text-yellow-600 dark:text-yellow-500">
-              <Clock size={20} />
-            </div>
-            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Pendientes</h3>
-          </div>
-          <p className="text-3xl font-bold text-yellow-600 dark:text-yellow-500">{stats.pendientes}</p>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-          <div className="flex items-center space-x-3 mb-2">
-            <div className="bg-purple-100 dark:bg-purple-900/30 p-2 rounded-lg text-purple-600 dark:text-purple-400">
-              <UserCheck size={20} />
-            </div>
-            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Por Llegar</h3>
-          </div>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.porLlegar}</p>
-        </div>
+      <div className="reservation-scroll">
+        {loading ? (
+          <div className="empty-message">Cargando reservas...</div>
+        ) : error ? (
+          <div className="empty-message error-message">{error}</div>
+        ) : visibles.length === 0 ? (
+          <div className="empty-message">No hay reservas para esta fecha.</div>
+        ) : (
+          visibles.map(reserva => (
+            <article className="reservation-card" key={reserva.ReservaID}>
+              <div className="reservation-time">
+                <span className={'status-pill status-' + reserva.Estado.toLowerCase().replaceAll('_', '-')}>
+                  {statusLabel(reserva.Estado)}
+                </span>
+                <strong>{formatTime(reserva.HoraReserva)}</strong>
+              </div>
+              <div className="reservation-main">
+                <div className="customer-name"><span>👤</span>{reserva.Nombre || 'SIN NOMBRE'}</div>
+                <div className="customer-meta">
+                  <Phone size={18} />
+                  <span>{reserva.Telefono || '—'}</span>
+                  <span>•</span>
+                  <span className="reservation-code">{reserva.CodigoReserva || '—'}</span>
+                </div>
+              </div>
+              <div className="reservation-party">
+                <div className="pax"><Users size={22} /> {reserva.Personas || 0} PAX</div>
+                <button className="table-button">
+                  {reserva.Mesa ? 'MESA ' + reserva.Mesa : 'SIN ASIGNAR'}
+                </button>
+              </div>
+            </article>
+          ))
+        )}
       </div>
-
-      <div className="mt-8">
-        <Link
-          to="/reservas"
-          className="w-full block text-center bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold py-4 rounded-xl hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors"
-        >
-          VER RESERVAS DE HOY
-        </Link>
-      </div>
-    </div>
+    </section>
   );
 }
