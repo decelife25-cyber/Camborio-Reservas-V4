@@ -210,29 +210,29 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 @media (max-width: 620px) {
-  .private-header { min-height: 112px; }
+  .private-header { min-height: 76px; }
   .brand-emblem { width: 55px; height: 55px; flex-basis: 55px; }
   .brand-name { font-size: clamp(20px, 5.7vw, 27px); }
   .brand-line { font-size: clamp(10px, 2.8vw, 14px); }
   .header-actions { gap: 4px; }
   .header-icon { width: 34px; height: 34px; }
   .logout-button { height: 34px; padding: 0 9px; font-size: 10px; }
-  .menu-card { min-height: 104px; }
+  .menu-card { min-height: 66px; }
   .reservation-card { grid-template-columns: 162px 1fr 145px; }
 }
 @media (max-width: 500px) {
-  .private-header { padding-top: 9px; }
-  .brand-emblem { width: 50px; height: 50px; flex-basis: 50px; }
-  .brand-name { font-size: 20px; }
-  .brand-line { font-size: 10px; gap: 4px; }
+  .private-header { padding-top: 6px; min-height: 70px; }
+  .brand-emblem { width: 44px; height: 44px; flex-basis: 44px; }
+  .brand-name { font-size: 18px; }
+  .brand-line { font-size: 9px; gap: 3px; }
   .brand-line span { width: 19px; }
-  .header-icon { width: 32px; height: 32px; }
-  .logout-button { padding: 0 7px; font-size: 9px; }
-  .menu-card { min-height: 92px; font-size: 11px; }
-  .menu-icon { font-size: 32px; }
-  .today-title { font-size: 14px; }
-  .turn-button { padding: 0 7px; font-size: 9px; }
-  .filter-button { width: 32px; height: 32px; }
+  .header-icon { width: 30px; height: 30px; }
+  .logout-button { height: 30px; padding: 0 6px; font-size: 8px; }
+  .menu-card { min-height: 66px; font-size: 10px; }
+  .menu-icon { font-size: 27px; }
+  .today-title { font-size: 13px; }
+  .turn-button { padding: 0 6px; font-size: 8px; }
+  .filter-button { width: 30px; height: 30px; }
   .reservation-card { grid-template-columns: 120px 1fr; }
   .reservation-party { grid-column: 2; flex-direction: row; align-items: center; justify-content: space-between; border-top: 1px solid #222; }
   .reservation-time { grid-row: span 2; }
