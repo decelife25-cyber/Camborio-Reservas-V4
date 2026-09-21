@@ -424,3 +424,288 @@ html.light .app-version { color: rgba(0,0,0,.58); }
 }
 .today-day { color:#f3f3f3; }
 .today-date { color:#ffc400; }
+
+/* FASE 1: pantallas privadas principales. La cabecera y los seis botones siguen siendo comunes. */
+.menu-card { position: relative; }
+.menu-label { display: block; }
+.pending-badge {
+  position: absolute;
+  top: 15px;
+  right: 24%;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 7px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #ffc400;
+  color: #111;
+  font-size: 18px;
+  font-weight: 1000;
+  line-height: 1;
+  box-shadow: 0 0 0 2px rgba(0,0,0,.35);
+}
+.subscreen-header {
+  min-height: 66px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 12px;
+  border: 1px solid #242424;
+  border-radius: 7px 7px 0 0;
+  background: linear-gradient(180deg,#060606,#010101);
+}
+.subscreen-header h1 {
+  margin: 0;
+  color: #f5f5f5;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: clamp(22px, 5.2vw, 29px);
+  font-weight: 1000;
+  line-height: 1.05;
+}
+.subscreen-back {
+  width: 45px;
+  min-width: 45px;
+  height: 45px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #555;
+  border-radius: 7px;
+  background: #171717;
+  color: #fff;
+}
+.confirm-screen {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: #000;
+}
+.confirm-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 6px 12px;
+}
+.confirm-card {
+  min-height: 105px;
+  display: grid;
+  grid-template-columns: 118px 118px 90px 1fr 66px;
+  align-items: stretch;
+  border: 1px solid #292929;
+  border-top: 0;
+  background: linear-gradient(180deg,#101010,#080808);
+}
+.confirm-card > * {
+  min-width: 0;
+  border-right: 1px solid #242424;
+}
+.confirm-date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #141414;
+  color: #ffc400;
+}
+.confirm-date strong { font-size: 28px; line-height: 1; }
+.confirm-date span { color:#f3f3f3; font-size:15px; font-weight:900; margin-top:5px; }
+.confirm-day {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+}
+.confirm-day span { color:#f0f0f0; font-size:13px; font-weight:900; }
+.confirm-day strong { font-size:28px; line-height:1; color:#fff; }
+.confirm-pax {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#4da6ff;
+  font-size:20px;
+  font-weight:1000;
+}
+.confirm-client {
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:7px;
+  padding:8px 12px;
+}
+.confirm-client strong { font-size:20px; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.confirm-client span { color:#bbb; font-size:15px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.confirm-client b { color:#ffc400; }
+.confirm-check {
+  align-self:center;
+  justify-self:center;
+  width:48px;
+  height:48px;
+  border:2px solid #ffc400;
+  border-radius:7px;
+  background:#070707;
+  color:#ffc400;
+  display:grid;
+  place-items:center;
+}
+.confirm-check:disabled { opacity:.6; }
+.confirm-empty {
+  margin: 7px 6px;
+  border: 1px dashed #333;
+  padding: 20px 10px;
+  text-align: center;
+  color: #eee;
+  font-size: 18px;
+  font-weight: 800;
+}
+.confirm-error { color:#ffb5b5; }
+.calendar-screen {
+  height:100%;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  border:1px solid #2b2c30;
+  border-radius:8px;
+  background:#000;
+  overflow:hidden;
+}
+.calendar-scroll {
+  flex:1;
+  min-height:0;
+  overflow-y:auto;
+  padding:7px 6px 12px;
+}
+.calendar-month-header {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  min-height:52px;
+}
+.calendar-month-header strong {
+  color:#ffc400;
+  font-size:25px;
+  font-weight:1000;
+}
+.calendar-month-header button {
+  width:40px;
+  height:40px;
+  display:grid;
+  place-items:center;
+  border:1px solid #333;
+  border-radius:7px;
+  background:#151515;
+  color:#fff;
+}
+.calendar-weekdays {
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  border:1px solid #242424;
+  border-bottom:0;
+}
+.calendar-weekdays span {
+  min-height:30px;
+  display:grid;
+  place-items:center;
+  border-right:1px solid #242424;
+  color:#bcbcbc;
+  font-size:11px;
+  font-weight:900;
+}
+.calendar-weekdays span:last-child { border-right:0; color:#ff6675; }
+.calendar-grid {
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  border-left:1px solid #242424;
+  border-top:1px solid #242424;
+}
+.calendar-day,.calendar-empty {
+  position:relative;
+  min-height:58px;
+  box-sizing:border-box;
+  border-right:1px solid #242424;
+  border-bottom:1px solid #242424;
+  background:#030303;
+}
+.calendar-day {
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:0;
+}
+.calendar-day strong { font-size:23px; font-weight:1000; }
+.calendar-day.past { color:#555; }
+.calendar-day.today { box-shadow:inset 0 0 0 2px #20dc83; }
+.calendar-day.selected { box-shadow:inset 0 0 0 2px #ffc400; }
+.calendar-day:disabled { cursor:default; }
+.calendar-reservation-mark {
+  position:absolute;
+  right:6px;
+  bottom:6px;
+  width:15px;
+  height:15px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:#ff9f1a;
+  color:#151515;
+  font-size:9px;
+  font-weight:1000;
+}
+.calendar-reservations {
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  margin-top:7px;
+}
+.calendar-empty-message {
+  border:1px dashed #333;
+  padding:16px 10px;
+  text-align:center;
+  color:#eee;
+  font-size:18px;
+  font-weight:800;
+}
+html.light .subscreen-header,
+html.light .confirm-screen,
+html.light .calendar-screen { background:#fff; color:#222; }
+html.light .subscreen-header h1 { color:#222; }
+html.light .subscreen-back { background:#fff; color:#222; border-color:#bbb; }
+html.light .confirm-card { background:linear-gradient(#fff,#f3f1ec); border-color:#d4d0c8; }
+html.light .confirm-date { background:#f3f1ec; }
+html.light .confirm-client strong,
+html.light .confirm-day strong { color:#222; }
+html.light .confirm-day span,
+html.light .confirm-date span { color:#444; }
+html.light .confirm-check { background:#fff; }
+html.light .calendar-day,.light .calendar-empty { background:#fff; color:#222; }
+html.light .calendar-day.past { color:#aaa; }
+html.light .calendar-weekdays,
+html.light .calendar-grid { border-color:#ddd; }
+html.light .calendar-weekdays span { border-color:#ddd; color:#777; }
+html.light .calendar-month-header button { background:#fff; color:#222; border-color:#ccc; }
+html.light .confirm-empty,
+html.light .calendar-empty-message { color:#444; border-color:#bbb; }
+@media (max-width: 500px) {
+  .pending-badge { top: 9px; right: 19%; width: 31px; min-width:31px; height:31px; font-size:17px; }
+  .confirm-card { grid-template-columns: 88px 82px 65px 1fr 58px; min-height:96px; }
+  .confirm-date strong { font-size:22px; }
+  .confirm-date span { font-size:12px; }
+  .confirm-day span { font-size:10px; }
+  .confirm-day strong { font-size:22px; }
+  .confirm-pax { font-size:17px; }
+  .confirm-client { padding:7px 8px; gap:5px; }
+  .confirm-client strong { font-size:17px; }
+  .confirm-client span { font-size:12px; }
+  .confirm-check { width:43px; height:43px; }
+  .calendar-month-header strong { font-size:21px; }
+  .calendar-day { min-height:54px; }
+  .calendar-day strong { font-size:21px; }
+  .calendar-reservation-mark { right:4px; bottom:4px; }
+}
