@@ -372,9 +372,7 @@ html.light .filter-button { background: #fff; }
 
 
 
-/* V2 RESPONSIVE COPY
-   Valores trasladados directamente del panel privado V2.
-   No se usa zoom, transform ni factor proporcional inventado. */
+/* V2 RESPONSIVE COPY — direct values and breakpoints from V2. */
 .private-app{min-height:100svh;height:100svh;overflow:hidden}
 .private-header{min-height:78px;padding:6px 8px 5px;gap:6px;margin-bottom:8px}
 .brand-lockup{gap:9px}
@@ -388,47 +386,49 @@ html.light .filter-button { background: #fff; }
 .menu-card{min-height:150px;padding:14px 8px;border-radius:8px;gap:12px;font-size:24px;line-height:1.12}
 .menu-icon{font-size:50px;line-height:1}
 .private-content{padding:0 6px 5px}
-.date-turn-header{min-height:66px;padding:15px 17px;gap:10px}
-.today-title{gap:12px;font-size:24px}
-.today-calendar{font-size:25px}
-.turn-actions{gap:6px}
-.turn-button{flex-basis:126px;width:126px;min-width:126px;min-height:44px;height:44px;font-size:15px}
-.filter-button{width:48px;min-width:48px;height:44px;min-height:44px}
-.filter-button svg{width:28px;height:28px}
-.empty-message{padding:20px;font-size:clamp(24px,5.6vw,34px)}
-.reservation-card{grid-template-columns:148px minmax(0,1fr) 138px 45px;min-height:92px}
-.reservation-time{padding:12px}
-.reservation-time strong{font-size:42px}
-.status-pill{font-size:15px;padding:3px 6px}
-.reservation-main{padding:13px 10px 12px 22px;gap:6px}
-.customer-name{font-size:22px}
-.customer-meta{font-size:16px}
-.reservation-party{gap:9px;padding:13px 7px}
-.pax{font-size:21px}
-.table-button{min-width:128px;height:35px;font-size:18px}
+.date-turn-header{min-height:78px;padding:18px 26px 16px;gap:14px}
+.today-title{gap:12px;font-size:30px}
+.today-calendar{font-size:31px}
+.turn-actions{gap:10px}
+.turn-button{flex-basis:126px;width:126px;min-width:126px;min-height:40px;height:40px;font-size:15px}
+.filter-button{width:52px;min-width:52px;height:48px;min-height:48px}
+.filter-button svg{width:30px;height:30px}
+.empty-message{margin:12px 8px;padding:20px;font-size:clamp(24px,5.6vw,34px)}
+.reservation-scroll{padding:0 8px 8px}
+.reservation-card{grid-template-columns:216px minmax(0,1fr) 212px 60px;min-height:118px}
+.reservation-time{padding:16px 17px 14px}
+.reservation-time strong{font-size:55px}
+.status-pill{font-size:20px;padding-left:25px}
+.reservation-main{padding:18px 20px 16px 44px;gap:13px}
+.customer-name{font-size:29px}
+.customer-meta{font-size:26px;gap:14px}
+.reservation-party{gap:13px;padding:18px 12px}
+.pax{font-size:28px}
+.table-button{min-width:174px;height:auto;padding:9px 17px 8px;font-size:24px}
+@media(max-width:720px){
+ .date-turn-header{min-height:66px;padding:15px 17px}
+ .today-title{font-size:24px}
+ .today-calendar{font-size:25px}
+ .turn-actions{gap:6px}
+ .turn-button{width:126px;min-width:126px;min-height:44px;height:44px}
+ .filter-button{width:48px;min-width:48px;height:44px;min-height:44px}
+ .filter-button svg{width:28px;height:28px}
+ .reservation-card{grid-template-columns:148px minmax(0,1fr) 138px 45px;min-height:92px}
+ .reservation-time{padding:12px}
+ .reservation-time strong{font-size:42px}
+ .status-pill{font-size:15px;padding:3px 6px}
+ .reservation-main{padding:13px 10px 12px 22px;gap:10px}
+ .customer-name{font-size:22px}
+ .customer-meta{font-size:20px}
+ .reservation-party{gap:9px;padding:13px 7px}
+ .pax{font-size:21px}
+ .table-button{min-width:128px;padding:8px;font-size:18px}
+}
 @media(max-width:620px){
- .private-header{min-height:78px}
- .brand-emblem{width:69px;min-width:69px;max-width:69px;height:69px;min-height:69px;max-height:69px;flex-basis:69px}
- .brand-name{font-size:clamp(21px,6.3vw,24px)}
- .brand-line{font-size:clamp(15px,4.35vw,16px)}
  .menu-card{min-height:144px;padding:12px 4px;gap:10px;font-size:clamp(18px,5.4vw,22px)}
  .menu-icon{font-size:46px}
- .date-turn-header{min-height:66px;padding:13px 12px}
- .today-calendar{font-size:25px}
- .today-title{font-size:20px}
- .turn-actions{gap:6px}
- .turn-button{width:126px;min-width:126px;min-height:42px;height:42px;font-size:15px}
- .filter-button{width:44px;min-width:44px;height:42px;min-height:42px}
- .reservation-card{grid-template-columns:120px minmax(0,1fr) 100px 36px;min-height:82px}
- .reservation-time{padding:10px 8px}
- .reservation-time strong{font-size:33px}
- .status-pill{font-size:12px;padding:3px 6px}
- .reservation-main{padding:10px 7px 10px 10px;gap:8px}
- .customer-name{font-size:18px}
- .customer-meta{font-size:17px}
- .reservation-party{padding:10px 4px;gap:8px}
- .pax{font-size:18px}
- .table-button{min-width:98px;height:32px;font-size:15px}
+ .header-icon{width:44px;min-width:44px;height:44px}
+ .logout-button{min-height:56px;height:56px;padding:0 12px;font-size:14px}
 }
 @media(max-width:500px){
  .reservation-card{grid-template-columns:120px 1fr}
@@ -439,24 +439,4 @@ html.light .filter-button { background: #fff; }
  .customer-meta{font-size:13px}
  .reservation-time strong{font-size:27px}
  .status-pill{font-size:11px;padding:3px 6px}
-}
-/* The Android WebView used by this app reports a wider CSS viewport than
-   the browser screenshot of V2. This selects V2's compact mobile dimensions
-   at that viewport width; it does not scale or transform the UI. */
-@media(min-width:621px) and (max-width:760px){
- .private-header{min-height:76px;padding:6px 8px 5px}
- .brand-emblem{width:55px;min-width:55px;max-width:55px;height:55px;min-height:55px;max-height:55px;flex-basis:55px}
- .brand-name{font-size:clamp(20px,5.7vw,27px)}
- .brand-line{font-size:clamp(10px,2.8vw,14px);letter-spacing:1px}
- .header-actions{gap:4px}
- .header-icon{width:34px;min-width:34px;height:34px}
- .logout-button{height:34px;min-height:34px;padding:0 9px;font-size:10px}
- .menu-card{min-height:66px;padding:8px 4px;gap:5px;font-size:20px}
- .menu-icon{font-size:38px}
- .date-turn-header{min-height:60px;padding:8px 4px;gap:4px}
- .today-title{gap:4px;font-size:19px}
- .today-calendar{font-size:19px}
- .turn-actions{gap:3px}
- .turn-button{width:126px;min-width:126px;min-height:40px;height:40px;font-size:15px}
- .filter-button{width:38px;min-width:38px;height:42px;min-height:42px}
 }
