@@ -32,6 +32,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 .private-header {
+  position:relative;
   box-sizing:border-box;
   width:100%;
   min-height:78px;
@@ -385,9 +386,9 @@ html.light .filter-button { background: #fff; }
   height: 210.084034svh;
 }
 .app-version {
-  position: fixed;
+  position: absolute;
   right: 8px;
-  bottom: 4px;
+  bottom: 1px;
   z-index: 9999;
   font: 700 10px/1 Arial, sans-serif;
   color: rgba(255,255,255,.48);
