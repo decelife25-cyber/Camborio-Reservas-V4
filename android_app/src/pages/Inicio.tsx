@@ -16,12 +16,12 @@ type Reserva = {
 
 const CANCELADAS = new Set(['CANCELADA_CLIENTE', 'CANCELADA_LOCAL']);
 
-function formatDate(value: Date) {
+function formatDateParts(value: Date) {
   const day = value.toLocaleDateString('es-ES', { weekday: 'long', timeZone: 'Europe/Madrid' });
   const dayNumber = value.toLocaleDateString('es-ES', { day: 'numeric', timeZone: 'Europe/Madrid' });
   const month = value.toLocaleDateString('es-ES', { month: 'long', timeZone: 'Europe/Madrid' });
   const year = value.toLocaleDateString('es-ES', { year: 'numeric', timeZone: 'Europe/Madrid' });
-  return day.toUpperCase() + ' ' + dayNumber + ' ' + month.toUpperCase() + ' ' + year;
+  return { day: day.toUpperCase(), date: dayNumber + ' ' + month.toUpperCase() + ' ' + year };
 }
 
 function formatTime(value: string) {
@@ -89,7 +89,8 @@ export default function Inicio() {
       <header className="date-turn-header">
         <div className="today-title">
           <span className="today-calendar" aria-hidden="true">📅</span>
-          <span>{formatDate(new Date())}</span>
+          <span className="today-day">{formatDateParts(new Date()).day}</span>
+          <span className="today-date">{formatDateParts(new Date()).date}</span>
         </div>
 
         <div className="turn-actions">
