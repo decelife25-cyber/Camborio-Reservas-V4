@@ -379,11 +379,13 @@ html.light .filter-button { background: #fff; }
    The V2 panel is rendered at the compact mobile scale; this APK WebView
    reports a wider CSS viewport than the same physical device. */
 .private-app {
-  transform: scale(0.476);
+  transform: scale(0.50);
   transform-origin: top left;
-  width: 210.084034%;
-  min-height: 210.084034svh;
-  height: 210.084034svh;
+  width: 200%;
+  min-height: 200svh;
+  height: 200svh;
+  padding-top: max(120px, calc(env(safe-area-inset-top, 24px) * 5));
+  box-sizing: border-box;
 }
 .app-version {
   position: absolute;
