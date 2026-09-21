@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Filter, Users, Phone } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 type Reserva = {
@@ -17,18 +16,16 @@ type Reserva = {
 
 const CANCELADAS = new Set(['CANCELADA_CLIENTE', 'CANCELADA_LOCAL']);
 
-function formatTime(value: string) {
-  return String(value || '').slice(0, 5);
+function formatDate(value: Date) {
+  const day = value.toLocaleDateString('es-ES', { weekday: 'long', timeZone: 'Europe/Madrid' });
+  const dayNumber = value.toLocaleDateString('es-ES', { day: 'numeric', timeZone: 'Europe/Madrid' });
+  const month = value.toLocaleDateString('es-ES', { month: 'long', timeZone: 'Europe/Madrid' });
+  const year = value.toLocaleDateString('es-ES', { year: 'numeric', timeZone: 'Europe/Madrid' });
+  return day.toUpperCase() + ' ' + dayNumber + ' ' + month.toUpperCase() + ' ' + year;
 }
 
-function formatDate(value: Date) {
-  return value.toLocaleDateString('es-ES', {
-    weekday: 'long',
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-    timeZone: 'Europe/Madrid',
-  }).toUpperCase();
+function formatTime(value: string) {
+  return String(value || '').slice(0, 5);
 }
 
 function statusLabel(status: string) {
@@ -42,7 +39,7 @@ function statusLabel(status: string) {
 
 export default function Inicio() {
   const [reservas, setReservas] = useState<Reserva[]>([]);
-  const [turno, setTurno] = useState<'COMIDA' | 'CENA'>('CENA');
+  const [turnos, setTurnos] = useState({ COMIDA: true, CENA: true });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -50,6 +47,7 @@ export default function Inicio() {
     setLoading(true);
     setError('');
     const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
+
     const { data, error: queryError } = await supabase
       .from('Reservas')
       .select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,Turno')
@@ -63,6 +61,7 @@ export default function Inicio() {
     } else {
       setReservas((data || []).filter((r: Reserva) => !CANCELADAS.has(r.Estado)));
     }
+
     setLoading(false);
   }
 
@@ -72,29 +71,49 @@ export default function Inicio() {
 
   const comida = useMemo(() => reservas.filter(r => r.Turno === 'COMIDA'), [reservas]);
   const cena = useMemo(() => reservas.filter(r => r.Turno === 'CENA'), [reservas]);
-  const visibles = turno === 'COMIDA' ? comida : cena;
 
-  useEffect(() => {
-    if (cena.length === 0 && comida.length > 0) setTurno('COMIDA');
-    else if (cena.length > 0) setTurno('CENA');
-  }, [comida.length, cena.length]);
+  const visibles = useMemo(
+    () => reservas.filter(r => {
+      const turno = r.Turno === 'COMIDA' || r.Turno === 'CENA' ? r.Turno : null;
+      return !turno || turnos[turno];
+    }),
+    [reservas, turnos]
+  );
 
-  const today = new Date();
+  const toggleTurno = (turno: 'COMIDA' | 'CENA') => {
+    setTurnos(current => ({ ...current, [turno]: !current[turno] }));
+  };
 
   return (
     <section className="today-screen" aria-label="Reservas de hoy">
-      <div className="date-turn-header">
-        <div className="today-title"><span>📅</span> {formatDate(today)}</div>
-        <div className="turn-actions">
-          <button className={'turn-button ' + (turno === 'COMIDA' ? 'selected' : '')} onClick={() => setTurno('COMIDA')}>
-            ☀ COMIDA ({comida.length})
-          </button>
-          <button className={'turn-button ' + (turno === 'CENA' ? 'selected' : '')} onClick={() => setTurno('CENA')}>
-            🌙 CENA ({cena.length})
-          </button>
-          <button className="filter-button" aria-label="Filtros" title="Filtros"><Filter size={22} /></button>
+      <header className="date-turn-header">
+        <div className="today-title">
+          <span className="today-calendar" aria-hidden="true">📅</span>
+          <span>{formatDate(new Date())}</span>
         </div>
-      </div>
+
+        <div className="turn-actions">
+          <button
+            className={'turn-button ' + (turnos.COMIDA ? 'selected' : '')}
+            onClick={() => toggleTurno('COMIDA')}
+            type="button"
+          >
+            ☀ Comida ({comida.length})
+          </button>
+          <button
+            className={'turn-button ' + (turnos.CENA ? 'selected' : '')}
+            onClick={() => toggleTurno('CENA')}
+            type="button"
+          >
+            🌙 Cena ({cena.length})
+          </button>
+          <button className="filter-button" type="button" aria-label="Filtrar reservas" title="Filtrar reservas">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3 5h18l-7 8v5l-4 2v-7L3 5z" />
+            </svg>
+          </button>
+        </div>
+      </header>
 
       <div className="reservation-scroll">
         {loading ? (
@@ -115,15 +134,15 @@ export default function Inicio() {
               <div className="reservation-main">
                 <div className="customer-name"><span>👤</span>{reserva.Nombre || 'SIN NOMBRE'}</div>
                 <div className="customer-meta">
-                  <Phone size={18} />
+                  <span className="phone-icon">☎</span>
                   <span>{reserva.Telefono || '—'}</span>
                   <span>•</span>
                   <span className="reservation-code">{reserva.CodigoReserva || '—'}</span>
                 </div>
               </div>
               <div className="reservation-party">
-                <div className="pax"><Users size={22} /> {reserva.Personas || 0} PAX</div>
-                <button className="table-button">
+                <div className="pax"><span>👥</span> {reserva.Personas || 0} PAX</div>
+                <button className="table-button" type="button">
                   {reserva.Mesa ? 'MESA ' + reserva.Mesa : 'SIN ASIGNAR'}
                 </button>
               </div>
