@@ -7,7 +7,7 @@ import { useAuth } from '../contexts/AuthContext';
 const menuItems = [
   { to: '/reservas', icon: '📝', label: 'HACER RESERVA' },
   { to: '/calendario', icon: '📅', label: 'CALENDARIO' },
-  { to: '/reservas', icon: '🔎', label: 'BUSCAR RESERVA' },
+  { to: '/buscar', icon: '🔎', label: 'BUSCAR RESERVA' },
   { to: '/', icon: '📖', label: 'RESERVAS HOY' },
   { to: '/confirmar', icon: '✅', label: 'CONFIRMAR' },
   { to: '/mesas', icon: '🗺️', label: 'PLANOS DE MESAS' },
