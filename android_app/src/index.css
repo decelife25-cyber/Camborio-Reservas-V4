@@ -376,7 +376,7 @@ html.light .filter-button { background: #fff; }
    No se usa zoom/transform para corregir el tamaño. El panel se dimensiona
    proporcionalmente al viewport CSS real del WebView, manteniendo el ancho
    completo y las proporciones de V2 en móviles de distintas densidades. */
-:root { --v2s: clamp(.55, 0.14vw, 1); }
+:root { --v2s: clamp(.43, 0.0667vw, .70); }
 
 .private-app {
   min-height: 100svh;
