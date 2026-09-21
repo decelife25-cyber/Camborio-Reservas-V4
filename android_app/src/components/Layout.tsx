@@ -64,7 +64,7 @@ export default function Layout() {
           </button>
           <button className="logout-button" onClick={handleLogout}>CERRAR SESIÓN</button>
         </div>
-        <div className="app-version" aria-label="Versión de la aplicación">V1.0.1</div>
+        <div className="app-version" aria-label="Versión de la aplicación">V1.0.2</div>
       </header>
 
       <nav className="private-menu" aria-label="Menú privado">
