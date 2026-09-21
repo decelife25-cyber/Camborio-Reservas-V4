@@ -26,19 +26,6 @@ function formatDateParts(value: Date) {
   return { day: day.toUpperCase(), date: dayNumber + ' ' + month.toUpperCase() + ' ' + year };
 }
 
-function formatTime(value: string) {
-  return String(value || '').slice(0, 5);
-}
-
-function statusLabel(status: string) {
-  if (status === 'CONFIRMADA') return 'CONFIRMADA';
-  if (status === 'PENDIENTE') return 'PENDIENTE';
-  if (status === 'SENTADA') return 'SENTADA';
-  if (status === 'FINALIZADA') return 'FINALIZADA';
-  if (status === 'NO_PRESENTADO') return 'NO PRESENTADO';
-  return status;
-}
-
 export default function Inicio() {
   const [reservas, setReservas] = useState<Reserva[]>([]);
   const [turnos, setTurnos] = useState({ COMIDA: true, CENA: true });
