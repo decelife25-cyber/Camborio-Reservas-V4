@@ -163,7 +163,9 @@ export default function NuevaReserva(){
         {(error||message)&&<div className="cr-nueva-reserva__mensaje" data-tipo={error?'error':'info'}>{error||message}</div>}
         <div className="cr-nueva-reserva__acciones"><button className="cr-button cr-button--primary" type="submit" disabled={saving}>{saving?'GUARDANDO...':'CREAR RESERVA'}</button></div>
       </form>
-      {calendarOpen && <FechaPicker value={fecha} onChange={setFecha} onClose={() => setCalendarOpen(false)} />}\n    </div>\n  </section>;ef, useState } from 'react';
+      {calendarOpen && <FechaPicker value={fecha} onChange={setFecha} onClose={() => setCalendarOpen(false)} />}
+    </div>
+  </section>;ef, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import FechaPicker from '../components/FechaPicker';
 import { getTurnoFromHora } from '../utils/shifts';
