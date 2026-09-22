@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, Filter } from 'lucide-react';
+import { Filter } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import SearchReservationCard from '../components/SearchReservationCard';
 import type { SearchReservation } from '../components/SearchReservationCard';
