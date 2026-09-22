@@ -70,7 +70,10 @@ export default function Inicio() {
   );
 
   const toggleTurno = (turno: 'COMIDA' | 'CENA') => {
-    setTurnos(current => ({ ...current, [turno]: !current[turno] }));
+    setTurnos(current => {
+      if (current[turno] && !current[turno === 'COMIDA' ? 'CENA' : 'COMIDA']) return current;
+      return { ...current, [turno]: !current[turno] };
+    });
   };
 
   return (
