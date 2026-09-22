@@ -46,6 +46,7 @@ export default function Calendario() {
   });
   const [selectedDate, setSelectedDate] = useState(todayKey());
   const [reservasMes, setReservasMes] = useState<Reserva[]>([]);
+  const [turnos, setTurnos] = useState({ COMIDA: true, CENA: true });
   const [loading, setLoading] = useState(true);
 
   const year = monthDate.getFullYear();
@@ -88,9 +89,23 @@ export default function Calendario() {
   }, [reservasMes]);
 
   const reservasSeleccionadas = useMemo(
-    () => reservasMes.filter(r => r.FechaReserva === selectedDate),
-    [reservasMes, selectedDate]
+    () => reservasMes.filter(r => {
+      if (r.FechaReserva !== selectedDate) return false;
+      if (r.Turno === 'COMIDA' || r.Turno === 'CENA') return turnos[r.Turno];
+      return true;
+    }),
+    [reservasMes, selectedDate, turnos]
   );
+
+  const comida = useMemo(() => reservasMes.filter(r => r.FechaReserva === selectedDate && r.Turno === 'COMIDA'), [reservasMes, selectedDate]);
+  const cena = useMemo(() => reservasMes.filter(r => r.FechaReserva === selectedDate && r.Turno === 'CENA'), [reservasMes, selectedDate]);
+
+  const toggleTurno = (turno: 'COMIDA' | 'CENA') => {
+    setTurnos(current => {
+      if (current[turno] && !current[turno === 'COMIDA' ? 'CENA' : 'COMIDA']) return current;
+      return { ...current, [turno]: !current[turno] };
+    });
+  };
 
   const selectedParts = formatDateParts(selectedDate);
 
@@ -113,8 +128,8 @@ export default function Calendario() {
           <span className="today-date">{selectedParts.date}</span>
         </div>
         <div className="turn-actions">
-          <button className="turn-button selected" type="button">☀ Comida ({reservasSeleccionadas.filter(r => r.Turno === 'COMIDA').length})</button>
-          <button className="turn-button selected" type="button">🌙 Cena ({reservasSeleccionadas.filter(r => r.Turno === 'CENA').length})</button>
+          <button className={'turn-button ' + (turnos.COMIDA ? 'selected' : '')} type="button" onClick={() => toggleTurno('COMIDA')}>☀ Comida ({comida.length})</button>
+          <button className={'turn-button ' + (turnos.CENA ? 'selected' : '')} type="button" onClick={() => toggleTurno('CENA')}>🌙 Cena ({cena.length})</button>
           <button className="filter-button" type="button" aria-label="Filtrar reservas">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18l-7 8v5l-4 2v-7L3 5z" /></svg>
           </button>
