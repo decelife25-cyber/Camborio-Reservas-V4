@@ -1953,3 +1953,80 @@ html.light .search-empty{color:#444;border-color:#bbb;}
 .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha__bloque--mesa strong{font-size:29px}
 
 /* Build 1.0.017: calibración física V2 aplicada. */
+
+/* ===== AJUSTE FINAL 1.0.018: modal bajo + calendario propio + modo día ===== */
+.cr-nueva-reserva{padding-top:150px!important}
+.cr-nueva-reserva__panel{max-height:680px!important}
+.cr-nueva-reserva__fecha-input-oculto{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}
+.cr-nueva-reserva__fecha-boton{width:100%;height:64px;border:1px solid #5a5a5a;border-radius:8px;background:#090909;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 12px;font:1000 28px/1 var(--cr-font);cursor:pointer}
+.cr-nueva-reserva__fecha-boton span{color:#ffc400;font-size:20px}
+.cr-fecha-picker{position:fixed;inset:0;z-index:10050;display:grid;place-items:center;background:rgba(0,0,0,.78);padding:20px;box-sizing:border-box}
+.cr-fecha-picker__backdrop{position:absolute;inset:0;border:0;background:transparent}
+.cr-fecha-picker__panel{position:relative;width:min(560px,92vw);padding:22px;border:1px solid #d6a900;border-radius:14px;background:linear-gradient(180deg,#111,#050505);box-shadow:0 24px 70px rgba(0,0,0,.8);color:#fff}
+.cr-fecha-picker__header{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #2d2d2d;padding-bottom:14px}
+.cr-fecha-picker__header span{display:block;color:#ffc400;font:1000 16px/1 var(--cr-font)}
+.cr-fecha-picker__header strong{display:block;margin-top:8px;font:1000 30px/1 var(--cr-font)}
+.cr-fecha-picker__header button{width:52px;height:46px;border:1px solid #ffc400;border-radius:7px;background:#111;color:#ffc400;font-weight:1000}
+.cr-fecha-picker__nav{display:grid;grid-template-columns:54px 1fr 54px;align-items:center;gap:8px;margin:16px 0}
+.cr-fecha-picker__nav button{height:48px;border:1px solid #5b4700;border-radius:7px;background:#111;color:#ffc400;font-size:30px}
+.cr-fecha-picker__nav strong{text-align:center;font:1000 22px/1 var(--cr-font)}
+.cr-fecha-picker__week,.cr-fecha-picker__grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cr-fecha-picker__week span{text-align:center;color:#aaa;font:1000 14px/1 var(--cr-font);padding:7px}
+.cr-fecha-picker__grid{margin-top:4px}
+.cr-fecha-picker__grid>span{height:52px}
+.cr-fecha-picker__grid button{height:52px;border:1px solid transparent;border-radius:50%;background:transparent;color:#fff;font:1000 22px/1 var(--cr-font)}
+.cr-fecha-picker__grid button.today{border-color:#ffc400;background:#ffc400;color:#111}
+.cr-fecha-picker__grid button.selected:not(.today){border-color:#ffc400;color:#ffc400;background:transparent}
+.cr-fecha-picker__grid button.past{color:#555}
+.cr-fecha-picker__grid button:disabled{cursor:not-allowed}
+.cr-fecha-picker__actions{display:flex;justify-content:flex-end;gap:28px;margin-top:18px}
+.cr-fecha-picker__actions button{border:0;background:transparent;color:#ffc400;font:1000 18px/1 var(--cr-font);padding:10px}
+
+/* Pendiente: texto más proporcionado al botón. */
+.cr-busqueda-ficha__estado{font-size:18px!important}
+.cr-busqueda-ficha__estado select,.cr-busqueda-ficha__estado button{font-size:20px!important}
+
+/* Modo día: las pantallas que seguían heredando negro ahora siguen el mismo tema del shell. */
+html.light .cr-reservas-hoy,
+html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar],
+html.light .cr-buscar-reserva,
+html.light .cr-busqueda-ficha-wrap,
+html.light .cr-busqueda-ficha,
+html.light .subscreen-header,
+html.light .cr-calendario-panel{background:#fff!important;color:#171717!important;border-color:#c9c5bd!important}
+html.light .cr-reservas-hoy .cr-busqueda-ficha,
+html.light .cr-reservas-hoy .cr-reserva-confirmar,
+html.light .cr-busqueda-ficha__bloque,
+html.light .cr-busqueda-ficha__observaciones,
+html.light .cr-busqueda-ficha__nav,
+html.light .cr-busqueda-ficha__cabecera,
+html.light .cr-busqueda-ficha__cliente,
+html.light .cr-busqueda-ficha__estado,
+html.light .cr-buscar-reserva,
+html.light .cr-buscar-reserva__controles,
+html.light .cr-buscar-reserva__input{background:#fff!important;color:#171717!important;border-color:#c9c5bd!important}
+html.light .cr-busqueda-ficha__bloque strong,
+html.light .cr-busqueda-ficha__bloque em,
+html.light .cr-busqueda-ficha__cliente,
+html.light .cr-busqueda-ficha__observaciones,
+html.light .cr-busqueda-ficha__creada{color:#171717!important}
+html.light .cr-busqueda-ficha__estado{background:#fff!important;color:#9b7600!important}
+html.light .cr-busqueda-ficha__guardar{background:#ece9e2!important;color:#555!important}
+html.light .cr-nueva-reserva__panel{background:linear-gradient(180deg,#fff,#f2f0eb)!important;color:#171717!important}
+html.light .cr-nueva-reserva__header{border-color:#d4d0c8!important}
+html.light .cr-nueva-reserva__header h2,
+html.light .cr-nueva-reserva__form label{color:#8b6800!important}
+html.light .cr-nueva-reserva__form input,
+html.light .cr-nueva-reserva__form textarea,
+html.light .cr-nueva-reserva__contador,
+html.light .cr-nueva-reserva__fecha-boton,
+html.light .cr-nueva-reserva__mesa,
+html.light .cr-nueva-reserva__rueda{background:#fff!important;color:#171717!important;border-color:#c9c5bd!important}
+html.light .cr-nueva-reserva__contador strong,
+html.light .cr-nueva-reserva__mesa strong,
+html.light .cr-nueva-reserva__form input,
+html.light .cr-nueva-reserva__form textarea,
+html.light .cr-nueva-reserva__fecha-boton{color:#171717!important}
+html.light .cr-fecha-picker__panel{background:linear-gradient(180deg,#fff,#f2f0eb)!important;color:#171717!important}
+html.light .cr-fecha-picker__grid button{color:#171717}
+html.light .cr-fecha-picker__grid button.past{color:#aaa}
