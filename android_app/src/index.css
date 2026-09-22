@@ -2116,3 +2116,81 @@ html.light .cr-nueva-reserva__rueda-item--cerca{color:#666!important}
 .cr-busqueda-ficha__bloque--mesa span{font-size:18px!important}
 .cr-busqueda-ficha__bloque--mesa strong{font-size:22px!important;letter-spacing:-.3px!important;white-space:nowrap!important}
 html.light .cr-busqueda-ficha__bloque--mesa strong{font-size:22px!important;color:#171717!important}
+
+
+/* ===== 1.0.022: selector fijo de hora/minutos + ocre uniforme en modo día ===== */
+/* La rueda ya no es una lista desplazable: siempre hay tres posiciones fijas:
+   anterior arriba, valor seleccionado en el centro, siguiente abajo. */
+.cr-nueva-reserva__rueda{
+  height:96px!important;
+  min-height:96px!important;
+  display:grid!important;
+  grid-template-rows:repeat(3,32px)!important;
+  overflow:hidden!important;
+  padding:0 8px!important;
+  scroll-behavior:auto!important;
+  scroll-snap-type:none!important;
+  touch-action:none!important;
+  overscroll-behavior:none!important;
+}
+.cr-nueva-reserva__rueda-item{
+  height:32px!important;
+  min-height:32px!important;
+  margin:0!important;
+  padding:0!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  overflow:hidden!important;
+  line-height:1!important;
+  transform:none!important;
+}
+.cr-nueva-reserva__rueda-item--cerca{
+  font-size:15px!important;
+  opacity:.72!important;
+}
+.cr-nueva-reserva__rueda-item--actual{
+  font-size:30px!important;
+  font-weight:1000!important;
+  opacity:1!important;
+}
+html.light .cr-nueva-reserva__rueda{
+  background:#f7f5f0!important;
+}
+html.light .cr-nueva-reserva__rueda-item--cerca{
+  color:#666!important;
+}
+html.light .cr-nueva-reserva__rueda-item--actual{
+  color:#171717!important;
+}
+
+/* En modo día, el acento de esta pantalla es ocre, no amarillo. */
+html.light .cr-nueva-reserva__acciones .cr-button--primary,
+html.light .cr-buscar-reserva__boton{
+  background:#b89a42!important;
+  border-color:#a48735!important;
+  color:#fff!important;
+  box-shadow:none!important;
+}
+html.light .cr-nueva-reserva__acciones .cr-button--primary:hover,
+html.light .cr-buscar-reserva__boton:hover{
+  background:#a88b37!important;
+}
+html.light .cr-buscar-reserva__label,
+html.light .cr-buscar-reserva__boton,
+html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha__volver,
+html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha__contador span,
+html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha__codigo,
+html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha__bloque span,
+html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha__observaciones>span{
+  color:#8b6800!important;
+}
+html.light .cr-buscar-reserva__boton{
+  color:#fff!important;
+}
+html.light .cr-nueva-reserva__fecha-boton span{
+  color:#8b6800!important;
+}
+html.light .cr-nueva-reserva__panel .cr-button--primary{
+  text-shadow:none!important;
+}
