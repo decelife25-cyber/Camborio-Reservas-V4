@@ -2097,3 +2097,22 @@ html.light .cr-fecha-picker__grid button.past{color:#aaa!important}
 html.light .cr-fecha-picker__grid button.today{background:#b89a42!important;border-color:#b89a42!important;color:#fff!important}
 html.light .cr-fecha-picker__grid button.selected:not(.today){border-color:#b89a42!important;color:#8b6800!important;background:transparent!important}
 html.light .cr-fecha-picker__actions button{color:#8b6800!important}
+
+
+/* ===== 1.0.021: rueda centrada + modal completo + mesa ficha ===== */
+.cr-nueva-reserva__rueda{height:96px!important;padding:0 8px!important}
+.cr-nueva-reserva__rueda-item{height:32px!important;font-size:13px!important}
+.cr-nueva-reserva__rueda-item--actual{font-size:30px!important}
+.cr-nueva-reserva__rueda-item--cerca{font-size:15px!important;opacity:.75!important}
+html.light .cr-nueva-reserva__rueda{background:#f7f5f0!important}
+html.light .cr-nueva-reserva__rueda-item{color:#777!important}
+html.light .cr-nueva-reserva__rueda-item--actual{color:#171717!important}
+html.light .cr-nueva-reserva__rueda-item--cerca{color:#666!important}
+.cr-nueva-reserva__panel{max-height:none!important;overflow:visible!important}
+.cr-nueva-reserva__form{gap:8px 10px!important}
+.cr-nueva-reserva__form input{height:62px!important}
+.cr-nueva-reserva__form textarea{min-height:76px!important;max-height:76px!important}
+.cr-nueva-reserva__acciones .cr-button{min-height:56px!important;height:56px!important}
+.cr-busqueda-ficha__bloque--mesa span{font-size:18px!important}
+.cr-busqueda-ficha__bloque--mesa strong{font-size:22px!important;letter-spacing:-.3px!important;white-space:nowrap!important}
+html.light .cr-busqueda-ficha__bloque--mesa strong{font-size:22px!important;color:#171717!important}
