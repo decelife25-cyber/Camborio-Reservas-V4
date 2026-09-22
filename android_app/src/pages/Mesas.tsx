@@ -222,7 +222,7 @@ export default function Mesas() {
     setSaving(false);
   };
 
-  const estado = selectedTable ? visualState(reservaSeleccionada) : 'disponible';
+  const estado: 'disponible' | 'reservada' | 'ocupada' | 'desactivada' = selectedTable && mesasConfig[selectedTable]?.Activa === false ? 'desactivada' : (selectedTable ? visualState(reservaSeleccionada) : 'disponible');
 
   const mesasVisibles = useMemo(() => layout.mesas.map(m => ({
     ...m,
@@ -253,6 +253,7 @@ export default function Mesas() {
           ))}
         </div>
 
+        {loading && <div className="cr-planos-mesas__loading">CARGANDO MESAS...</div>}
         <div className="cr-planos-mesas__canvas-wrap">
           <div className={'cr-planos-mesas__canvas cr-planos-mesas__canvas--' + zona}>
             <div className="cr-planos-mesas__rotulo">{layout.nombre}</div>
