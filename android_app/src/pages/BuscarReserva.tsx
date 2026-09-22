@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import SearchReservationCard from '../components/SearchReservationCard';
 import type { SearchReservation } from '../components/SearchReservationCard';
@@ -6,15 +7,9 @@ import type { SearchReservation } from '../components/SearchReservationCard';
 const selectFields='ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,MesasAdicionales,Turno,Observaciones,FechaCreacion';
 
 export default function BuscarReserva(){
- const[term,setTerm]=useState(''),[results,setResults]=useState<SearchReservation[]>([]),[index,setIndex]=useState(0),[loading,setLoading]=useState(false),[searched,setSearched]=useState(false),[error,setError]=useState('');
- async function buscar(e:React.FormEvent){
-  e.preventDefault();const value=term.trim();if(!value)return;
-  setLoading(true);setSearched(true);setError('');setResults([]);setIndex(0);
-  const byCode=await supabase.from('Reservas').select(selectFields).eq('CodigoReserva',value.toUpperCase()).order('FechaReserva',{ascending:false}).order('HoraReserva',{ascending:false});
-  let data=byCode.data as SearchReservation[]|null,err=byCode.error;
-  if(!err&&!data?.length){const byPhone=await supabase.from('Reservas').select(selectFields).eq('Telefono',value).order('FechaReserva',{ascending:false}).order('HoraReserva',{ascending:false});data=byPhone.data as SearchReservation[]|null;err=byPhone.error}
-  if(err)setError(err.message);setResults(data||[]);setLoading(false);
- }
+ const [searchParams] = useSearchParams();
+ const[term,setTerm]=useState(searchParams.get('codigo') || searchParams.get('telefono') || ''),[results,setResults]=useState<SearchReservation[]>([]),[index,setIndex]=useState(0),[loading,setLoading]=useState(false),[searched,setSearched]=useState(false),[error,setError]=useState('');
+
  function updateResult(updated:SearchReservation){setResults(prev=>prev.map(r=>r.ReservaID===updated.ReservaID?updated:r))}
  return <section className="cr-reservas-hoy" data-cr-vista-reservas="buscar" aria-labelledby="crBuscarReservaTitulo">
    <header className="cr-reservas-hoy__header">
