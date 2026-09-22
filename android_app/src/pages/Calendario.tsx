@@ -221,7 +221,6 @@ export default function Calendario() {
           )}
         </div>
       </div>
-    </section>
       {filtroAbierto && (
         <div className="filter-overlay" role="dialog" aria-modal="true" aria-labelledby="filtroReservasTitulo">
           <div className="filter-modal">
@@ -245,5 +244,6 @@ export default function Calendario() {
           </div>
         </div>
       )}
+    </section>
   );
 }
