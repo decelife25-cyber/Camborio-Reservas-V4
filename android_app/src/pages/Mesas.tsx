@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import type { CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -261,7 +262,7 @@ export default function Mesas() {
                 key={mesa.numero}
                 type="button"
                 className={'cr-planos-mesas__mesa cr-planos-mesas__mesa--' + mesa.estado}
-                style={{ '--mesa-x': mesa.x + '%', '--mesa-y': mesa.y + '%' } as React.CSSProperties}
+                style={{ '--mesa-x': mesa.x + '%', '--mesa-y': mesa.y + '%' } as CSSProperties}
                 onClick={() => setSelectedTable(mesa.numero)}
                 aria-label={'Mesa ' + mesa.numero + ' ' + mesa.estado}
               >
