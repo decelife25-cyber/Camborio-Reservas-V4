@@ -88,7 +88,7 @@ export default function Inicio() {
       setError('No se pudieron cargar las reservas.');
       setReservas([]);
     } else {
-      setReservas((data || []).filter((r: Reserva) => !CANCELADAS.has(r.Estado)));
+      setReservas((data || []) as Reserva[]);
     }
 
     setLoading(false);
