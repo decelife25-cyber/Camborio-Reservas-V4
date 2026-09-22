@@ -322,7 +322,7 @@ export default function Mesas() {
         </div>
 
         <div className="cr-planos-mesas__leyenda">
-          {assignmentMode && <><span><i className="principal" />PRINCIPAL</span><span><i className="adicional" />ADICIONAL</span><span><i className="cambio-pendiente" />CAMBIO PENDIENTE</span></>}
+          
           <span><i className="libre" />LIBRE</span><span><i className="reservada" />RESERVADA</span><span><i className="ocupada" />OCUPADA</span><span><i className="desactivada" />DESACTIVADA</span>
         </div>
 
