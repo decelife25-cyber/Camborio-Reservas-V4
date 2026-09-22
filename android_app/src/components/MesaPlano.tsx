@@ -10,7 +10,7 @@ export type MesaPlanoEstado = 'disponible' | 'reservada' | 'ocupada' | 'desactiv
 type Props = {
   layout: MesaPlanoLayout;
   zona: string;
-  mesas: Array<{ numero: string; x: number; y: number; zona: string; estado: MesaPlanoEstado }>;
+  mesas: Array<{ numero: string; x: number; y: number; zona: string; estado: string }>;
   assignmentMode: boolean;
   assignmentTables: string[];
   onTableClick: (numero: string) => void;
