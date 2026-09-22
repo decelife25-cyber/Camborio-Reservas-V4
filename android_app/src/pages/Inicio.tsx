@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import ReservationCard from '../components/ReservationCard';
+import { useNavigate } from 'react-router-dom';
 
 type Reserva = {
   ReservaID: string;
@@ -63,6 +64,7 @@ function formatDateParts(value: Date) {
 }
 
 export default function Inicio() {
+  const navigate = useNavigate();
   const [reservas, setReservas] = useState<Reserva[]>([]);
   const [turnos, setTurnos] = useState({ COMIDA: true, CENA: true });
   const [loading, setLoading] = useState(true);
@@ -193,7 +195,7 @@ export default function Inicio() {
         ) : (
           <div className="calendar-reservations">
             {visibles.map(reserva => (
-              <ReservationCard key={reserva.ReservaID} reserva={reserva} />
+              <ReservationCard key={reserva.ReservaID} reserva={reserva} onAssignTable={r => navigate('/mesas?asignar=' + encodeURIComponent(r.ReservaID))} />
             ))}
           </div>
         )}
