@@ -16,7 +16,6 @@ type Reserva = {
   Observaciones: string | null;
 };
 
-const CANCELADAS = new Set(['CANCELADA_CLIENTE', 'CANCELADA_LOCAL']);
 const FILTRO_STORAGE_KEY = 'camborio_reservas_hoy_filtro_estados_v1';
 const ESTADOS_FILTRO = ['PENDIENTE', 'CONFIRMADA', 'SENTADA', 'FINALIZADA', 'CANCELADA', 'NO_ASISTIO'] as const;
 type EstadoFiltro = typeof ESTADOS_FILTRO[number];
