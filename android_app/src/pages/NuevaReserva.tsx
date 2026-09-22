@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import FechaPicker from '../components/FechaPicker';
 import { getTurnoFromHora } from '../utils/shifts';
@@ -7,8 +7,6 @@ const HORAS = ['09','10','11','12','13','14','15','16','17','18','19','20','21',
 const MINUTOS = ['00','15','30','45'];
 
 const todayMadrid = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
-const parseISODate = (iso:string) => { const [y,m,d]=iso.split('-').map(Number); return new Date(y,m-1,d); };
-const formatDateES = (iso:string) => { const [y,m,d]=iso.split('-'); return d+'/'+m+'/'+y; };
 const isoDate = (d:Date) => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 
 function Wheel({ values, value, onChange, kind }: { values:string[]; value:string; onChange:(v:string)=>void; kind:'hora'|'minutos' }) {
