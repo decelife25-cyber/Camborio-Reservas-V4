@@ -2253,3 +2253,92 @@ html.light .observation-close{
 html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha__observaciones span{
   color:#8b6800!important;
 }
+
+/* ===== 1.0.026: filtro de Reservas Hoy persistente + modo día/noche ===== */
+.filter-button.has-filter{box-shadow:0 0 0 1px rgba(255,196,0,.22) inset}
+.filter-overlay{
+  position:fixed;inset:0;z-index:100000;
+  display:grid;place-items:center;padding:18px;
+  background:rgba(0,0,0,.82);
+}
+.filter-modal{
+  width:min(520px,calc(100vw - 36px));
+  box-sizing:border-box;padding:18px 16px 16px;
+  border:2px solid #ffc400;border-radius:10px;
+  background:linear-gradient(180deg,#181818,#070707);
+  color:#fff;box-shadow:0 20px 60px rgba(0,0,0,.75);
+}
+.filter-modal__header{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:10px;padding-bottom:12px;border-bottom:1px solid #343434;
+}
+.filter-modal__header h2{margin:0;color:#fff;font:1000 25px/1 var(--cr-font);letter-spacing:.2px}
+.filter-modal__close{
+  width:40px;height:40px;border:1px solid #555;border-radius:7px;
+  background:#151515;color:#fff;font-size:28px;line-height:1;
+}
+.filter-modal__options{display:grid}
+.filter-option{
+  min-height:52px;display:flex;align-items:center;gap:10px;
+  border-bottom:1px solid #292929;
+  font:1000 19px/1 var(--cr-font);
+  cursor:pointer;
+}
+.filter-option input{
+  position:absolute;opacity:0;width:1px;height:1px;pointer-events:none;
+}
+.filter-option__box{
+  width:24px;height:24px;flex:0 0 24px;
+  display:grid;place-items:center;border:2px solid #aaa;border-radius:2px;
+  background:#050505;color:transparent;font:1000 19px/1 Arial;
+}
+.filter-option input:checked + .filter-option__box{
+  background:#ffc400;border-color:#ffc400;color:#111;
+}
+.filter-option--pendiente{color:#ffc400}
+.filter-option--confirmada{color:#20dc83}
+.filter-option--sentada{color:#4da6ff}
+.filter-option--finalizada{color:#aaa}
+.filter-option--cancelada{color:#ff5d67}
+.filter-option--no_asistio{color:#ff9f1a}
+.filter-modal__actions{display:grid;gap:8px;padding-top:14px}
+.filter-modal__apply,.filter-modal__cancel{
+  width:100%;min-height:56px;border-radius:8px;
+  font:1000 18px/1 var(--cr-font);cursor:pointer;
+}
+.filter-modal__apply{
+  border:2px solid #ffc400;
+  background:linear-gradient(180deg,#ffd946 0,#ffc400 58%,#e6a500 100%);
+  color:#070707;
+}
+.filter-modal__cancel{
+  border:1px solid #666;background:linear-gradient(#333,#181818);color:#fff;
+}
+html.light .filter-overlay{background:rgba(0,0,0,.58)}
+html.light .filter-modal{
+  border-color:#b89a42;
+  background:linear-gradient(180deg,#fff,#f2f0eb);
+  color:#171717;box-shadow:0 20px 60px rgba(0,0,0,.28);
+}
+html.light .filter-modal__header{border-color:#d4d0c8}
+html.light .filter-modal__header h2{color:#8b6800}
+html.light .filter-modal__close{
+  background:#f4f2ed;color:#8b6800;border-color:#c9c5bd;
+}
+html.light .filter-option{border-color:#ddd9d1}
+html.light .filter-option__box{background:#fff;border-color:#aaa;color:transparent}
+html.light .filter-option input:checked + .filter-option__box{
+  background:#b89a42;border-color:#a48735;color:#fff;
+}
+html.light .filter-option--pendiente{color:#8b6800}
+html.light .filter-option--confirmada{color:#167247}
+html.light .filter-option--sentada{color:#287ac0}
+html.light .filter-option--finalizada{color:#777}
+html.light .filter-option--cancelada{color:#c03945}
+html.light .filter-option--no_asistio{color:#9a6400}
+html.light .filter-modal__apply{
+  border-color:#a48735;background:#b89a42;color:#fff;
+}
+html.light .filter-modal__cancel{
+  border-color:#c9c5bd;background:#ece9e2;color:#555;
+}
