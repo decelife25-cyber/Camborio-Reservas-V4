@@ -11,31 +11,52 @@ const formatDateES = (iso:string) => { const [y,m,d]=iso.split('-'); return d+'/
 const isoDate = (d:Date) => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 
 function Wheel({ values, value, onChange, kind }: { values:string[]; value:string; onChange:(v:string)=>void; kind:'hora'|'minutos' }) {
-  const ref=useRef<HTMLSpanElement>(null);
-  const [near,setNear]=useState<string[]>([]);
-  const itemH=32;
-  const sync=(smooth:boolean)=>{
-    const el=ref.current;if(!el)return;
-    const idx=Math.max(0,values.indexOf(value));
-    el.scrollTo({top:Math.max(0,idx*itemH-itemH),behavior:smooth?'smooth':'auto'});
+  const touchStart=useRef<number|null>(null);
+  const index=Math.max(0,values.indexOf(value));
+  const previous=index>0?values[index-1]:kind==='minutos'?values[values.length-1]:'';
+  const next=index<values.length-1?values[index+1]:kind==='minutos'?values[0]:'';
+  const change=(direction:1|-1)=>{
+    let nextIndex=index+direction;
+    if(kind==='minutos'){
+      if(nextIndex<0)nextIndex=values.length-1;
+      if(nextIndex>=values.length)nextIndex=0;
+    }else{
+      nextIndex=Math.max(0,Math.min(values.length-1,nextIndex));
+    }
+    const nextValue=values[nextIndex];
+    if(nextValue&&nextValue!==value)onChange(nextValue);
   };
-  useEffect(()=>sync(false),[value]);
-  useEffect(()=>{
-    const el=ref.current;if(!el)return;
-    const onScroll=()=>{
-      const idx=Math.max(0,Math.min(values.length-1,Math.round((el.scrollTop)/itemH)+1));
-      const around=[values[idx-1],values[idx+1]].filter(Boolean);
-      setNear(around);
-      const snapped=values[idx];
-      if(snapped&&snapped!==value)onChange(snapped);
-    };
-    el.addEventListener('scroll',onScroll,{passive:true});
-    return()=>el.removeEventListener('scroll',onScroll);
-  },[value,values]);
-  return <span className="cr-nueva-reserva__rueda" data-wheel-kind={kind} ref={ref}>
-    <span className="cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--vacio" />
-    {values.map(v=><span key={v} className={'cr-nueva-reserva__rueda-item '+(v===value?'cr-nueva-reserva__rueda-item--actual':near.includes(v)?'cr-nueva-reserva__rueda-item--cerca':'cr-nueva-reserva__rueda-item--lejos')}>{v}</span>)}
-    <span className="cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--vacio" />
+  const handleTouchStart=(e:React.TouchEvent<HTMLSpanElement>)=>{
+    touchStart.current=e.touches[0]?.clientY??null;
+  };
+  const handleTouchEnd=(e:React.TouchEvent<HTMLSpanElement>)=>{
+    if(touchStart.current===null)return;
+    const end=e.changedTouches[0]?.clientY??touchStart.current;
+    const delta=touchStart.current-end;
+    touchStart.current=null;
+    if(Math.abs(delta)<12)return;
+    change(delta>0?1:-1);
+  };
+  const handleWheel=(e:React.WheelEvent<HTMLSpanElement>)=>{
+    e.preventDefault();
+    if(Math.abs(e.deltaY)<1)return;
+    change(e.deltaY>0?1:-1);
+  };
+  return <span
+    className="cr-nueva-reserva__rueda"
+    data-wheel-kind={kind}
+    role="slider"
+    aria-label={kind==='hora'?'Hora':'Minutos'}
+    aria-valuetext={value}
+    tabIndex={0}
+    onTouchStart={handleTouchStart}
+    onTouchEnd={handleTouchEnd}
+    onWheel={handleWheel}
+    onKeyDown={e=>{if(e.key==='ArrowUp')change(-1);if(e.key==='ArrowDown')change(1)}}
+  >
+    <span className="cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--cerca">{previous}</span>
+    <span className="cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--actual">{value}</span>
+    <span className="cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--cerca">{next}</span>
   </span>;
 }
 
