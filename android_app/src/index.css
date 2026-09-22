@@ -2032,3 +2032,47 @@ html.light .cr-fecha-picker__grid button{color:#171717}
 html.light .cr-fecha-picker__grid button.past{color:#aaa}
 
 /* 1.0.018 build trigger */
+
+/* ===== 1.0.019: correcciones finas modo día + rueda V2 ===== */
+
+/* Rueda: mantener las tres posiciones visibles (anterior / actual / siguiente). */
+.cr-nueva-reserva__rueda{height:132px!important;background:linear-gradient(180deg,#050505 0,#111 34%,#060606 50%,#111 66%,#050505 100%)!important;box-shadow:inset 0 34px 24px rgba(6,6,6,.72),inset 0 -34px 24px rgba(6,6,6,.72)!important}
+.cr-nueva-reserva__rueda-item--actual{font-size:36px!important}
+.cr-nueva-reserva__rueda-item--cerca{font-size:18px!important;opacity:.75!important;color:#bdbdbd!important}
+
+/* Modo día: controles que no deben conservar el negro del modo noche. */
+html.light .cr-nueva-reserva__cerrar,
+html.light .cr-nueva-reserva__contador button{background:#f4f2ed!important;color:#8b6800!important;border-color:#c9c5bd!important}
+html.light .cr-nueva-reserva__rueda{background:#f7f5f0!important;box-shadow:inset 0 22px 18px rgba(0,0,0,.10),inset 0 -22px 18px rgba(0,0,0,.10)!important}
+html.light .cr-nueva-reserva__rueda-item{color:#777!important}
+html.light .cr-nueva-reserva__rueda-item--actual{color:#171717!important}
+html.light .cr-nueva-reserva__rueda-item--cerca{color:#666!important}
+
+/* Buscar reserva: quitar el bloque negro que seguía siendo de noche. */
+html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reservas-hoy__header,
+html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reservas-hoy__titlewrap,
+html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reservas-hoy__controles{background:#fff!important;color:#171717!important;border-color:#c9c5bd!important}
+html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reservas-hoy__header h1{color:#171717!important}
+html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reservas-hoy__volver,
+html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reservas-hoy__filtro{background:#f4f2ed!important;color:#8b6800!important;border-color:#c9c5bd!important}
+
+/* Ficha en modo día: textos blancos -> negro y amarillos -> ocre. */
+html.light .cr-busqueda-ficha__nav{background:#fff!important;color:#171717!important;border-color:#c9c5bd!important}
+html.light .cr-busqueda-ficha__volver,
+html.light .cr-busqueda-ficha__contador span{color:#8b6800!important}
+html.light .cr-busqueda-ficha__contador button{background:#f4f2ed!important;color:#171717!important;border-color:#c9c5bd!important}
+html.light .cr-busqueda-ficha__cliente strong,
+html.light .cr-busqueda-ficha__telefono,
+html.light .cr-busqueda-ficha__codigo,
+html.light .cr-busqueda-ficha__observaciones p,
+html.light .cr-busqueda-ficha__creada{color:#171717!important}
+html.light .cr-busqueda-ficha__codigo{color:#8b6800!important}
+html.light .cr-busqueda-ficha__bloque span,
+html.light .cr-busqueda-ficha__bloque--mesa span,
+html.light .cr-busqueda-ficha__observaciones>span{color:#8b6800!important}
+html.light .cr-busqueda-ficha__bloque strong,
+html.light .cr-busqueda-ficha__bloque em{color:#171717!important}
+html.light .cr-busqueda-ficha__bloque--pax strong{color:#171717!important}
+html.light .cr-busqueda-ficha__estado{color:#8b6800!important;font-size:22px!important}
+html.light .cr-busqueda-ficha__bloque--mesa span{font-size:18px!important}
+html.light .cr-busqueda-ficha__bloque--mesa strong{font-size:29px!important}
