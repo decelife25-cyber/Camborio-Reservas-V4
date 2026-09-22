@@ -13,17 +13,17 @@ const isoDate = (d:Date) => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(
 function Wheel({ values, value, onChange, kind }: { values:string[]; value:string; onChange:(v:string)=>void; kind:'hora'|'minutos' }) {
   const ref=useRef<HTMLSpanElement>(null);
   const [near,setNear]=useState<string[]>([]);
-  const itemH=44;
+  const itemH=32;
   const sync=(smooth:boolean)=>{
     const el=ref.current;if(!el)return;
     const idx=Math.max(0,values.indexOf(value));
-    el.scrollTo({top:(idx+1)*itemH,behavior:smooth?'smooth':'auto'});
+    el.scrollTo({top:Math.max(0,idx*itemH-itemH),behavior:smooth?'smooth':'auto'});
   };
   useEffect(()=>sync(false),[value]);
   useEffect(()=>{
     const el=ref.current;if(!el)return;
     const onScroll=()=>{
-      const idx=Math.max(0,Math.min(values.length-1,Math.round((el.scrollTop)/itemH)-1));
+      const idx=Math.max(0,Math.min(values.length-1,Math.round((el.scrollTop)/itemH)+1));
       const around=[values[idx-1],values[idx+1]].filter(Boolean);
       setNear(around);
       const snapped=values[idx];
