@@ -17,7 +17,30 @@ type Reserva = {
   Observaciones: string | null;
 };
 
-const CANCELADAS = new Set(['CANCELADA_CLIENTE', 'CANCELADA_LOCAL']);
+const FILTRO_STORAGE_KEY = 'camborio_reservas_filtro_estados_v1';
+const ESTADOS_FILTRO = ['PENDIENTE', 'CONFIRMADA', 'SENTADA', 'FINALIZADA', 'CANCELADA', 'NO_ASISTIO'] as const;
+type EstadoFiltro = typeof ESTADOS_FILTRO[number];
+function normalizarEstadoFiltro(value: string | null): EstadoFiltro | null {
+  if (!value) return null;
+  if (value === 'PENDIENTE' || value === 'PENDIENTE_CONFIRMACION') return 'PENDIENTE';
+  if (value === 'CONFIRMADA') return 'CONFIRMADA';
+  if (value === 'SENTADA') return 'SENTADA';
+  if (value === 'FINALIZADA') return 'FINALIZADA';
+  if (value === 'CANCELADA' || value === 'CANCELADA_CLIENTE' || value === 'CANCELADA_LOCAL') return 'CANCELADA';
+  if (value === 'NO_ASISTIO' || value === 'NO ASISTIÓ') return 'NO_ASISTIO';
+  return null;
+}
+const FILTRO_DEFAULT: Record<EstadoFiltro, boolean> = {
+  PENDIENTE:true, CONFIRMADA:true, SENTADA:true, FINALIZADA:false, CANCELADA:false, NO_ASISTIO:false
+};
+function cargarFiltroGuardado(): Record<EstadoFiltro, boolean> {
+  try {
+    const raw=localStorage.getItem(FILTRO_STORAGE_KEY);
+    if(!raw) return FILTRO_DEFAULT;
+    const parsed=JSON.parse(raw) as Partial<Record<EstadoFiltro,boolean>>;
+    return ESTADOS_FILTRO.reduce((acc,estado)=>{ acc[estado]=parsed[estado]===true; return acc; },{} as Record<EstadoFiltro,boolean>);
+  } catch { return FILTRO_DEFAULT; }
+}
 
 function pad(value: number) {
   return String(value).padStart(2, '0');
@@ -48,6 +71,9 @@ export default function Calendario() {
   const [reservasMes, setReservasMes] = useState<Reserva[]>([]);
   const [turnos, setTurnos] = useState({ COMIDA: true, CENA: true });
   const [loading, setLoading] = useState(true);
+  const [filtroEstados, setFiltroEstados] = useState<Record<EstadoFiltro, boolean>>(cargarFiltroGuardado);
+  const [filtroAbierto, setFiltroAbierto] = useState(false);
+  const [filtroEdicion, setFiltroEdicion] = useState<Record<EstadoFiltro, boolean>>(filtroEstados);
 
   const year = monthDate.getFullYear();
   const month = monthDate.getMonth();
@@ -72,7 +98,7 @@ export default function Calendario() {
         console.error('Error cargando calendario', error);
         setReservasMes([]);
       } else {
-        setReservasMes(((data || []) as Reserva[]).filter(r => !CANCELADAS.has(r.Estado)));
+        setReservasMes((data || []) as Reserva[]);
       }
       setLoading(false);
     }
@@ -91,10 +117,11 @@ export default function Calendario() {
   const reservasSeleccionadas = useMemo(
     () => reservasMes.filter(r => {
       if (r.FechaReserva !== selectedDate) return false;
-      if (r.Turno === 'COMIDA' || r.Turno === 'CENA') return turnos[r.Turno];
-      return true;
+      if (r.Turno === 'COMIDA' || r.Turno === 'CENA') { if (!turnos[r.Turno]) return false; }
+      const estado=normalizarEstadoFiltro(r.Estado);
+      return estado === null || filtroEstados[estado];
     }),
-    [reservasMes, selectedDate, turnos]
+    [reservasMes, selectedDate, turnos, filtroEstados]
   );
 
   const comida = useMemo(() => reservasMes.filter(r => r.FechaReserva === selectedDate && r.Turno === 'COMIDA'), [reservasMes, selectedDate]);
@@ -106,6 +133,13 @@ export default function Calendario() {
       return { ...current, [turno]: !current[turno] };
     });
   };
+
+  useEffect(() => { localStorage.setItem(FILTRO_STORAGE_KEY, JSON.stringify(filtroEstados)); }, [filtroEstados]);
+  const abrirFiltro=()=>{ setFiltroEdicion(filtroEstados); setFiltroAbierto(true); };
+  const toggleFiltroEstado=(estado:EstadoFiltro)=>setFiltroEdicion(current=>({...current,[estado]:!current[estado]}));
+  const aplicarFiltro=()=>{ if(!ESTADOS_FILTRO.some(estado=>filtroEdicion[estado])) return; setFiltroEstados(filtroEdicion); setFiltroAbierto(false); };
+  const cerrarFiltroSinCambios=()=>{ setFiltroEdicion(filtroEstados); setFiltroAbierto(false); };
+  const etiquetasFiltro:Record<EstadoFiltro,string>={PENDIENTE:'PENDIENTES',CONFIRMADA:'CONFIRMADAS',SENTADA:'SENTADAS',FINALIZADA:'FINALIZADAS',CANCELADA:'CANCELADAS',NO_ASISTIO:'NO ASISTIÓ'};
 
   const selectedParts = formatDateParts(selectedDate);
 
@@ -130,7 +164,7 @@ export default function Calendario() {
         <div className="turn-actions">
           <button className={'turn-button ' + (turnos.COMIDA ? 'selected' : '')} type="button" onClick={() => toggleTurno('COMIDA')}>☀ Comida ({comida.length})</button>
           <button className={'turn-button ' + (turnos.CENA ? 'selected' : '')} type="button" onClick={() => toggleTurno('CENA')}>🌙 Cena ({cena.length})</button>
-          <button className="filter-button" type="button" aria-label="Filtrar reservas">
+          <button className={"filter-button " + (Object.values(filtroEstados).some(Boolean) ? "has-filter" : "")} type="button" aria-label="Filtrar reservas" title="Filtrar reservas" onClick={abrirFiltro}>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18l-7 8v5l-4 2v-7L3 5z" /></svg>
           </button>
         </div>
@@ -188,5 +222,28 @@ export default function Calendario() {
         </div>
       </div>
     </section>
+      {filtroAbierto && (
+        <div className="filter-overlay" role="dialog" aria-modal="true" aria-labelledby="filtroReservasTitulo">
+          <div className="filter-modal">
+            <div className="filter-modal__header">
+              <h2 id="filtroReservasTitulo">FILTRO RESERVAS</h2>
+              <button type="button" className="filter-modal__close" onClick={cerrarFiltroSinCambios} aria-label="Cerrar">×</button>
+            </div>
+            <div className="filter-modal__options">
+              {ESTADOS_FILTRO.map(estado => (
+                <label key={estado} className={'filter-option filter-option--' + estado.toLowerCase()}>
+                  <input type="checkbox" checked={filtroEdicion[estado]} onChange={() => toggleFiltroEstado(estado)} />
+                  <span className="filter-option__box" aria-hidden="true">✓</span>
+                  <span>{etiquetasFiltro[estado]}</span>
+                </label>
+              ))}
+            </div>
+            <div className="filter-modal__actions">
+              <button type="button" className="filter-modal__apply" onClick={aplicarFiltro}>APLICAR FILTRO</button>
+              <button type="button" className="filter-modal__cancel" onClick={cerrarFiltroSinCambios}>CERRAR SIN CAMBIOS</button>
+            </div>
+          </div>
+        </div>
+      )}
   );
 }
