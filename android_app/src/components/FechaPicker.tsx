@@ -17,7 +17,7 @@ export default function FechaPicker({ value, onChange, onClose }:{value:string;o
    <div className="cr-fecha-picker__week">{['L','M','X','J','V','S','D'].map(x=><span key={x}>{x}</span>)}</div>
    <div className="cr-fecha-picker__grid">
     {Array.from({length:(month.getDay()+6)%7}).map((_,i)=><span key={'e'+i}/>)}
-    {Array.from({length:new Date(month.getFullYear(),month.getMonth()+1,0).getDate()).map((_,i)=>{const d=i+1,iso=isoDate(new Date(month.getFullYear(),month.getMonth(),d)),isToday=iso===today,selected=iso===draft,past=iso<today;return <button key={iso} type="button" disabled={past} className={(isToday?'today ':'')+(selected?'selected ':'')+(past?'past':'')} onClick={()=>setDraft(iso)}>{d}</button>})}
+    {Array.from({length:new Date(month.getFullYear(),month.getMonth()+1,0).getDate()}).map((_,i)=>{const d=i+1,iso=isoDate(new Date(month.getFullYear(),month.getMonth(),d)),isToday=iso===today,selected=iso===draft,past=iso<today;return <button key={iso} type="button" disabled={past} className={(isToday?'today ':'')+(selected?'selected ':'')+(past?'past':'')} onClick={()=>setDraft(iso)}>{d}</button>})}
    </div>
    <div className="cr-fecha-picker__actions"><button type="button" onClick={onClose}>CANCELAR</button><button type="button" onClick={()=>{onChange(draft);onClose()}}>ACEPTAR</button></div>
   </section>
