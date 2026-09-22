@@ -2405,7 +2405,7 @@ html.light .filter-modal__cancel{
   .cr-planos-mesas__mesa{width:54px;height:54px;border-radius:10px;font-size:23px}
   .cr-planos-mesas__rotulo{font-size:24px;padding:7px 18px}
   .cr-planos-mesas__terraza-marco{left:13%;right:13%;top:31%;bottom:20%;border-width:5px}
-  .cr-planos-mesas__leyenda{font-size:12px;gap:7px;margin-top:8px}
+ .cr-planos-mesas__leyenda{font-size:12px;gap:7px;margin-top:8px}
   .cr-planos-mesas__dialog{padding:10px}
   .cr-planos-mesas__dialog-panel{padding:20px 14px}
   .cr-planos-mesas__dialog-actions{grid-template-columns:1fr}
