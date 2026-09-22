@@ -2076,3 +2076,24 @@ html.light .cr-busqueda-ficha__bloque--pax strong{color:#171717!important}
 html.light .cr-busqueda-ficha__estado{color:#8b6800!important;font-size:22px!important}
 html.light .cr-busqueda-ficha__bloque--mesa span{font-size:18px!important}
 html.light .cr-busqueda-ficha__bloque--mesa strong{font-size:29px!important}
+
+
+/* ===== 1.0.020: refinado modo día + calendario + buscar ===== */
+html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reservas-hoy__volver{background:#f4f2ed!important;color:#8b6800!important;border-color:#c9c5bd!important}
+html.light .cr-nueva-reserva__mesa span{color:#8b6800!important;font-size:18px!important}
+html.light .cr-nueva-reserva__mesa strong{color:#171717!important;font-size:22px!important;letter-spacing:-.25px!important;white-space:nowrap!important}
+.cr-nueva-reserva__mesa span{font-size:18px!important}
+.cr-nueva-reserva__mesa strong{font-size:22px!important;letter-spacing:-.25px!important;white-space:nowrap!important}
+html.light .cr-fecha-picker{background:rgba(0,0,0,.58)!important}
+html.light .cr-fecha-picker__panel{border-color:#c9a94a!important;background:linear-gradient(180deg,#fff,#f2f0eb)!important;color:#171717!important}
+html.light .cr-fecha-picker__header{border-color:#d4d0c8!important}
+html.light .cr-fecha-picker__header span{color:#8b6800!important}
+html.light .cr-fecha-picker__header strong{color:#171717!important}
+html.light .cr-fecha-picker__header button,html.light .cr-fecha-picker__nav button{background:#f4f2ed!important;color:#8b6800!important;border-color:#c9c5bd!important}
+html.light .cr-fecha-picker__nav strong{color:#171717!important}
+html.light .cr-fecha-picker__week span{color:#777!important}
+html.light .cr-fecha-picker__grid button{color:#171717!important;background:transparent!important}
+html.light .cr-fecha-picker__grid button.past{color:#aaa!important}
+html.light .cr-fecha-picker__grid button.today{background:#b89a42!important;border-color:#b89a42!important;color:#fff!important}
+html.light .cr-fecha-picker__grid button.selected:not(.today){border-color:#b89a42!important;color:#8b6800!important;background:transparent!important}
+html.light .cr-fecha-picker__actions button{color:#8b6800!important}
