@@ -1636,3 +1636,282 @@ html.light .search-empty{color:#444;border-color:#bbb;}
 .cr-busqueda-salir-modal .cr-confirmacion-mesa__texto{font-size:clamp(20px,5vw,30px);text-transform:none}
 
 
+
+/* ===== BASE CONTENEDOR V2 PARA BUSCAR ===== */
+.cr-reservas-hoy{margin-top:14px;border:1px solid #292929;border-radius:8px;background:rgba(0,0,0,.94);overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.025)}
+.cr-reservas-hoy__header{min-height:78px;padding:18px 26px 16px 24px;display:flex;align-items:center;justify-content:space-between;gap:14px;border-bottom:1px solid #242424;background:linear-gradient(180deg,#060606,#010101)}
+.cr-reservas-hoy__titlewrap{display:flex;align-items:center;gap:12px;min-width:0}
+.cr-reservas-hoy__calendar{flex:0 0 auto;font-size:31px;line-height:1;filter:drop-shadow(0 1px 0 rgba(255,255,255,.22))}
+.cr-reservas-hoy h1{margin:0;color:#fff;font:1000 30px/1 var(--cr-font);letter-spacing:.2px;white-space:nowrap}
+.cr-reservas-hoy__fecha{margin:0}
+.cr-reservas-hoy__dia{color:#fff}
+.cr-reservas-hoy__fecha-resto{color:#ffc400}
+.cr-reservas-hoy__controles{flex:0 0 auto;display:flex;align-items:center;gap:10px}
+.cr-reservas-hoy__contador{flex:0 0 auto;color:#bfb9b9;font:900 28px/1 var(--cr-font);letter-spacing:.1px;white-space:nowrap}
+.cr-reservas-hoy__filtro{position:relative;display:grid;place-items:center;width:52px;min-height:48px;border:2px solid #ffc400;border-radius:8px;padding:0;background:linear-gradient(180deg,#242424,#080808);color:#ffc400;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+.cr-reservas-hoy__filtro-icon{width:30px;height:30px;fill:currentColor;display:block}
+.cr-reservas-hoy__filtro[data-cr-filtro-activo=true]{background:linear-gradient(180deg,#242424,#080808);color:#ffc400;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 2px rgba(255,196,0,.22)}
+.cr-reservas-hoy__filtro[data-cr-filtro-activo=true]:after{content:"";position:absolute;top:5px;right:5px;width:10px;height:10px;border-radius:50%;background:#05d677;box-shadow:0 0 0 2px #070707}
+.cr-reservas-filtro-modal .cr-confirmacion-mesa__panel{width:80vw;max-width:430px;padding:24px 18px 20px;border:2px solid #ffc400;border-radius:12px;background:linear-gradient(180deg,#161616,#050505)}
+.cr-reservas-filtro-modal .cr-confirmacion-mesa__eyebrow{margin:0 0 16px;color:#fff;font-size:clamp(25px,6vw,32px);line-height:1.05;text-align:center;letter-spacing:.3px}
+.cr-reservas-filtro__opciones{display:grid;grid-template-columns:1fr;gap:0;margin:0 0 18px;border-top:1px solid #454545;border-bottom:1px solid #454545}
+.cr-reservas-filtro__opcion{display:flex;align-items:center;justify-content:flex-start;gap:14px;min-height:53px;width:100%;padding:0 8px;border:0;border-bottom:1px solid #242424;border-radius:0;background:transparent;color:#fff;font:1000 24px/1 var(--cr-font);text-transform:none;cursor:pointer;box-sizing:border-box}
+.cr-reservas-filtro__opcion:last-child{border-bottom:0}
+.cr-reservas-filtro__opcion input{flex:0 0 auto;width:30px;height:30px;margin:0;accent-color:#ffc400;cursor:pointer}
+.cr-reservas-filtro__opcion span{display:block;min-width:0;text-align:left}
+.cr-reservas-filtro__opcion[data-cr-reservas-filtro-color=PENDIENTE] span{color:#ffc400}
+.cr-reservas-filtro__opcion[data-cr-reservas-filtro-color=CONFIRMADA] span{color:#05d677}
+.cr-reservas-filtro__opcion[data-cr-reservas-filtro-color=SENTADA] span{color:#3b82f6}
+.cr-reservas-filtro__opcion[data-cr-reservas-filtro-color=FINALIZADA] span{color:#9a9a9a}
+.cr-reservas-filtro__opcion[data-cr-reservas-filtro-color=CANCELADAS] span{color:#ff4d58}
+.cr-reservas-filtro__opcion[data-cr-reservas-filtro-color=CADUCADAS] span{color:#c47a32}
+.cr-reservas-filtro__acciones{display:grid;gap:12px;width:100%}
+.cr-reservas-filtro__boton{width:100%;min-height:58px;border:2px solid #3a3a3a;border-radius:8px;font:1000 24px/1 var(--cr-font);text-transform:uppercase;cursor:pointer}
+.cr-reservas-filtro__boton--aplicar{border-color:#ffc400;background:linear-gradient(180deg,#ffd946 0,#ffc400 58%,#e6a500 100%);color:#070707}
+.cr-reservas-filtro__boton--cerrar{border-color:#666;background:linear-gradient(180deg,#4a4a4a,#1f1f1f);color:#fff}
+.cr-reservas-hoy__mensaje{margin:12px 8px;padding:20px;border:1px dashed #343434;border-radius:7px;background:#070707;color:#eee;font:1000 clamp(24px,5.6vw,34px)/1.15 var(--cr-font);text-align:center;text-transform:none}
+.cr-reservas-hoy__mensaje[data-tipo=error]{border-color:#ff4d58;color:#ffb3b8}
+.cr-reservas-lista{display:grid;gap:7px;padding:0 8px 8px}
+.cr-reserva-item{display:grid;gap:0}
+.cr-reserva-card{position:relative;display:grid;grid-template-columns:216px minmax(0,1fr) 212px 60px;align-items:stretch;gap:0;min-height:118px;border:1px solid #292929;border-radius:8px;background:linear-gradient(100deg,#111 0,#0b0b0b 54%,#101010 100%);overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.035);cursor:pointer}
+.cr-reserva-card__tiempo{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:7px;padding:16px 17px 14px;border-right:1px solid #242424;background:linear-gradient(90deg,rgba(255,255,255,.025),rgba(255,255,255,.01))}
+.cr-reserva-card__hora{display:block;color:#fff;font:1000 55px/.86 var(--cr-font);letter-spacing:-1.4px;text-shadow:0 2px 0 rgba(0,0,0,.55)}
+.cr-reserva-card__fecha{display:block;color:#ffc400;font:1000 15px/1.05 var(--cr-font);letter-spacing:.15px;text-transform:uppercase}
+.cr-reserva-estado{position:relative;display:inline-flex;align-items:center;max-width:100%;padding-left:25px;border:0;background:transparent!important;font:1000 20px/1 var(--cr-font);letter-spacing:.05px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase}
+.cr-reserva-estado:before{content:"";position:absolute;left:0;top:50%;width:17px;height:17px;border-radius:50%;transform:translateY(-50%);background:currentColor;box-shadow:0 0 8px currentColor}
+.cr-reserva-card__datos{min-width:0;display:grid;grid-template-columns:30px minmax(0,1fr);grid-template-rows:auto auto;align-content:center;column-gap:12px;row-gap:13px;padding:18px 20px 16px 44px}
+.cr-reserva-card__icon{display:grid;place-items:center;width:30px;color:#5caeff;font-size:27px;line-height:1}
+.cr-reserva-card__icon--phone{color:#8a8a8a}
+.cr-reserva-card__nombre{display:block;min-width:0;margin:0;color:#fff;font:1000 29px/1.02 var(--cr-font);letter-spacing:.15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cr-reserva-card__contacto{display:flex;align-items:center;gap:14px;min-width:0;white-space:nowrap;overflow:hidden}.cr-reserva-card__telefono{display:block;min-width:0;flex:0 1 auto;color:#e9e9e9;font:800 26px/1.05 var(--cr-font);letter-spacing:.35px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:none}.cr-reserva-card__codigo{display:inline-flex;align-items:center;gap:5px;min-width:0;flex:0 1 auto;color:#ffc400;font:800 26px/1.05 var(--cr-font);letter-spacing:.35px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase}.cr-reserva-card__codigo-icon{flex:0 0 auto}
+.cr-reserva-card__obs{grid-column:2;margin:-4px 0 0;max-width:100%;overflow:hidden;color:#cfcfcf;font:700 16px Arial,sans-serif;line-height:1.25;text-transform:none;white-space:nowrap;text-overflow:ellipsis}
+.cr-reserva-card__resumen{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:13px;min-width:0;padding:18px 12px}
+.cr-reserva-card__rapidas{min-width:0;border-left:1px solid #242424}
+.cr-reserva-card__personas{display:block;color:#58aaff;font:1000 28px/1 var(--cr-font);letter-spacing:.25px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase}
+.cr-reserva-card__personas-icon{margin-right:10px;color:#58aaff}
+.cr-reserva-card__mesa{display:block;min-width:174px;border:2px solid #ffc400;border-radius:8px;padding:9px 17px 8px;background:linear-gradient(180deg,#ffd946 0,#ffc400 56%,#e6a500 100%);color:#070707;font:1000 24px/1 var(--cr-font);letter-spacing:.05px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase;box-shadow:inset 0 1px 0 rgba(255,255,255,.45)}
+.cr-reserva-card__mesa--sin-asignar{background:#090909;color:#ffc400;box-shadow:none}
+.cr-reserva-card__desplegar{align-self:center;justify-self:center;display:grid;place-items:center;width:51px;height:51px;border:0;border-radius:50%;background:#242424;color:#fff;font:1000 36px/1 Arial,sans-serif;cursor:pointer;transition:transform .16s ease,background .16s ease}
+.cr-reserva-card:hover .cr-reserva-card__desplegar,.cr-reserva-card__desplegar:hover{background:#323232}
+.cr-reserva-item[data-cr-reserva-abierta=true] .cr-reserva-card{border-bottom-left-radius:0;border-bottom-right-radius:0;border-color:#3a3a3a;background:linear-gradient(100deg,#151515 0,#0d0d0d 54%,#131313 100%)}
+.cr-reserva-item[data-cr-reserva-abierta=true] .cr-reserva-card__desplegar{transform:rotate(180deg);background:#ffc400;color:#070707}
+.cr-reserva-acciones{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:10px 12px 12px;border:1px solid #3a3a3a;border-top:0;border-radius:0 0 8px 8px;background:linear-gradient(180deg,#090909 0,#030303 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.03)}
+.cr-reserva-acciones[hidden]{display:none}
+.cr-reserva-acciones--columnas-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.cr-reserva-acciones--columnas-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.cr-reserva-acciones--columnas-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.cr-reserva-acciones--mensaje{grid-template-columns:1fr}
+.cr-reserva-acciones__mensaje{margin:0;min-height:54px;display:grid;place-items:center;border:1px solid #353535;border-radius:7px;background:linear-gradient(180deg,#252525,#111);color:#fff;font:1000 20px/1 var(--cr-font);letter-spacing:.25px;text-align:center;text-transform:uppercase;box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+.cr-reserva-acciones__boton{min-height:54px;border:1px solid #353535;border-radius:7px;background:linear-gradient(180deg,#252525,#111);color:#fff;font:1000 20px/1 var(--cr-font);letter-spacing:.25px;text-align:center;text-transform:uppercase;box-shadow:inset 0 1px 0 rgba(255,255,255,.08);cursor:default}
+.cr-reserva-acciones__boton--modificar{border-color:#777;background:linear-gradient(180deg,#5f5f5f,#2f2f2f);color:#f4f4f4}
+.cr-reserva-acciones__boton--asignar-mesa,.cr-reserva-acciones__boton--cambiar-mesa{border-color:#ffc400;background:linear-gradient(180deg,#ffd946 0,#ffc400 58%,#e6a500 100%);color:#070707;box-shadow:inset 0 1px 0 rgba(255,255,255,.45)}
+.cr-reserva-acciones__boton--confirmar{border-color:#05d677;background:linear-gradient(180deg,#0cd982,#048b4f);color:#04120b}
+.cr-reserva-acciones__boton--sentar{border-color:#3b82f6;background:linear-gradient(180deg,#5caeff,#1d4ed8);color:#031126}
+.cr-reserva-acciones__boton--finalizar{border-color:#05d677;background:linear-gradient(180deg,#0cd982,#048b4f);color:#04120b}
+.cr-reserva-acciones__boton--cancelar{border-color:#ff4d58;background:linear-gradient(180deg,#402020,#160808);color:#ffb3b8}
+.cr-reserva-card--pendiente .cr-reserva-estado{color:#ffc400}
+.cr-reserva-card--confirmada .cr-reserva-estado{color:#05d677}
+.cr-reserva-card--sentada .cr-reserva-estado{color:#3b82f6}
+.cr-reserva-card--finalizada .cr-reserva-estado{color:#9a9a9a}
+.cr-reserva-card--cancelada-cliente .cr-reserva-estado{color:#ff4d58}
+.cr-reserva-card--cancelada-local .cr-reserva-estado{color:#ff4d58}
+.cr-reserva-card--no-presentado .cr-reserva-estado{color:#ff8a00}
+@media(max-width:720px){.cr-reservas-hoy__header{min-height:66px;padding:15px 17px}.cr-reservas-hoy h1{font-size:24px}.cr-reservas-hoy__contador{font-size:22px}.cr-reservas-hoy__filtro{width:48px;min-height:44px}.cr-reservas-hoy__filtro-icon{width:28px;height:28px}.cr-reserva-card{grid-template-columns:148px minmax(0,1fr) 138px 45px;min-height:92px}.cr-reserva-card__tiempo{padding:12px}.cr-reserva-card__hora{font-size:42px}.cr-reserva-estado{font-size:15px;padding-left:20px}.cr-reserva-estado:before{width:14px;height:14px}.cr-reserva-card__datos{padding:13px 10px 12px 22px;grid-template-columns:24px minmax(0,1fr);column-gap:9px;row-gap:10px}.cr-reserva-card__icon{width:24px;font-size:21px}.cr-reserva-card__nombre{font-size:22px}.cr-reserva-card__telefono{font-size:20px}.cr-reserva-card__obs{font-size:15px}.cr-reserva-card__resumen{gap:9px;padding:13px 7px}.cr-reserva-card__personas{font-size:21px}.cr-reserva-card__personas-icon{margin-right:5px}.cr-reserva-card__mesa{min-width:128px;padding:8px 8px 7px;font-size:18px}.cr-reserva-card__desplegar{width:39px;height:39px;font-size:28px}.cr-reserva-acciones{gap:6px;padding:8px 9px 10px}.cr-reserva-acciones__boton,.cr-reserva-acciones__mensaje{min-height:46px;font-size:16px}}
+@media(max-width:620px){.cr-reservas-hoy{margin-top:10px}.cr-reservas-hoy__header{padding:13px 12px}.cr-reservas-hoy__calendar{font-size:25px}.cr-reservas-hoy h1{font-size:20px}.cr-reservas-hoy__contador{font-size:18px}.cr-reservas-hoy__controles{gap:6px}.cr-reservas-hoy__filtro{width:44px;min-height:42px}.cr-reservas-hoy__filtro-icon{width:26px;height:26px}.cr-reservas-lista{gap:6px;padding:0 6px 6px}.cr-reserva-card{grid-template-columns:120px minmax(0,1fr) 100px 36px;min-height:82px}.cr-reserva-card__tiempo{padding:10px 8px}.cr-reserva-card__hora{font-size:33px}.cr-reserva-estado{font-size:12px;padding-left:17px}.cr-reserva-estado:before{width:12px;height:12px}.cr-reserva-card__datos{padding:10px 7px 10px 10px;grid-template-columns:20px minmax(0,1fr);column-gap:7px;row-gap:8px}.cr-reserva-card__icon{width:20px;font-size:18px}.cr-reserva-card__nombre{font-size:18px}.cr-reserva-card__telefono{font-size:17px}.cr-reserva-card__obs{font-size:14px}.cr-reserva-card__resumen{padding:10px 4px;gap:8px}.cr-reserva-card__personas{font-size:18px}.cr-reserva-card__personas-icon{margin-right:3px}.cr-reserva-card__mesa{min-width:98px;border-width:1px;border-radius:6px;padding:7px 5px 6px;font-size:15px}.cr-reserva-card__desplegar{width:31px;height:31px;font-size:23px}.cr-reserva-acciones{gap:6px;padding:7px}.cr-reserva-acciones__boton,.cr-reserva-acciones__mensaje{min-height:42px;font-size:14px}}
+.cr-reserva-acciones__boton--asignar-mesa{cursor:pointer}
+.cr-reserva-acciones__boton--cambiar-mesa{cursor:pointer}
+
+/* Estándar visual privado móvil: no usar textos por debajo de 14px; botones >=22px; valores >=24px en negrita. */
+
+.cr-reservas-hoy h1{font-size:var(--cr-text-main-title);}
+.cr-reservas-hoy__contador{font-size:var(--cr-text-panel-title);}
+.cr-reservas-hoy__mensaje,.cr-reserva-card__obs{font-size:var(--cr-text-info);}
+.cr-reserva-card__nombre{font-size:clamp(30px,7vw,38px);font-weight:1000;}
+.cr-reserva-card__telefono,.cr-reserva-card__codigo,.cr-reserva-card__personas,.cr-reserva-card__mesa{font-size:var(--cr-text-value);font-weight:1000;}
+.cr-reserva-estado{font-size:20px;}
+.cr-reserva-card__fecha{font-size:15px;}
+.cr-reserva-acciones__boton,.cr-reserva-acciones__mensaje{font-size:var(--cr-text-button);font-weight:1000;text-transform:uppercase;}
+@media(max-width:720px){.cr-reservas-hoy h1{font-size:34px}.cr-reservas-hoy__contador{font-size:24px}.cr-reserva-card{grid-template-columns:140px minmax(0,1fr) 118px 60px;min-height:112px}.cr-reserva-card__hora{font-size:42px}.cr-reserva-estado{font-size:16px}.cr-reserva-card__datos{padding-left:12px}.cr-reserva-card__nombre{font-size:30px}.cr-reserva-card__telefono,.cr-reserva-card__codigo,.cr-reserva-card__personas,.cr-reserva-card__mesa{font-size:24px}.cr-reserva-acciones__boton,.cr-reserva-acciones__mensaje{min-height:56px;font-size:22px}}
+@media(max-width:620px){.cr-reservas-hoy h1{font-size:34px}.cr-reservas-hoy__contador{font-size:24px}.cr-reserva-card{grid-template-columns:124px minmax(0,1fr) 60px;grid-template-areas:"tiempo datos abrir" "resumen resumen abrir";min-height:0}.cr-reserva-card__tiempo{grid-area:tiempo}.cr-reserva-card__datos{grid-area:datos}.cr-reserva-card__resumen{grid-area:resumen;display:grid;grid-template-columns:1fr 1fr;padding:10px}.cr-reserva-card__rapidas{grid-area:abrir;border-left:1px solid #242424}.cr-reserva-card__desplegar{width:var(--cr-por-confirmar-boton-lateral);height:var(--cr-por-confirmar-boton-lateral);border-radius:8px;font-size:28px}.cr-reserva-card__nombre{font-size:30px}.cr-reserva-card__telefono,.cr-reserva-card__codigo,.cr-reserva-card__personas,.cr-reserva-card__mesa{font-size:24px}.cr-reserva-card__obs{font-size:16px}.cr-reserva-estado{font-size:21px}}
+
+/* Vista POR CONFIRMAR: diseño exclusivo para confirmar reservas rápido desde móvil. */
+.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reservas-hoy__calendar{display:none}
+.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reservas-hoy__header{min-height:70px;padding:16px 18px}
+.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] h1{font-size:clamp(24px,5.6vw,42px);letter-spacing:.4px}
+.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reservas-hoy__contador{color:#ffc400;font-size:clamp(21px,4.5vw,34px)}
+.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reservas-lista{gap:10px;padding:0 8px 10px}
+.cr-reserva-confirmar{position:relative;display:grid;grid-template-columns:.92fr .88fr .72fr minmax(170px,1.8fr) minmax(74px,.58fr);align-items:stretch;min-height:148px;border:2px solid #3a3a3a;border-radius:9px;background:#080808;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.05);cursor:pointer}
+.cr-reserva-confirmar>*{min-width:0;border-right:1px solid #242424}
+.cr-reserva-confirmar>*:last-child{border-right:0}
+.cr-reserva-confirmar__fecha,.cr-reserva-confirmar__dia-hora,.cr-reserva-confirmar__pax,.cr-reserva-confirmar__cliente,.cr-reserva-confirmar__rapidas{display:flex;flex-direction:column;justify-content:center;padding:12px 10px}
+.cr-reserva-confirmar__fecha{align-items:center;background:#111;color:#ffc400;text-align:center;text-transform:uppercase}
+.cr-reserva-confirmar__fecha strong{display:block;color:#ffc400;font:1000 clamp(34px,5.2vw,38px)/.9 var(--cr-font);letter-spacing:-1px;white-space:nowrap}
+.cr-reserva-confirmar__fecha span{display:block;margin-top:8px;color:#fff;font:1000 clamp(22px,3.2vw,24px)/.95 var(--cr-font);letter-spacing:-.3px}
+.cr-reserva-confirmar__dia-hora{align-items:center;text-align:center;text-transform:uppercase}
+.cr-reserva-confirmar__dia-hora span{color:#f1f1f1;font:1000 clamp(20px,3vw,22px)/1 var(--cr-font);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cr-reserva-confirmar__dia-hora strong{margin-top:11px;color:#fff;font:1000 clamp(34px,5vw,38px)/.9 var(--cr-font);letter-spacing:-.8px;white-space:nowrap}
+.cr-reserva-confirmar__pax{align-items:center;color:#58aaff;font:1000 clamp(30px,4.5vw,34px)/.96 var(--cr-font);letter-spacing:-.5px;text-align:center;text-transform:uppercase;white-space:nowrap}
+.cr-reserva-confirmar__cliente{align-items:flex-start;gap:8px;padding-left:16px;padding-right:14px}
+.cr-reserva-confirmar__cliente strong{display:block;width:100%;color:#fff;font:1000 clamp(28px,4.2vw,32px)/.95 var(--cr-font);letter-spacing:-.35px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cr-reserva-confirmar__linea-icon{display:inline-grid;place-items:center;width:34px;font-size:28px;line-height:1;vertical-align:middle}
+.cr-reserva-confirmar__cliente-icon{color:#5caeff}
+.cr-reserva-confirmar__telefono-icon{color:#8a8a8a}
+.cr-reserva-confirmar__contacto{display:flex;width:100%;align-items:center;gap:12px;min-width:0;color:#dfdfdf;white-space:nowrap;overflow:hidden}.cr-reserva-confirmar__mesa,.cr-reserva-confirmar__observaciones{display:block;width:100%;color:#d7d7d7;font:900 clamp(17px,2.6vw,21px)/1.05 var(--cr-font);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase}.cr-reserva-confirmar__mesa{color:#ffc400}.cr-reserva-confirmar__telefono{display:block;min-width:0;flex:0 1 auto;color:#f2f2f2;font:1000 clamp(25px,3.5vw,28px)/1 var(--cr-font);letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cr-reserva-confirmar__codigo{display:inline-flex;align-items:center;gap:5px;min-width:0;flex:0 1 auto;border:0;padding:6px 0;background:transparent;color:#ffc400;font:1000 clamp(25px,3.5vw,28px)/1 var(--cr-font);letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase;cursor:pointer}.cr-reserva-confirmar__codigo-icon{flex:0 0 auto}
+.cr-reserva-confirmar__rapidas{--cr-por-confirmar-boton-lateral:58px;align-items:center;gap:10px;padding:10px 8px;background:#0d0d0d}
+.cr-reserva-confirmar__obs{align-self:center;justify-self:center;display:grid;place-items:center;width:var(--cr-por-confirmar-boton-lateral,58px);height:var(--cr-por-confirmar-boton-lateral,58px);min-height:0;border:2px solid #e0a900;border-radius:8px;padding:0;background:linear-gradient(180deg,#ffe36b,#ffc400);color:#070707;font:1000 40px/1 var(--cr-font);letter-spacing:0;text-transform:none;cursor:pointer}
+.cr-reserva-confirmar__desplegar{width:var(--cr-por-confirmar-boton-lateral);height:var(--cr-por-confirmar-boton-lateral);border-radius:8px;font-size:38px}
+.cr-reserva-item--por-confirmar[data-cr-reserva-abierta=true] .cr-reserva-confirmar{border-bottom-left-radius:0;border-bottom-right-radius:0;border-color:#ffc400;background:#0c0c0c}
+.cr-reserva-item--por-confirmar[data-cr-reserva-abierta=true] .cr-reserva-confirmar__desplegar{transform:rotate(180deg);background:#ffc400;color:#070707}
+.cr-reserva-acciones--por-confirmar{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:12px;border-width:2px;border-color:#ffc400;background:#050505}
+.cr-reserva-acciones--por-confirmar .cr-reserva-acciones__boton{min-height:68px;font-size:clamp(18px,3vw,26px);cursor:pointer}
+.cr-reserva-acciones__boton--volver{border-color:#777;background:linear-gradient(180deg,#262626,#111);color:#fff}
+@media(max-width:620px){.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reservas-hoy__header{padding:12px 9px;gap:8px}.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] h1{font-size:24px}.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reservas-hoy__contador{font-size:19px}.cr-reserva-confirmar{grid-template-columns:.9fr .82fr .66fr minmax(118px,1.7fr) 60px;min-height:150px}.cr-reserva-confirmar__fecha,.cr-reserva-confirmar__dia-hora,.cr-reserva-confirmar__pax,.cr-reserva-confirmar__cliente,.cr-reserva-confirmar__rapidas{padding:8px 5px}.cr-reserva-confirmar__fecha strong{font-size:34px}.cr-reserva-confirmar__fecha span{font-size:24px}.cr-reserva-confirmar__dia-hora span{font-size:20px}.cr-reserva-confirmar__dia-hora strong{font-size:34px}.cr-reserva-confirmar__pax{font-size:30px;white-space:normal}.cr-reserva-confirmar__cliente strong{font-size:28px}.cr-reserva-confirmar__telefono{font-size:24px}.cr-reserva-confirmar__codigo{font-size:24px}.cr-reserva-confirmar__rapidas{--cr-por-confirmar-boton-lateral:50px;gap:7px}.cr-reserva-confirmar__obs{font-size:34px;padding:0}.cr-reserva-confirmar__desplegar{font-size:32px}.cr-reserva-acciones--por-confirmar{grid-template-columns:1fr;gap:8px}.cr-reserva-acciones--por-confirmar .cr-reserva-acciones__boton{min-height:60px;font-size:22px}}
+.cr-reservas-hoy__volver{flex:0 0 auto;width:58px;height:58px;margin-left:auto;display:grid;place-items:center;border:2px solid #777;border-radius:8px;padding:0;background:linear-gradient(180deg,#262626,#111);color:#fff;font:1000 40px/1 var(--cr-font);letter-spacing:0;text-transform:none;cursor:pointer}
+.cr-reservas-hoy__volver[hidden]{display:none}
+.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reservas-hoy__titlewrap{flex:1 1 auto;flex-wrap:nowrap;width:100%}
+.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reservas-hoy__contador{display:none}
+.cr-observaciones-modal{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:24px;background:rgba(0,0,0,.82)}
+.cr-observaciones-modal[hidden]{display:none}
+.cr-observaciones-modal__panel{width:min(680px,94vw);border:2px solid #ffc400;border-radius:12px;background:linear-gradient(180deg,#111,#050505);box-shadow:0 24px 70px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.08);padding:24px;color:#fff;text-align:center}
+.cr-observaciones-modal__panel h2{margin:0 0 16px;color:#ffc400;font:1000 clamp(28px,5vw,42px)/1 var(--cr-font);letter-spacing:.25px}
+.cr-observaciones-modal__panel p{margin:0 0 22px;color:#fff;font:900 clamp(24px,4vw,34px)/1.18 var(--cr-font);white-space:pre-wrap;text-transform:none}
+.cr-observaciones-modal__cerrar{width:100%;min-height:62px;border:2px solid #ffc400;border-radius:9px;background:linear-gradient(180deg,#ffd946 0,#ffc400 58%,#e6a500 100%);color:#070707;font:1000 var(--cr-text-button)/1 var(--cr-font);letter-spacing:.2px;text-transform:uppercase;cursor:pointer}
+@media(max-width:620px){.cr-reservas-hoy__volver{width:50px;height:50px;min-height:0;font-size:34px}.cr-observaciones-modal__panel{padding:20px 14px}.cr-observaciones-modal__cerrar{min-height:58px;font-size:22px}}
+
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reservas-hoy__calendar{display:none}
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reservas-hoy__header{min-height:70px;padding:16px 18px}
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reservas-hoy__titlewrap{flex:1 1 auto;width:100%}
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] h1{font-size:clamp(24px,5.6vw,42px);letter-spacing:.4px}
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reservas-hoy__contador{display:none}
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reservas-lista{gap:10px;padding:0 8px 10px}
+.cr-buscar-reserva{display:grid;gap:12px;margin:0 0 4px;padding:14px;border:2px solid #292929;border-radius:9px;background:#050505;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+.cr-buscar-reserva__label{color:#ffc400;font:1000 var(--cr-text-panel-title)/1 var(--cr-font);letter-spacing:.25px;text-transform:uppercase}
+.cr-buscar-reserva__controles{display:grid;grid-template-columns:minmax(0,1fr) minmax(170px,260px);gap:10px;align-items:stretch}
+.cr-buscar-reserva__input{width:100%;min-height:68px;border:2px solid #3a3a3a;border-radius:9px;background:#090909;color:#fff;font:1000 var(--cr-text-value)/1 var(--cr-font);letter-spacing:.25px;padding:0 18px;text-transform:uppercase;outline:none}
+.cr-buscar-reserva__input:focus{border-color:#ffc400;box-shadow:0 0 0 3px rgba(255,196,0,.16)}
+.cr-buscar-reserva__input::placeholder{color:#7e7e7e;opacity:1}
+.cr-buscar-reserva__boton{min-height:68px;border:2px solid #ffc400;border-radius:9px;background:linear-gradient(180deg,#ffd946 0,#ffc400 58%,#e6a500 100%);color:#070707;font:1000 var(--cr-text-button)/1 var(--cr-font);letter-spacing:.2px;text-transform:uppercase;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.45)}
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reservas-hoy__mensaje{border-color:#ffc400;color:#fff;font-size:var(--cr-text-info)}
+.cr-reserva-confirmar__estado{display:grid;place-items:center;min-width:0;width:100%;min-height:40px;border:1px solid #353535;border-radius:7px;background:#151515;color:#ffc400;font:1000 18px/1 var(--cr-font);letter-spacing:.15px;text-align:center;text-transform:uppercase;white-space:normal;overflow:hidden}
+@media(max-width:620px){.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reservas-hoy__header{padding:12px 9px;gap:8px}.cr-reservas-hoy[data-cr-vista-reservas=buscar] h1{font-size:24px}.cr-buscar-reserva{padding:10px;gap:10px}.cr-buscar-reserva__label{font-size:24px}.cr-buscar-reserva__controles{grid-template-columns:1fr}.cr-buscar-reserva__input,.cr-buscar-reserva__boton{min-height:62px;font-size:24px}.cr-reserva-confirmar__estado{min-height:34px;font-size:14px}}
+/* Ajustes finales de legibilidad móvil en tarjetas privadas: código sin icono y contacto más limpio. */
+.cr-reserva-card__codigo,.cr-reserva-confirmar__codigo{gap:0}
+@media(max-width:620px){
+  .cr-reserva-card__contacto,.cr-reserva-confirmar__contacto{flex-direction:column;align-items:flex-start;gap:3px;white-space:normal;overflow:visible}
+  .cr-reserva-card__telefono,.cr-reserva-card__codigo,.cr-reserva-confirmar__telefono,.cr-reserva-confirmar__codigo{max-width:100%;line-height:1.02}
+  .cr-reserva-card__datos{row-gap:6px}
+  .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__cliente{gap:5px}
+}
+
+
+/* Ajustes de legibilidad solicitados para el panel privado. */
+.cr-reservas-hoy__mensaje{padding:28px 18px;border-width:2px;color:#fff;font:1000 clamp(30px,7vw,52px)/1.05 var(--cr-font);letter-spacing:.4px;text-transform:uppercase}
+.cr-reserva-card__codigo::before,.cr-reserva-confirmar__codigo::before{content:"·";display:inline-block;margin:0 12px 0 2px;color:#fff;font-weight:1000}
+.cr-reserva-estado,.cr-reserva-confirmar__estado{display:inline-flex;align-items:center;justify-content:center;min-height:0;border:0;border-radius:0;background:transparent;box-shadow:none;padding:0;color:#ffc400;font:1000 clamp(22px,4.2vw,30px)/1 var(--cr-font);letter-spacing:.2px;text-align:center;text-transform:uppercase;white-space:normal;overflow:visible}
+.cr-reserva-estado:before{box-shadow:none}
+.cr-reserva-card--pendiente .cr-reserva-confirmar__estado{color:#ffc400}
+.cr-reserva-card--confirmada .cr-reserva-confirmar__estado{color:#05d677}
+.cr-reserva-card--cancelada-cliente .cr-reserva-confirmar__estado,.cr-reserva-card--cancelada-local .cr-reserva-confirmar__estado{color:#ff4d58}
+@media(max-width:620px){.cr-reservas-hoy__mensaje{font-size:34px;padding:26px 12px}.cr-reserva-card__contacto,.cr-reserva-confirmar__contacto{flex-direction:row;align-items:center;gap:0;white-space:nowrap;overflow:hidden}.cr-reserva-card__codigo::before,.cr-reserva-confirmar__codigo::before{margin:0 8px}.cr-reserva-confirmar__estado{font-size:22px;min-height:0}.cr-reserva-estado{font-size:22px}}
+
+/* Corrección visual mínima de tarjetas/listas privadas. */
+.cr-reserva-card__contacto,.cr-reserva-confirmar__contacto{gap:0}
+.cr-reserva-card__codigo::before,.cr-reserva-confirmar__codigo::before{content:" · ";display:inline;margin:0;color:#fff;font:inherit}
+.cr-reserva-card__telefono,.cr-reserva-card__codigo,.cr-reserva-confirmar__telefono,.cr-reserva-confirmar__codigo{font-size:var(--cr-text-value);font-weight:1000;line-height:1.02}
+.cr-reserva-card__codigo,.cr-reserva-confirmar__codigo{text-transform:uppercase;color:#ffc400}
+.cr-reserva-card__datos{padding-left:24px;column-gap:9px}
+.cr-reserva-card__icon--phone{display:none}
+.cr-reserva-card__contacto{grid-column:1 / -1}
+.cr-reserva-card__mesa{min-width:0;width:min(100%,174px);max-width:100%;padding:9px 10px 8px;font-size:24px}
+.cr-reserva-card__mesa--sin-asignar{display:inline-grid;place-items:center;width:auto;min-width:0;justify-self:center;padding:8px 10px 7px;border-color:#ffc400;border-radius:7px;background:#090909;color:#ffc400;font-size:22px;box-shadow:none}
+.cr-reserva-card__rapidas,.cr-reserva-confirmar__rapidas{display:flex;flex-direction:column;align-items:center;justify-content:center}
+.cr-reserva-card__rapidas .cr-reserva-confirmar__obs{width:var(--cr-por-confirmar-boton-lateral,58px);height:var(--cr-por-confirmar-boton-lateral,58px);font-size:34px}
+.cr-reservas-hoy__mensaje{font-size:clamp(34px,7vw,54px);line-height:1.08;text-transform:none}
+.cr-busqueda-vacia-modal__panel h2{text-transform:none}
+.cr-busqueda-vacia-modal__panel p{text-transform:none}
+@media(max-width:720px){.cr-reserva-card{grid-template-columns:116px minmax(0,1fr) 112px 60px}.cr-reserva-card__datos{padding-left:8px;column-gap:7px}.cr-reserva-card__mesa{font-size:22px}.cr-reserva-card__mesa--sin-asignar{font-size:20px;padding-left:8px;padding-right:8px}}
+@media(max-width:620px){.cr-reserva-card{grid-template-columns:96px minmax(0,1fr) 60px}.cr-reserva-card__datos{padding-left:7px}.cr-reserva-card__telefono,.cr-reserva-card__codigo,.cr-reserva-confirmar__telefono,.cr-reserva-confirmar__codigo{font-size:22px}.cr-reserva-card__mesa{width:auto;max-width:100%;font-size:22px}.cr-reserva-card__mesa--sin-asignar{font-size:19px}.cr-reserva-card__codigo::before,.cr-reserva-confirmar__codigo::before{margin:0}.cr-reserva-card__rapidas .cr-reserva-confirmar__obs{width:var(--cr-por-confirmar-boton-lateral);height:var(--cr-por-confirmar-boton-lateral)}}
+
+/* Ajuste visual final: misma estructura privada y estado siempre a la izquierda. */
+.cr-reserva-card{min-height:126px}
+.cr-reserva-estado{position:relative;justify-content:flex-start;padding-left:21px;font-size:18px;line-height:1.05;white-space:nowrap;overflow:visible;text-overflow:clip;text-align:left}
+.cr-reserva-estado:before{left:0;width:14px;height:14px;box-shadow:none}
+.cr-reserva-card__tiempo{gap:6px}
+.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reservas-lista,
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reservas-lista{gap:7px;padding:0 8px 8px}
+.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar,
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar{display:grid;grid-template-columns:204px minmax(0,1fr) 212px 60px;min-height:126px;border:1px solid #292929;border-radius:8px;background:linear-gradient(100deg,#111 0,#0b0b0b 54%,#101010 100%)}
+.cr-reserva-confirmar>*{border-right:0}
+.cr-reserva-confirmar__tiempo{border-right:1px solid #242424}
+.cr-reserva-confirmar__cliente{align-items:initial;gap:13px;padding:18px 20px 16px 24px}
+.cr-reserva-confirmar__cliente strong{width:auto;font:1000 29px/1.02 var(--cr-font);letter-spacing:.15px}
+.cr-reserva-confirmar__resumen{border-left:0}
+.cr-reserva-card__fecha-dia{color:#f1f1f1;font-size:14px}
+.cr-reserva-card__rapidas .cr-reserva-estado,
+.cr-reserva-confirmar__rapidas .cr-reserva-estado{display:none}
+@media(max-width:720px){.cr-reserva-card{min-height:120px}.cr-reserva-estado{padding-left:18px;font-size:15px}.cr-reserva-estado:before{width:12px;height:12px}.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar,.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar{grid-template-columns:116px minmax(0,1fr) 112px 60px;min-height:120px}.cr-reserva-confirmar__cliente{padding-left:8px}.cr-reserva-card__fecha-dia{font-size:13px}}
+@media(max-width:620px){.cr-reserva-card{min-height:0}.cr-reserva-estado{padding-left:17px;font-size:15px;line-height:1}.cr-reserva-estado:before{width:11px;height:11px}.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar,.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar{grid-template-columns:96px minmax(0,1fr) 60px;grid-template-areas:"tiempo datos abrir" "resumen resumen abrir";min-height:0}.cr-reserva-confirmar__tiempo{grid-area:tiempo}.cr-reserva-confirmar__cliente{grid-area:datos;gap:6px;padding-left:7px}.cr-reserva-confirmar__resumen{grid-area:resumen;display:grid;grid-template-columns:1fr 1fr;padding:10px}.cr-reserva-card__fecha{font-size:13px}.cr-reserva-card__fecha-dia{font-size:12px}}
+
+/* POR CONFIRMAR: recupera lectura compacta sin repetir el estado pendiente. */
+.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__tiempo{align-items:center;justify-content:center;gap:8px;text-align:center;text-transform:uppercase}
+.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__tiempo .cr-reserva-card__fecha{color:#ffc400;font:1000 27px/.95 var(--cr-font);letter-spacing:-.3px;white-space:nowrap}
+.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__tiempo .cr-reserva-card__hora{color:#fff;font:1000 34px/.95 var(--cr-font);letter-spacing:-.7px;white-space:nowrap}
+.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__personas{color:#58aaff;font:1000 25px/1 var(--cr-font);letter-spacing:-.2px;white-space:nowrap}
+.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__resumen{display:flex;align-items:center;justify-content:center;padding:12px 10px}
+@media(max-width:720px){.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__tiempo .cr-reserva-card__fecha{font-size:22px}.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__tiempo .cr-reserva-card__hora{font-size:30px}.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__personas{font-size:22px}}
+@media(max-width:620px){.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__resumen{display:flex;padding:8px 10px}.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__tiempo .cr-reserva-card__fecha{font-size:18px}.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__tiempo .cr-reserva-card__hora{font-size:26px}.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__personas{font-size:20px}}
+
+/* POR CONFIRMAR: restauración literal del diseño previo a cce51ca. */
+.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar{position:relative;display:grid;grid-template-columns:.82fr .78fr .58fr minmax(170px,2.14fr) minmax(74px,.58fr);align-items:stretch;min-height:148px;border:2px solid #3a3a3a;border-radius:9px;background:#080808;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.05);cursor:pointer}
+.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar>*{min-width:0;border-right:1px solid #242424}
+.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar>*:last-child{border-right:0}
+.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__fecha,.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__dia-hora,.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__pax,.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__cliente,.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__rapidas{display:flex;flex-direction:column;justify-content:center;padding:12px 10px}
+.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__fecha{align-items:center;background:#111;color:#ffc400;text-align:center;text-transform:uppercase}
+.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__fecha strong{display:block;color:#ffc400;font:1000 clamp(34px,5.2vw,38px)/.9 var(--cr-font);letter-spacing:-1px;white-space:nowrap}
+.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__fecha span{display:block;margin-top:8px;color:#fff;font:1000 clamp(22px,3.2vw,24px)/.95 var(--cr-font);letter-spacing:-.3px}
+.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__dia-hora{align-items:center;text-align:center;text-transform:uppercase}
+.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__dia-hora span{color:#f1f1f1;font:1000 clamp(20px,3vw,22px)/1 var(--cr-font);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__dia-hora strong{margin-top:11px;color:#fff;font:1000 clamp(34px,5vw,38px)/.9 var(--cr-font);letter-spacing:-.8px;white-space:nowrap}
+.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__pax{align-items:center;color:#58aaff;font:1000 clamp(30px,4.5vw,34px)/.96 var(--cr-font);letter-spacing:-.5px;text-align:center;text-transform:uppercase;white-space:nowrap}
+.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__cliente{align-items:flex-start;gap:8px;padding-left:16px;padding-right:14px}
+.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__cliente strong{display:block;width:100%;color:#fff;font:1000 clamp(28px,4.2vw,32px)/.95 var(--cr-font);letter-spacing:-.35px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__contacto{display:flex;width:100%;align-items:center;gap:0;min-width:0;color:#dfdfdf;white-space:nowrap;overflow:hidden}
+.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__telefono{display:block;min-width:0;flex:0 1 auto;color:#f2f2f2;font:1000 clamp(25px,3.5vw,28px)/1 var(--cr-font);letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__codigo{display:inline-flex;align-items:center;gap:5px;min-width:0;flex:0 1 auto;border:0;padding:6px 0;background:transparent;color:#ffc400;font:1000 clamp(25px,3.5vw,28px)/1 var(--cr-font);letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase;cursor:pointer}
+.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__codigo::before{content:" · ";display:inline;margin:0;color:#fff;font:inherit}
+.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__codigo-icon{flex:0 0 auto}
+.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__rapidas{--cr-por-confirmar-boton-lateral:58px;align-items:center;gap:10px;padding:10px 8px;background:#0d0d0d}
+@media(max-width:620px){.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar{grid-template-columns:.76fr .7fr .52fr minmax(118px,2.02fr) 60px;min-height:150px}.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__fecha,.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__dia-hora,.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__pax,.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__cliente,.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__rapidas{padding:8px 5px}.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__fecha strong{font-size:34px}.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__fecha span{font-size:24px}.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__dia-hora span{font-size:20px}.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__dia-hora strong{font-size:34px}.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__pax{font-size:30px;white-space:normal}.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__cliente strong{font-size:28px}.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__telefono{font-size:24px}.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__codigo{font-size:24px}.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__rapidas{--cr-por-confirmar-boton-lateral:50px;gap:7px}.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__obs{font-size:34px;padding:0}.cr-reservas-hoy[data-cr-vista-reservas=por-confirmar] .cr-reserva-confirmar__desplegar{font-size:32px}}
+
+/* BUSCAR RESERVA: restaura tarjeta previa y solo ubica el estado arriba a la izquierda. */
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar{position:relative;display:grid;grid-template-columns:.92fr .88fr .72fr minmax(170px,1.8fr) minmax(74px,.58fr);align-items:stretch;min-height:148px;border:2px solid #3a3a3a;border-radius:9px;background:#080808;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.05);cursor:pointer}
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar>*{min-width:0;border-right:1px solid #242424}.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar>*:last-child{border-right:0}
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__fecha,.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__dia-hora,.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__pax,.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__cliente,.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__rapidas{display:flex;flex-direction:column;justify-content:center;padding:12px 10px}
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__fecha{align-items:center;background:#111;color:#ffc400;text-align:center;text-transform:uppercase}.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__fecha strong{display:block;color:#ffc400;font:1000 clamp(34px,5.2vw,38px)/.9 var(--cr-font);letter-spacing:-1px;white-space:nowrap}.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__fecha span{display:block;margin-top:8px;color:#fff;font:1000 clamp(22px,3.2vw,24px)/.95 var(--cr-font);letter-spacing:-.3px}
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__dia-hora{align-items:center;text-align:center;text-transform:uppercase}.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__dia-hora span{color:#f1f1f1;font:1000 clamp(20px,3vw,22px)/1 var(--cr-font);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__dia-hora strong{margin-top:11px;color:#fff;font:1000 clamp(34px,5vw,38px)/.9 var(--cr-font);letter-spacing:-.8px;white-space:nowrap}
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__pax{align-items:center;color:#58aaff;font:1000 clamp(30px,4.5vw,34px)/.96 var(--cr-font);letter-spacing:-.5px;text-align:center;text-transform:uppercase;white-space:nowrap}
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__cliente{align-items:flex-start;gap:8px;padding-left:16px;padding-right:14px}.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__cliente strong{display:block;width:100%;color:#fff;font:1000 clamp(28px,4.2vw,32px)/.95 var(--cr-font);letter-spacing:-.35px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__contacto{display:flex;width:100%;align-items:center;gap:12px;min-width:0;color:#dfdfdf;white-space:nowrap;overflow:hidden}.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__telefono{display:block;min-width:0;flex:0 1 auto;color:#f2f2f2;font:1000 clamp(25px,3.5vw,28px)/1 var(--cr-font);letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__codigo{display:inline-flex;align-items:center;gap:5px;min-width:0;flex:0 1 auto;color:#ffc400;font:1000 clamp(25px,3.5vw,28px)/1 var(--cr-font);letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase}.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__codigo::before{content:none}
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__rapidas{--cr-por-confirmar-boton-lateral:58px;align-items:center;gap:10px;padding:10px 8px;background:#0d0d0d}
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__fecha .cr-reserva-estado{align-self:flex-start;margin-bottom:10px;text-align:left}
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-card--pendiente .cr-reserva-estado{color:#ffc400}
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-card--confirmada .cr-reserva-estado{color:#05d677}
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-card--sentada .cr-reserva-estado{color:#3b82f6}
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-card--finalizada .cr-reserva-estado{color:#9a9a9a}
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-card--cancelada-cliente .cr-reserva-estado{color:#ff4d58}
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-card--cancelada-local .cr-reserva-estado{color:#ff4d58}
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-card--no-presentado .cr-reserva-estado{color:#ff8a00}
+@media(max-width:620px){.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar{grid-template-columns:.9fr .82fr .66fr minmax(118px,1.7fr) 60px;min-height:150px}.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__fecha,.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__dia-hora,.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__pax,.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__cliente,.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__rapidas{padding:8px 5px}.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__fecha strong{font-size:34px}.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__fecha span{font-size:24px}.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__dia-hora span{font-size:20px}.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__dia-hora strong{font-size:34px}.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__pax{font-size:30px;white-space:normal}.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__cliente strong{font-size:28px}.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__telefono,.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__codigo{font-size:24px}.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__rapidas{--cr-por-confirmar-boton-lateral:50px;gap:7px}}
+
+
+/* BUSCAR RESERVA: primera fase gráfica mínima sobre la tarjeta estable. */
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar{min-height:166px;border-color:#4a3a12;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 10px 24px rgba(0,0,0,.28)}
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__fecha,.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__dia-hora,.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__pax,.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__cliente,.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__rapidas{padding:16px 12px}
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__cliente{gap:12px;padding-left:20px;padding-right:18px}
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__cliente strong{font-size:clamp(31px,4.6vw,36px);line-height:.98;color:#fff7d6;text-shadow:0 1px 0 rgba(0,0,0,.5)}
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__telefono{font-size:clamp(26px,3.7vw,30px)}
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__codigo{flex:0 0 auto;padding:5px 8px;border:1px solid rgba(255,196,0,.45);border-radius:8px;background:rgba(255,196,0,.1);font-size:clamp(26px,3.7vw,30px);letter-spacing:.8px}
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__fecha .cr-reserva-estado{padding:4px 7px;border:1px solid currentColor;border-radius:999px;background:rgba(0,0,0,.28);font-size:clamp(12px,2.1vw,15px);line-height:1;letter-spacing:.4px}
+@media(max-width:620px){.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar{min-height:164px}.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__fecha,.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__dia-hora,.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__pax,.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__cliente,.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__rapidas{padding:10px 6px}.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__cliente{gap:10px;padding-left:10px;padding-right:8px}.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__cliente strong{font-size:30px}.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__telefono,.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__codigo{font-size:25px}.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-confirmar__fecha .cr-reserva-estado{font-size:12px;padding:4px 6px;margin-bottom:8px}}
+
+
