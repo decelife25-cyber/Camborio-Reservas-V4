@@ -20,7 +20,6 @@ export default function BuscarReserva(){
    <header className="cr-reservas-hoy__header">
      <div className="cr-reservas-hoy__titlewrap">
        <h1 id="crBuscarReservaTitulo">BUSCAR RESERVA</h1>
-       <button className="cr-reservas-hoy__volver" type="button" onClick={()=>window.history.back()} aria-label="Volver">←</button>
      </div>
    </header>
    <div className="cr-reservas-lista-scroll">
