@@ -291,8 +291,6 @@ export default function Mesas() {
         {!assignmentMode && <div className="cr-planos-mesas__turnos" role="tablist" aria-label="Turnos">
           <button type="button" className={turno === 'COMIDA' ? 'activo' : ''} onClick={() => setTurno('COMIDA')}>☀ COMIDA</button>
           <button type="button" className={turno === 'CENA' ? 'activo' : ''} onClick={() => setTurno('CENA')}>🌙 CENA</button>
-        </div>
-
         </div>}
 
         <div className="cr-planos-mesas__tabs" role="tablist" aria-label="Zonas">
