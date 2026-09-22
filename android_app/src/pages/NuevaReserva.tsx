@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { getTurnoFromHora } from '../utils/shifts';
 
@@ -11,52 +11,100 @@ const formatDateES = (iso:string) => { const [y,m,d]=iso.split('-'); return d+'/
 const isoDate = (d:Date) => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 
 function Wheel({ values, value, onChange, kind }: { values:string[]; value:string; onChange:(v:string)=>void; kind:'hora'|'minutos' }) {
-  const touchStart=useRef<number|null>(null);
-  const index=Math.max(0,values.indexOf(value));
-  const previous=index>0?values[index-1]:kind==='minutos'?values[values.length-1]:'';
-  const next=index<values.length-1?values[index+1]:kind==='minutos'?values[0]:'';
-  const change=(direction:1|-1)=>{
-    let nextIndex=index+direction;
-    if(kind==='minutos'){
-      if(nextIndex<0)nextIndex=values.length-1;
-      if(nextIndex>=values.length)nextIndex=0;
-    }else{
-      nextIndex=Math.max(0,Math.min(values.length-1,nextIndex));
-    }
-    const nextValue=values[nextIndex];
-    if(nextValue&&nextValue!==value)onChange(nextValue);
+  const controlRef=useRef<HTMLSpanElement|null>(null);
+  const encajeRef=useRef<number|null>(null);
+  const ITEM_HEIGHT=32;
+  const [indiceVisual,setIndiceVisual]=useState(Math.max(1,values.indexOf(value)+1));
+
+  const limitarIndice=(indice:number)=>{
+    return Math.min(Math.max(Math.round(indice),1),values.length);
   };
-  const handleTouchStart=(e:React.TouchEvent<HTMLSpanElement>)=>{
-    touchStart.current=e.touches[0]?.clientY??null;
+
+  const centrarIndice=(indice:number,suave:boolean)=>{
+    const control=controlRef.current;
+    if(!control)return;
+    const scrollTop=(indice*ITEM_HEIGHT)-(control.clientHeight/2)+(ITEM_HEIGHT/2);
+    control.scrollTo({top:Math.max(0,scrollTop),behavior:suave?'smooth':'auto'});
   };
-  const handleTouchEnd=(e:React.TouchEvent<HTMLSpanElement>)=>{
-    if(touchStart.current===null)return;
-    const end=e.changedTouches[0]?.clientY??touchStart.current;
-    const delta=touchStart.current-end;
-    touchStart.current=null;
-    if(Math.abs(delta)<12)return;
-    change(delta>0?1:-1);
+
+  const indiceDesdeScroll=(control:HTMLSpanElement)=>{
+    return limitarIndice(
+      Math.round((control.scrollTop+(control.clientHeight/2)-(ITEM_HEIGHT/2))/ITEM_HEIGHT)
+    );
   };
-  const handleWheel=(e:React.WheelEvent<HTMLSpanElement>)=>{
+
+  const aplicarVisual=(indice:number)=>{
+    const limitado=limitarIndice(indice);
+    setIndiceVisual(limitado);
+    return limitado;
+  };
+
+  useEffect(()=>{
+    const indice=limitarIndice(values.indexOf(value)+1);
+    setIndiceVisual(indice);
+    const frame=window.requestAnimationFrame(()=>centrarIndice(indice,false));
+    return ()=>window.cancelAnimationFrame(frame);
+  },[value,values]);
+
+  useEffect(()=>{
+    return ()=>{if(encajeRef.current!==null)window.clearTimeout(encajeRef.current);};
+  },[]);
+
+  const programarEncaje=()=>{
+    const control=controlRef.current;
+    if(!control)return;
+    if(encajeRef.current!==null)window.clearTimeout(encajeRef.current);
+    const indice=aplicarVisual(indiceDesdeScroll(control));
+    encajeRef.current=window.setTimeout(()=>{
+      const controlActual=controlRef.current;
+      if(!controlActual)return;
+      const indiceCentral=aplicarVisual(indiceDesdeScroll(controlActual));
+      centrarIndice(indiceCentral,false);
+      onChange(values[indiceCentral-1]);
+      encajeRef.current=null;
+    },90);
+  };
+
+  const manejarScroll=()=>{
+    const control=controlRef.current;
+    if(!control)return;
+    aplicarVisual(indiceDesdeScroll(control));
+    programarEncaje();
+  };
+
+  const manejarTecla=(e:React.KeyboardEvent<HTMLSpanElement>)=>{
+    if(e.key!=='ArrowDown'&&e.key!=='ArrowUp')return;
     e.preventDefault();
-    if(Math.abs(e.deltaY)<1)return;
-    change(e.deltaY>0?1:-1);
+    const control=controlRef.current;
+    if(!control)return;
+    const actual=indiceDesdeScroll(control);
+    const siguiente=limitarIndice(actual+(e.key==='ArrowDown'?1:-1));
+    centrarIndice(siguiente,true);
+    window.setTimeout(()=>onChange(values[siguiente-1]),90);
   };
+
   return <span
+    ref={controlRef}
     className="cr-nueva-reserva__rueda"
     data-wheel-kind={kind}
-    role="slider"
+    role="listbox"
     aria-label={kind==='hora'?'Hora':'Minutos'}
-    aria-valuetext={value}
     tabIndex={0}
-    onTouchStart={handleTouchStart}
-    onTouchEnd={handleTouchEnd}
-    onWheel={handleWheel}
-    onKeyDown={e=>{if(e.key==='ArrowUp')change(-1);if(e.key==='ArrowDown')change(1)}}
+    onScroll={manejarScroll}
+    onKeyDown={manejarTecla}
   >
-    <span className="cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--cerca">{previous}</span>
-    <span className="cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--actual">{value}</span>
-    <span className="cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--cerca">{next}</span>
+    <span className="cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--vacio" aria-hidden="true"/>
+    {values.map((item,index)=>{
+      const indice=index+1;
+      const distancia=Math.abs(indice-indiceVisual);
+      const clase=distancia===0
+        ? 'cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--actual'
+        : distancia===1
+          ? 'cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--cerca'
+          : 'cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--lejos';
+      return <span key={item} className={clase} role="option" aria-selected={distancia===0?'true':'false'}>{item}</span>;
+    })}
+    <span className="cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--vacio" aria-hidden="true"/>
   </span>;
 }
 
