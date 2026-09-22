@@ -352,6 +352,7 @@ export default function Mesas() {
           </div>
         </div>
       )}
+      {calendarOpen && <FechaPicker value={fecha} onChange={setFecha} onClose={() => setCalendarOpen(false)} />}
     </section>
   );
-}      {calendarOpen && <FechaPicker value={fecha} onChange={setFecha} onClose={() => setCalendarOpen(false)} />}\n
+}
