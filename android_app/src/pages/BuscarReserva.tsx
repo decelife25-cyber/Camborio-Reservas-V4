@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Filter } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import SearchReservationCard from '../components/SearchReservationCard';
 import type { SearchReservation } from '../components/SearchReservationCard';
@@ -22,9 +21,6 @@ export default function BuscarReserva(){
      <div className="cr-reservas-hoy__titlewrap">
        <h1 id="crBuscarReservaTitulo">BUSCAR RESERVA</h1>
        <button className="cr-reservas-hoy__volver" type="button" onClick={()=>window.history.back()} aria-label="Volver">←</button>
-     </div>
-     <div className="cr-reservas-hoy__controles">
-       <button className="cr-reservas-hoy__filtro" type="button" aria-label="Abrir filtro"><Filter className="cr-reservas-hoy__filtro-icon"/></button>
      </div>
    </header>
    <div className="cr-reservas-lista-scroll">
