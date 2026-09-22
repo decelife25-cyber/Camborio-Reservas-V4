@@ -1951,3 +1951,5 @@ html.light .search-empty{color:#444;border-color:#bbb;}
 .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha__bloque--pax strong{font-size:30px}
 .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha__bloque--hora em{font-size:30px}
 .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha__bloque--mesa strong{font-size:29px}
+
+/* Build 1.0.017: calibración física V2 aplicada. */
