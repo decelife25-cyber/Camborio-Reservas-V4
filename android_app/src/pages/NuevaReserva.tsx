@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { getTurnoFromHora } from '../utils/shifts';
 
