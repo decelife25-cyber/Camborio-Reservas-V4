@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { CSSProperties } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import FechaPicker from '../components/FechaPicker';
+import MesaPlano from '../components/MesaPlano';
 
 type Turno = 'COMIDA' | 'CENA';
 type Zona = 'terraza' | 'salon' | 'chillout';
@@ -252,7 +252,6 @@ export default function Mesas() {
     setSaving(false);
   };
 
-  const assignmentSet = new Set(assignmentTables);
   const toggleAssignmentTable = (numero: string) => {
     if (!assignmentMode || mesasConfig[numero]?.Activa === false) return;
     setAssignmentTables(current => current.includes(numero) ? current.filter(x => x !== numero) : [...current, numero]);
@@ -302,34 +301,14 @@ export default function Mesas() {
         </div>
 
         {loading && <div className="cr-planos-mesas__loading">CARGANDO MESAS...</div>}
-        <div className="cr-planos-mesas__canvas-wrap">
-          <div className={'cr-planos-mesas__canvas cr-planos-mesas__canvas--' + zona}>
-            <div className="cr-planos-mesas__rotulo">{layout.nombre}</div>
-            {zona === 'terraza' && <div className="cr-planos-mesas__terraza-marco" aria-hidden="true" />}
-            {mesasVisibles.map(mesa => (
-              <button
-                key={mesa.numero}
-                type="button"
-                className={'cr-planos-mesas__mesa cr-planos-mesas__mesa--' + (assignmentMode ? (assignmentSet.has(mesa.numero) ? (assignmentTables[0] === mesa.numero ? 'principal' : 'adicional') : mesa.estado) : mesa.estado)}
-                style={{ '--mesa-x': mesa.x + '%', '--mesa-y': mesa.y + '%' } as CSSProperties}
-                onClick={() => assignmentMode ? toggleAssignmentTable(mesa.numero) : setSelectedTable(mesa.numero)}
-                aria-label={'Mesa ' + mesa.numero + ' ' + mesa.estado}
-              >
-                {mesa.numero}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="cr-planos-mesas__leyenda" aria-label="Leyenda de estados de mesas">
-          <span><i className="principal" />PRINCIPAL</span>
-          <span><i className="adicional" />ADICIONAL</span>
-          <span><i className="cambio-pendiente" />CAMBIO PENDIENTE</span>
-          <span><i className="libre" />LIBRE</span>
-          <span><i className="reservada" />RESERVADA</span>
-          <span><i className="ocupada" />OCUPADA</span>
-          <span><i className="desactivada" />DESACTIVADA</span>
-        </div>
+        <MesaPlano
+          layout={layout}
+          zona={zona}
+          mesas={mesasVisibles}
+          assignmentMode={assignmentMode}
+          assignmentTables={assignmentTables}
+          onTableClick={numero => assignmentMode ? toggleAssignmentTable(numero) : setSelectedTable(numero)}
+        />
 
         {assignmentMode && <div className="cr-planos-mesas__assignment-actions"><div>SELECCIONA UNA O VARIAS MESAS Y PULSA GUARDAR ASIGNACIÓN PARA ACTUALIZAR LA RESERVA.</div><button type="button" className="primario" disabled={saving} onClick={() => void guardarAsignacion()}>{saving ? 'GUARDANDO...' : 'GUARDAR ASIGNACIÓN'}</button></div>}
         {error && <div className="cr-planos-mesas__error">{error}</div>}
