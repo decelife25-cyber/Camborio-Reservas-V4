@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import ReservationCard from '../components/ReservationCard';
+import { useNavigate } from 'react-router-dom';
 
 type Reserva = {
   ReservaID: string;
@@ -63,6 +64,7 @@ function formatDateParts(value: string) {
 }
 
 export default function Calendario() {
+  const navigate = useNavigate();
   const [monthDate, setMonthDate] = useState(() => {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
@@ -216,7 +218,7 @@ export default function Calendario() {
             <div className="calendar-empty-message">No hay reservas para esta fecha.</div>
           ) : (
             reservasSeleccionadas.map(reserva => (
-              <ReservationCard key={reserva.ReservaID} reserva={reserva} />
+              <ReservationCard key={reserva.ReservaID} reserva={reserva} onAssignTable={r => navigate('/mesas?asignar=' + encodeURIComponent(r.ReservaID))} />
             ))
           )}
         </div>

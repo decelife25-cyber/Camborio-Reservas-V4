@@ -27,7 +27,7 @@ function statusLabel(status: string) {
   return status.replaceAll('_', ' ');
 }
 
-export default function ReservationCard({ reserva }: { reserva: ReservationCardData }) {
+export default function ReservationCard({ reserva, onAssignTable }: { reserva: ReservationCardData; onAssignTable?: (reserva: ReservationCardData) => void }) {
   const [showObservations, setShowObservations] = useState(false);
   const hasObservations = Boolean(reserva.Observaciones?.trim());
 
@@ -60,7 +60,7 @@ export default function ReservationCard({ reserva }: { reserva: ReservationCardD
         </div>
         <div className="reservation-party">
           <div className="pax"><span>👥</span> {reserva.Personas || 0} PAX</div>
-          <button className="table-button" type="button">
+          <button className="table-button" type="button" onClick={() => { if (!reserva.Mesa && onAssignTable) onAssignTable(reserva); }}>
             {reserva.Mesa ? 'MESA ' + reserva.Mesa : 'SIN ASIGNAR'}
           </button>
         </div>

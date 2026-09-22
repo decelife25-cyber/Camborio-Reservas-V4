@@ -1,174 +1,408 @@
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import type { CSSProperties } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { Map as MapIcon, Users } from 'lucide-react';
-import AsignarMesaModal from '../components/AsignarMesaModal';
+import { useAuth } from '../contexts/AuthContext';
+import FechaPicker from '../components/FechaPicker';
 
-export default function Mesas() {
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-  const [turno, setTurno] = useState('COMIDA');
+type Turno = 'COMIDA' | 'CENA';
+type Zona = 'terraza' | 'salon' | 'chillout';
 
-  const [mesas, setMesas] = useState<any[]>([]);
-  const [reservas, setReservas] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [assigningTo, setAssigningTo] = useState<any>(null);
+type MesaLayout = { numero: string; x: number; y: number; zona: Zona };
+type MesaConfig = { Activa?: boolean; Unible?: boolean; GrupoUnion?: string | null };
 
-  useEffect(() => {
-    fetchData();
-  }, [selectedDate, turno]);
+type Reserva = {
+  ReservaID: string;
+  CodigoReserva: string | null;
+  FechaReserva: string;
+  HoraReserva: string;
+  Nombre: string | null;
+  Telefono: string | null;
+  Personas: number | null;
+  Estado: string;
+  Mesa: string | null;
+  Zona: string | null;
+  MesasAdicionales: string | null;
+  Turno: string | null;
+  Email?: string | null;
+};
 
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const { data: mesasData, error: mesasError } = await supabase
-        .from('mesas')
-        .select('*')
-        .order('zona')
-        .order('mesa');
-      if (mesasError) throw mesasError;
+const PLANOS: Record<Zona, { nombre: string; mesas: MesaLayout[] }> = {
+  terraza: {
+    nombre: 'TERRAZA',
+    mesas: [
+      { numero: '15', x: 20, y: 24, zona: 'terraza' }, { numero: '16', x: 38, y: 24, zona: 'terraza' },
+      { numero: '17', x: 60, y: 24, zona: 'terraza' }, { numero: '18', x: 78, y: 24, zona: 'terraza' },
+      { numero: '14', x: 6, y: 39, zona: 'terraza' }, { numero: '6', x: 19, y: 41, zona: 'terraza' },
+      { numero: '5', x: 31, y: 41, zona: 'terraza' }, { numero: '4', x: 43, y: 41, zona: 'terraza' },
+      { numero: '3', x: 55, y: 41, zona: 'terraza' }, { numero: '2', x: 67, y: 41, zona: 'terraza' },
+      { numero: '1', x: 79, y: 41, zona: 'terraza' }, { numero: '20', x: 92, y: 43, zona: 'terraza' },
+      { numero: '13', x: 6, y: 66, zona: 'terraza' }, { numero: '12', x: 19, y: 70, zona: 'terraza' },
+      { numero: '11', x: 31, y: 70, zona: 'terraza' }, { numero: '10', x: 43, y: 70, zona: 'terraza' },
+      { numero: '9', x: 55, y: 70, zona: 'terraza' }, { numero: '8', x: 67, y: 70, zona: 'terraza' },
+      { numero: '7', x: 79, y: 70, zona: 'terraza' }, { numero: '21', x: 92, y: 67, zona: 'terraza' },
+    ],
+  },
+  salon: {
+    nombre: 'SALÓN',
+    mesas: [
+      { numero: '104', x: 20, y: 18, zona: 'salon' }, { numero: '107', x: 50, y: 18, zona: 'salon' },
+      { numero: '110', x: 80, y: 18, zona: 'salon' }, { numero: '103', x: 20, y: 43, zona: 'salon' },
+      { numero: '106', x: 50, y: 43, zona: 'salon' }, { numero: '109', x: 80, y: 43, zona: 'salon' },
+      { numero: '102', x: 20, y: 68, zona: 'salon' }, { numero: '105', x: 50, y: 68, zona: 'salon' },
+      { numero: '108', x: 80, y: 68, zona: 'salon' }, { numero: '101', x: 50, y: 88, zona: 'salon' },
+    ],
+  },
+  chillout: {
+    nombre: 'CHILL OUT',
+    mesas: [
+      { numero: '204', x: 33, y: 18, zona: 'chillout' }, { numero: '205', x: 49, y: 18, zona: 'chillout' },
+      { numero: '208', x: 65, y: 18, zona: 'chillout' }, { numero: '203', x: 33, y: 39, zona: 'chillout' },
+      { numero: '206', x: 49, y: 39, zona: 'chillout' }, { numero: '209', x: 65, y: 39, zona: 'chillout' },
+      { numero: '202', x: 33, y: 60, zona: 'chillout' }, { numero: '207', x: 49, y: 60, zona: 'chillout' },
+      { numero: '210', x: 65, y: 60, zona: 'chillout' }, { numero: '201', x: 33, y: 81, zona: 'chillout' },
+    ],
+  },
+};
 
-      const { data: reservasData, error: reservasError } = await supabase
-        .from('reservas')
-        .select(`*, clientes(nombre_ultimo)`)
-        .eq('fecha_reserva', selectedDate)
-        .eq('turno', turno)
-        .not('estado', 'in', '("CANCELADA_CLIENTE","CANCELADA_LOCAL")')
-        .order('hora_reserva', { ascending: true });
-      if (reservasError) throw reservasError;
+const ESTADOS_ACTIVOS = new Set(['PENDIENTE', 'CONFIRMADA', 'SENTADA']);
 
-      setMesas(mesasData || []);
-      setReservas(reservasData || []);
-    } catch (error) {
-      console.error('Error fetching', error);
-    } finally {
-      setLoading(false);
+function todayMadrid() {
+  return new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
+}
+
+function formatHeaderDate(iso: string) {
+  const [y, m, d] = iso.split('-').map(Number);
+  if (!y || !m || !d) return iso;
+  const date = new Date(y, m - 1, d);
+  const days = ['DOMINGO','LUNES','MARTES','MIÉRCOLES','JUEVES','VIERNES','SÁBADO'];
+  const months = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
+  return days[date.getDay()] + ' ' + d + ' ' + months[m - 1] + ' ' + y;
+}
+
+function parseAssignedTables(reserva: Reserva | null) {
+  const result: string[] = [];
+  const add = (value: unknown) => {
+    if (Array.isArray(value)) value.forEach(add);
+    else if (value !== null && value !== undefined) {
+      String(value).split(',').forEach(part => {
+        const n = part.replace(/[^0-9]/g, '').trim();
+        if (n && !result.includes(n)) result.push(n);
+      });
     }
   };
+  add(reserva?.Mesa);
+  add(reserva?.MesasAdicionales);
+  return result;
+}
 
-  const isTableOccupied = (mesaIdStr: string) => {
-    return reservas.find(r =>
-      r.mesa === mesaIdStr ||
-      (r.mesas_adicionales && r.mesas_adicionales.includes(mesaIdStr))
-    );
-  };
+function reservationForTable(reservas: Reserva[], numero: string) {
+  const matches = reservas.filter(r => parseAssignedTables(r).includes(numero));
+  if (!matches.length) return null;
+  const occupied = matches.find(r => r.Estado === 'SENTADA');
+  return occupied || matches[0];
+}
 
-  const groupedMesas = mesas.reduce((acc, mesa) => {
-    if (!acc[mesa.zona]) acc[mesa.zona] = [];
-    acc[mesa.zona].push(mesa);
+function visualState(reserva: Reserva | null) {
+  if (!reserva || !ESTADOS_ACTIVOS.has(reserva.Estado)) return 'disponible';
+  if (reserva.Estado === 'SENTADA') return 'ocupada';
+  return 'reservada';
+}
+
+function normalizarMesasConfig(data: any[]) {
+  return data.reduce<Record<string, MesaConfig>>((acc, row) => {
+    const numero = String(row.Mesa || '').trim();
+    if (numero) acc[numero] = { Activa: row.Activa !== false, Unible: row.Unible !== false, GrupoUnion: row.GrupoUnion || null };
     return acc;
   }, {});
+}
 
-  const renderReservasSinAsignar = () => {
-    const sinAsignar = reservas.filter(r => !r.mesa);
-    if (sinAsignar.length === 0) return null;
+export default function Mesas() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { user } = useAuth();
+  const [fecha, setFecha] = useState(todayMadrid());
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [turno, setTurno] = useState<Turno>('COMIDA');
+  const [zona, setZona] = useState<Zona>('salon');
+  const [reservas, setReservas] = useState<Reserva[]>([]);
+  const [mesasConfig, setMesasConfig] = useState<Record<string, MesaConfig>>({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [selectedTable, setSelectedTable] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const assignmentId = searchParams.get('asignar');
+  const [assignmentReserva, setAssignmentReserva] = useState<Reserva | null>(null);
+  const [assignmentTables, setAssignmentTables] = useState<string[]>([]);
+  const assignmentMode = Boolean(assignmentId);
 
-    return (
-      <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-yellow-200 dark:border-yellow-900 mb-6">
-        <h3 className="font-bold text-lg mb-4 text-gray-900 dark:text-white flex items-center gap-2">
-          Reservas Sin Asignar ({turno})
-        </h3>
-        <div className="space-y-2">
-          {sinAsignar.map(r => (
-            <div key={r.reserva_id} className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-              <div>
-                <span className="font-bold dark:text-white mr-2">{String(r.hora_reserva).slice(0,5)}</span>
-                <span className="dark:text-gray-300">{r.clientes?.nombre_ultimo} ({r.personas}p)</span>
-              </div>
-              <button
-                onClick={() => setAssigningTo(r)}
-                className="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded text-sm font-bold"
-              >
-                ASIGNAR
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
+  const cargar = useCallback(async () => {
+    setLoading(true);
+    setError('');
+    const [mesasResult, reservasResult] = await Promise.all([
+      supabase.from('Mesas').select('*'),
+      supabase
+        .from('Reservas')
+        .select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,Zona,MesasAdicionales,Turno')
+        .eq('FechaReserva', fecha)
+        .eq('Turno', turno)
+        .in('Estado', ['PENDIENTE','CONFIRMADA','SENTADA'])
+        .order('HoraReserva', { ascending: true }),
+    ]);
+    if (mesasResult.error) console.warn('Mesas config:', mesasResult.error.message);
+    if (reservasResult.error) setError(reservasResult.error.message);
+    setMesasConfig(normalizarMesasConfig(mesasResult.data || []));
+    setReservas((reservasResult.data || []) as Reserva[]);
+    setLoading(false);
+  }, [fecha, turno]);
+
+  useEffect(() => { void cargar(); }, [cargar]);
+
+  useEffect(() => {
+    if (!assignmentId) { setAssignmentReserva(null); setAssignmentTables([]); return; }
+    let alive = true;
+    (async () => {
+      const { data, error } = await supabase.from('Reservas').select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,Zona,MesasAdicionales,Turno,Email').eq('ReservaID', assignmentId).maybeSingle();
+      if (!alive) return;
+      if (error) { setError(error.message); return; }
+      const reserva = (data || null) as Reserva | null;
+      setAssignmentReserva(reserva);
+      if (reserva) {
+        const hora = Number(String(reserva.HoraReserva || '00').slice(0,2));
+        setFecha(reserva.FechaReserva);
+        setTurno(hora >= 18 ? 'CENA' : 'COMIDA');
+        setAssignmentTables(parseAssignedTables(reserva));
+        if (reserva.Zona === 'TERRAZA') setZona('terraza');
+        else if (reserva.Zona === 'CHILL OUT' || reserva.Zona === 'CHILLOUT') setZona('chillout');
+        else setZona('salon');
+      }
+    })();
+    return () => { alive = false; };
+  }, [assignmentId]);
+
+  const layout = PLANOS[zona];
+  const reservaSeleccionada = selectedTable ? reservationForTable(reservas, selectedTable) : null;
+  const configSeleccionada = selectedTable ? mesasConfig[selectedTable] : undefined;
+
+  const abrirReserva = () => {
+    if (!reservaSeleccionada?.CodigoReserva) return;
+    navigate('/buscar?codigo=' + encodeURIComponent(reservaSeleccionada.CodigoReserva));
+    setSelectedTable(null);
   };
 
+  const actualizarEstado = async (estado: 'SENTADA' | 'FINALIZADA') => {
+    if (!reservaSeleccionada?.ReservaID || saving) return;
+    setSaving(true);
+    const { error: updateError } = await supabase
+      .from('Reservas')
+      .update({ Estado: estado, FechaEstado: new Date().toISOString(), FechaModificacion: new Date().toISOString() })
+      .eq('ReservaID', reservaSeleccionada.ReservaID);
+    if (updateError) {
+      setError(updateError.message);
+      setSaving(false);
+      return;
+    }
+    setSelectedTable(null);
+    await cargar();
+    setSaving(false);
+  };
+
+  const ocuparMesa = async () => {
+    if (!selectedTable || saving) return;
+    const now = new Date();
+    setSaving(true);
+    const { data, error: insertError } = await supabase
+      .from('Reservas')
+      .insert({
+        CodigoReserva: 'MESA-' + selectedTable + '-' + Date.now().toString(36).toUpperCase(),
+        FechaCreacion: now.toISOString(),
+        FechaReserva: fecha,
+        HoraReserva: now.toTimeString().slice(0, 8),
+        Nombre: 'SIN RESERVA',
+        Telefono: null,
+        Email: null,
+        Personas: 1,
+        Observaciones: null,
+        Estado: 'SENTADA',
+        FechaEstado: now.toISOString(),
+        UsuarioEstado: user?.email || 'PRIVADO',
+        Mesa: selectedTable,
+        Zona: zona.toUpperCase(),
+        ClienteID: null,
+        FechaModificacion: now.toISOString(),
+        OrigenReserva: 'PRIVADO',
+        CreadaPor: user?.email || 'PRIVADO',
+        MesasAdicionales: null,
+        Turno: turno,
+      })
+      .select('ReservaID')
+      .single();
+    if (insertError) {
+      setError(insertError.message);
+      setSaving(false);
+      return;
+    }
+    if (!data?.ReservaID) {
+      setError('No se pudo crear la ocupación de la mesa.');
+      setSaving(false);
+      return;
+    }
+    setSelectedTable(null);
+    await cargar();
+    setSaving(false);
+  };
+
+  const assignmentSet = new Set(assignmentTables);
+  const toggleAssignmentTable = (numero: string) => {
+    if (!assignmentMode || mesasConfig[numero]?.Activa === false) return;
+    setAssignmentTables(current => current.includes(numero) ? current.filter(x => x !== numero) : [...current, numero]);
+  };
+  const guardarAsignacion = async () => {
+    if (!assignmentReserva || saving) return;
+    setSaving(true); setError('');
+    const principal = assignmentTables[0] || null;
+    const adicionales = assignmentTables.slice(1);
+    const principalLayout = Object.values(PLANOS).flatMap(p => p.mesas).find(m => m.numero === principal);
+    const zonaAsignada = principalLayout ? principalLayout.zona.toUpperCase().replace('CHILLOUT','CHILL OUT') : null;
+    const { error: updateError } = await supabase.from('Reservas').update({ Mesa: principal, MesasAdicionales: adicionales.length ? adicionales.join(', ') : null, Zona: zonaAsignada, Turno: turno, FechaModificacion: new Date().toISOString() }).eq('ReservaID', assignmentReserva.ReservaID);
+    setSaving(false);
+    if (updateError) { setError(updateError.message); return; }
+    navigate('/');
+  };
+
+  const estado: 'disponible' | 'reservada' | 'ocupada' | 'desactivada' = selectedTable && mesasConfig[selectedTable]?.Activa === false ? 'desactivada' : (selectedTable ? visualState(reservaSeleccionada) : 'disponible');
+
+  const mesasVisibles = useMemo(() => layout.mesas.map(m => ({
+    ...m,
+    estado: mesasConfig[m.numero]?.Activa === false ? 'desactivada' : visualState(reservationForTable(reservas, m.numero)),
+  })), [layout.mesas, mesasConfig, reservas]);
+
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-          <MapIcon /> Estado de Mesas
-        </h2>
-        <div className="flex gap-4">
-          <input
-            type="date"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            className="p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-          />
-          <select
-            value={turno}
-            onChange={(e) => setTurno(e.target.value)}
-            className="p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white font-bold"
-          >
-            <option value="COMIDA">☀️ COMIDA</option>
-            <option value="CENA">🌙 CENA</option>
-          </select>
+    <section className="cr-planos-mesas" aria-label="Planos de mesas">
+      <button className="cr-planos-mesas__backdrop" type="button" aria-label="Cerrar" onClick={() => navigate('/')} />
+      <div className={'cr-planos-mesas__panel' + (assignmentMode ? ' cr-planos-mesas__panel--asignacion' : '')}>
+        <header className="cr-planos-mesas__header">
+          <h2>{assignmentMode ? 'ASIGNAR MESA' : 'PLANOS DE MESAS'}</h2>
+          <button type="button" className="cr-planos-mesas__cerrar" onClick={() => navigate('/')}>CERRAR</button>
+        </header>
+
+        {assignmentMode && assignmentReserva ? <div className="cr-planos-mesas__reserva-info"><div><span>NOMBRE</span><strong>{assignmentReserva.Nombre || 'SIN NOMBRE'}</strong></div><div className="cr-planos-mesas__reserva-fecha">📅 {formatHeaderDate(assignmentReserva.FechaReserva)}</div><div className="cr-planos-mesas__reserva-grid"><div><span>MESAS ASIGNADAS</span><strong>{assignmentTables.length ? assignmentTables.join(', ') : 'SIN ASIGNAR'}</strong></div><div><span>TELÉFONO</span><strong>{assignmentReserva.Telefono || '—'}</strong></div><div><span>HORA</span><strong>{String(assignmentReserva.HoraReserva).slice(0,5)}</strong></div><div><span>PERSONAS</span><strong>{assignmentReserva.Personas || 0} PAX</strong></div></div></div> : <button className="cr-planos-mesas__fecha" type="button" onClick={() => setCalendarOpen(true)} aria-label="Cambiar fecha">📅 {formatHeaderDate(fecha)}</button>}
+
+        {!assignmentMode && <div className="cr-planos-mesas__turnos" role="tablist" aria-label="Turnos">
+          <button type="button" className={turno === 'COMIDA' ? 'activo' : ''} onClick={() => setTurno('COMIDA')}>☀ COMIDA</button>
+          <button type="button" className={turno === 'CENA' ? 'activo' : ''} onClick={() => setTurno('CENA')}>🌙 CENA</button>
+        </div>}
+
+        <div className="cr-planos-mesas__tabs" role="tablist" aria-label="Zonas">
+          {(Object.keys(PLANOS) as Zona[]).map(key => (
+            <button key={key} type="button" className={zona === key ? 'activo' : ''} onClick={() => setZona(key)}>
+              {PLANOS[key].nombre}
+            </button>
+          ))}
         </div>
-      </div>
 
-      {loading ? (
-        <div className="text-center p-8 text-gray-500">Cargando estado del salón...</div>
-      ) : (
-        <>
-          {renderReservasSinAsignar()}
-
-          <div className="space-y-6">
-            {Object.entries(groupedMesas).map(([zona, mesasZona]: [string, any]) => (
-              <div key={zona} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
-                <h3 className="font-bold text-lg mb-4 text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2 capitalize">
-                  Zona {zona}
-                </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                  {mesasZona.map((m: any) => {
-                    const reserva = isTableOccupied(m.mesa);
-                    const isPrincipal = reserva?.mesa === m.mesa;
-                    return (
-                      <div
-                        key={m.mesa}
-                        onClick={() => {
-                           if (reserva) setAssigningTo(reserva);
-                        }}
-                        className={`p-3 rounded-lg border-2 flex flex-col items-center text-center transition cursor-pointer ${
-                          reserva
-                            ? 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-900 hover:bg-red-100 dark:hover:bg-red-900/40'
-                            : 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-900'
-                        }`}
-                      >
-                        <div className="font-black text-xl mb-1 dark:text-white flex items-center gap-1">
-                           {m.mesa} {!isPrincipal && reserva && <span className="text-[10px] bg-red-200 text-red-800 px-1 rounded">ADIC</span>}
-                        </div>
-                        <div className="text-xs flex items-center gap-1 text-gray-600 dark:text-gray-400">
-                          <Users size={12}/> {m.capacidad} pax
-                        </div>
-                        {reserva && (
-                          <div className="mt-2 text-xs font-bold text-red-800 dark:text-red-400 truncate w-full">
-                            {reserva.clientes?.nombre_ultimo?.split(' ')[0]} ({reserva.personas}p)
-                            <br />
-                            {String(reserva.hora_reserva).slice(0,5)}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
+        {loading && <div className="cr-planos-mesas__loading">CARGANDO MESAS...</div>}
+        <div className="cr-planos-mesas__canvas-wrap">
+          <div className={'cr-planos-mesas__canvas cr-planos-mesas__canvas--' + zona}>
+            <div className="cr-planos-mesas__rotulo">{layout.nombre}</div>
+            {zona === 'terraza' && <div className="cr-planos-mesas__terraza-marco" aria-hidden="true" />}
+            {mesasVisibles.map(mesa => (
+              <button
+                key={mesa.numero}
+                type="button"
+                className={'cr-planos-mesas__mesa cr-planos-mesas__mesa--' + (assignmentMode ? (assignmentSet.has(mesa.numero) ? (assignmentTables[0] === mesa.numero ? 'principal' : 'adicional') : mesa.estado) : mesa.estado)}
+                style={{ '--mesa-x': mesa.x + '%', '--mesa-y': mesa.y + '%' } as CSSProperties}
+                onClick={() => assignmentMode ? toggleAssignmentTable(mesa.numero) : setSelectedTable(mesa.numero)}
+                aria-label={'Mesa ' + mesa.numero + ' ' + mesa.estado}
+              >
+                {mesa.numero}
+              </button>
             ))}
           </div>
-        </>
-      )}
+        </div>
 
-      {assigningTo && (
-        <AsignarMesaModal
-          reserva={assigningTo}
-          mesasDisponibles={mesas}
-          onClose={() => setAssigningTo(null)}
-          onUpdated={fetchData}
-        />
+        <div className="cr-planos-mesas__leyenda" aria-label="Leyenda de estados de mesas">
+          <span><i className="principal" />PRINCIPAL</span>
+          <span><i className="adicional" />ADICIONAL</span>
+          <span><i className="cambio-pendiente" />CAMBIO PENDIENTE</span>
+          <span><i className="libre" />LIBRE</span>
+          <span><i className="reservada" />RESERVADA</span>
+          <span><i className="ocupada" />OCUPADA</span>
+          <span><i className="desactivada" />DESACTIVADA</span>
+        </div>
+
+        {assignmentMode && <div className="cr-planos-mesas__assignment-actions"><div>SELECCIONA UNA O VARIAS MESAS Y PULSA GUARDAR ASIGNACIÓN PARA ACTUALIZAR LA RESERVA.</div><button type="button" className="primario" disabled={saving} onClick={() => void guardarAsignacion()}>{saving ? 'GUARDANDO...' : 'GUARDAR ASIGNACIÓN'}</button></div>}
+        {error && <div className="cr-planos-mesas__error">{error}</div>}
+      </div>
+
+      {selectedTable && (
+        <div className="cr-planos-mesas__dialog" role="dialog" aria-modal="true" aria-label={'Mesa ' + selectedTable}>
+          <button className="cr-planos-mesas__dialog-backdrop" type="button" aria-label="Cerrar" onClick={() => setSelectedTable(null)} />
+          <div className="cr-planos-mesas__dialog-panel">
+            {estado === 'disponible' && (
+              <>
+                <div className="cr-planos-mesas__dialog-title">MESA {selectedTable}</div>
+                <div className="cr-planos-mesas__dialog-text">¿MARCAR COMO OCUPADA?</div>
+                <div className="cr-planos-mesas__dialog-actions cr-planos-mesas__dialog-actions--one">
+                  <button type="button" className="primario" disabled={saving} onClick={() => void ocuparMesa()}>{saving ? 'OCUPANDO...' : 'OCUPAR MESA'}</button>
+                  <button type="button" onClick={() => setSelectedTable(null)}>CERRAR</button>
+                </div>
+              </>
+            )}
+
+            {estado === 'reservada' && reservaSeleccionada && (
+              <>
+                <div className="cr-planos-mesas__dialog-title">MESA {selectedTable}</div>
+                <div className="cr-planos-mesas__dialog-type">MESA PRINCIPAL</div>
+                <div className="cr-planos-mesas__dialog-name">{reservaSeleccionada.Nombre || 'SIN NOMBRE'}</div>
+                <div className="cr-planos-mesas__dialog-phone">{reservaSeleccionada.Telefono || 'SIN TELÉFONO'}</div>
+                <div className="cr-planos-mesas__dialog-data">{String(reservaSeleccionada.HoraReserva).slice(0,5)} · {reservaSeleccionada.Personas || '—'} PAX</div>
+                <div className="cr-planos-mesas__dialog-code">CÓDIGO: {reservaSeleccionada.CodigoReserva || reservaSeleccionada.ReservaID}</div>
+                <div className="cr-planos-mesas__dialog-state">ESTADO: {reservaSeleccionada.Estado}</div>
+                <div className="cr-planos-mesas__dialog-tables">MESAS: {parseAssignedTables(reservaSeleccionada).join(', ') || 'SIN ASIGNAR'}</div>
+                <div className="cr-planos-mesas__dialog-actions">
+                  <button type="button" className="primario" disabled={saving} onClick={() => void actualizarEstado('SENTADA')}>{saving ? 'GUARDANDO...' : 'SENTAR MESA'}</button>
+                  <button type="button" className="primario" onClick={abrirReserva}>ABRIR RESERVA</button>
+                  <button type="button" onClick={() => setSelectedTable(null)}>CERRAR</button>
+                </div>
+              </>
+            )}
+
+            {estado === 'ocupada' && reservaSeleccionada && (
+              <>
+                <div className="cr-planos-mesas__dialog-title">MESA {selectedTable}</div>
+                <div className="cr-planos-mesas__dialog-type">{reservaSeleccionada.Nombre === 'SIN RESERVA' ? 'SIN RESERVA' : 'MESA PRINCIPAL'}</div>
+                <div className="cr-planos-mesas__dialog-name">{reservaSeleccionada.Nombre || 'SIN NOMBRE'}</div>
+                <div className="cr-planos-mesas__dialog-phone">{reservaSeleccionada.Telefono || 'SIN TELÉFONO'}</div>
+                <div className="cr-planos-mesas__dialog-data">{String(reservaSeleccionada.HoraReserva).slice(0,5)} · {reservaSeleccionada.Personas || '—'} PAX</div>
+                <div className="cr-planos-mesas__dialog-code">CÓDIGO: {reservaSeleccionada.CodigoReserva || reservaSeleccionada.ReservaID}</div>
+                <div className="cr-planos-mesas__dialog-state">ESTADO: {reservaSeleccionada.Estado}</div>
+                <div className="cr-planos-mesas__dialog-tables">MESAS: {parseAssignedTables(reservaSeleccionada).join(', ') || selectedTable}</div>
+                <div className="cr-planos-mesas__dialog-actions">
+                  <button type="button" className="primario" disabled={saving} onClick={() => void actualizarEstado('FINALIZADA')}>{saving ? 'GUARDANDO...' : (reservaSeleccionada.Nombre === 'SIN RESERVA' ? 'FINALIZAR MESA' : 'FINALIZAR RESERVA')}</button>
+                  {reservaSeleccionada.Nombre !== 'SIN RESERVA' && <button type="button" className="primario" onClick={abrirReserva}>ABRIR RESERVA</button>}
+                  <button type="button" onClick={() => setSelectedTable(null)}>CERRAR</button>
+                </div>
+              </>
+            )}
+
+            {estado === 'desactivada' && (
+              <>
+                <div className="cr-planos-mesas__dialog-title">MESA {selectedTable}</div>
+                <div className="cr-planos-mesas__dialog-text">MESA DESACTIVADA</div>
+                <div className="cr-planos-mesas__dialog-actions cr-planos-mesas__dialog-actions--one">
+                  <button type="button" onClick={() => setSelectedTable(null)}>CERRAR</button>
+                </div>
+              </>
+            )}
+
+            {configSeleccionada?.GrupoUnion && (
+              <div className="cr-planos-mesas__dialog-union">GRUPO DE UNIÓN: {configSeleccionada.GrupoUnion}</div>
+            )}
+          </div>
+        </div>
       )}
-    </div>
+      {calendarOpen && <FechaPicker value={fecha} onChange={setFecha} onClose={() => setCalendarOpen(false)} />}
+    </section>
   );
 }
