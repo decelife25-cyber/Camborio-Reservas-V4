@@ -1,7 +1,7 @@
 {
   "name": "android_app",
   "private": true,
-  "version": "1.0.023",
+  "version": "1.0.024",
   "type": "module",
   "scripts": {
     "dev": "vite",
