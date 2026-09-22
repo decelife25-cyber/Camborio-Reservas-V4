@@ -2392,19 +2392,19 @@ html.light .filter-modal__cancel{
 .cr-planos-mesas__dialog-text{margin:10px 0 4px;color:#fff;font:1000 clamp(24px,5.8vw,34px)/1.08 var(--cr-font);text-transform:uppercase}
 .cr-planos-mesas__dialog-union{margin-top:14px;color:#aaa;font-size:14px;font-weight:800;text-transform:uppercase}
 @media(max-width:620px){
-  .cr-planos-mesas{padding:6px;align-items:end}
+  .cr-planos-mesas{padding:6px;align-items:center}
   .cr-planos-mesas__panel{max-height:calc(100vh - 12px);padding:12px;border-radius:15px 15px 8px 8px}
   .cr-planos-mesas__header h2{font-size:var(--cr-text-panel-title)}
   .cr-planos-mesas__cerrar{min-height:44px}
   .cr-planos-mesas__fecha{font-size:24px}
-  .cr-planos-mesas__turnos{gap:8px}.cr-planos-mesas__turnos button{min-height:56px;font-size:21px}
-  .cr-planos-mesas__tabs{gap:6px}.cr-planos-mesas__tabs button{min-height:54px;font-size:clamp(16px,5vw,22px);padding:0 4px}
-  .cr-planos-mesas__canvas-wrap{padding:6px}
-  .cr-planos-mesas__canvas{height:560px;min-height:560px}
+  .cr-planos-mesas__turnos{gap:8px}.cr-planos-mesas__turnos button{min-height:40px;font-size:18px}
+  .cr-planos-mesas__tabs{gap:6px}.cr-planos-mesas__tabs button{min-height:40px;font-size:clamp(15px,4.5vw,20px);padding:0 4px}
+  .cr-planos-mesas__canvas-wrap{padding:5px}
+  .cr-planos-mesas__canvas{height:405px;min-height:405px}
   .cr-planos-mesas__mesa{width:54px;height:54px;border-radius:10px;font-size:23px}
   .cr-planos-mesas__rotulo{font-size:24px;padding:7px 18px}
   .cr-planos-mesas__terraza-marco{left:13%;right:13%;top:31%;bottom:20%;border-width:5px}
-  .cr-planos-mesas__leyenda{font-size:14px;gap:8px}
+  .cr-planos-mesas__leyenda{font-size:12px;gap:7px;margin-top:8px}
   .cr-planos-mesas__dialog{padding:10px}
   .cr-planos-mesas__dialog-panel{padding:20px 14px}
   .cr-planos-mesas__dialog-actions{grid-template-columns:1fr}
