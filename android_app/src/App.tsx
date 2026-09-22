@@ -4,7 +4,8 @@ import Login from './pages/Login';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 import Inicio from './pages/Inicio';
-import Reservas from './pages/Reservas';
+import NuevaReserva from './pages/NuevaReserva';
+import BuscarReserva from './pages/BuscarReserva';
 import Confirmar from './pages/Confirmar';
 import Calendario from './pages/Calendario';
 import Mesas from './pages/Mesas';
@@ -27,7 +28,8 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
             <Route index element={<Inicio />} />
-            <Route path="reservas" element={<Reservas />} />
+            <Route path="reservas" element={<NuevaReserva />} />
+            <Route path="buscar" element={<BuscarReserva />} />
             <Route path="confirmar" element={<Confirmar />} />
             <Route path="calendario" element={<Calendario />} />
             <Route path="mesas" element={<Mesas />} />

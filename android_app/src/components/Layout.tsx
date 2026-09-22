@@ -7,7 +7,7 @@ import { useAuth } from '../contexts/AuthContext';
 const menuItems = [
   { to: '/reservas', icon: '📝', label: 'HACER RESERVA' },
   { to: '/calendario', icon: '📅', label: 'CALENDARIO' },
-  { to: '/reservas', icon: '🔎', label: 'BUSCAR RESERVA' },
+  { to: '/buscar', icon: '🔎', label: 'BUSCAR RESERVA' },
   { to: '/', icon: '📖', label: 'RESERVAS HOY' },
   { to: '/confirmar', icon: '✅', label: 'CONFIRMAR' },
   { to: '/mesas', icon: '🗺️', label: 'PLANOS DE MESAS' },
@@ -79,7 +79,7 @@ export default function Layout() {
           </button>
           <button className="logout-button" onClick={handleLogout}>CERRAR SESIÓN</button>
         </div>
-        <div className="app-version" aria-label="Versión de la aplicación">V1.0.013</div>
+        <div className="app-version" aria-label="Versión de la aplicación">V1.0.028</div>
       </header>
 
       <nav className="private-menu" aria-label="Menú privado">
