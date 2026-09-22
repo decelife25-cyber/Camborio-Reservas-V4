@@ -54,7 +54,7 @@ function Wheel({ values, value, onChange, kind }: { values:string[]; value:strin
     const control=controlRef.current;
     if(!control)return;
     if(encajeRef.current!==null)window.clearTimeout(encajeRef.current);
-    const indice=aplicarVisual(indiceDesdeScroll(control));
+    aplicarVisual(indiceDesdeScroll(control));
     encajeRef.current=window.setTimeout(()=>{
       const controlActual=controlRef.current;
       if(!controlActual)return;
