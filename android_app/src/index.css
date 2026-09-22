@@ -2218,3 +2218,38 @@ html.light .observation-button{
   border-color:#a48735!important;
   color:#fff!important;
 }
+
+/* ===== 1.0.025: eliminar amarillos residuales del modo día ===== */
+html.light .cr-buscar-reserva__label{
+  color:#8b6800!important;
+}
+html.light .cr-observaciones-modal__panel{
+  border-color:#b89a42!important;
+}
+html.light .cr-observaciones-modal__panel h2{
+  color:#8b6800!important;
+}
+html.light .cr-observaciones-modal__cerrar{
+  background:#b89a42!important;
+  border-color:#a48735!important;
+  color:#fff!important;
+}
+html.light .observation-button{
+  background:#b89a42!important;
+  border-color:#a48735!important;
+  color:#fff!important;
+}
+html.light .observation-modal{
+  border-color:#b89a42!important;
+}
+html.light .observation-modal h2{
+  color:#8b6800!important;
+}
+html.light .observation-close{
+  background:#b89a42!important;
+  border:2px solid #a48735!important;
+  color:#fff!important;
+}
+html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha__observaciones span{
+  color:#8b6800!important;
+}
