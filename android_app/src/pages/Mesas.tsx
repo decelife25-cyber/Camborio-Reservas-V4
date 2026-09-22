@@ -321,9 +321,14 @@ export default function Mesas() {
           </div>
         </div>
 
-        <div className="cr-planos-mesas__leyenda">
-          <span><i className="principal" />PRINCIPAL</span><span><i className="adicional" />ADICIONAL</span><span><i className="cambio-pendiente" />CAMBIO PENDIENTE</span>
-          <span><i className="libre" />LIBRE</span><span><i className="reservada" />RESERVADA</span><span><i className="ocupada" />OCUPADA</span><span><i className="desactivada" />DESACTIVADA</span>
+        <div className="cr-planos-mesas__leyenda" aria-label="Leyenda de estados de mesas">
+          <span><i className="principal" />PRINCIPAL</span>
+          <span><i className="adicional" />ADICIONAL</span>
+          <span><i className="cambio-pendiente" />CAMBIO PENDIENTE</span>
+          <span><i className="libre" />LIBRE</span>
+          <span><i className="reservada" />RESERVADA</span>
+          <span><i className="ocupada" />OCUPADA</span>
+          <span><i className="desactivada" />DESACTIVADA</span>
         </div>
 
         {assignmentMode && <div className="cr-planos-mesas__assignment-actions"><div>SELECCIONA UNA O VARIAS MESAS Y PULSA GUARDAR ASIGNACIÓN PARA ACTUALIZAR LA RESERVA.</div><button type="button" className="primario" disabled={saving} onClick={() => void guardarAsignacion()}>{saving ? 'GUARDANDO...' : 'GUARDAR ASIGNACIÓN'}</button></div>}
