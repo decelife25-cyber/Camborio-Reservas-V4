@@ -16,7 +16,7 @@ type Reserva = {
   Observaciones: string | null;
 };
 
-const FILTRO_STORAGE_KEY = 'camborio_reservas_hoy_filtro_estados_v1';
+const FILTRO_STORAGE_KEY = 'camborio_reservas_filtro_estados_v1';
 const ESTADOS_FILTRO = ['PENDIENTE', 'CONFIRMADA', 'SENTADA', 'FINALIZADA', 'CANCELADA', 'NO_ASISTIO'] as const;
 type EstadoFiltro = typeof ESTADOS_FILTRO[number];
 
@@ -202,7 +202,7 @@ export default function Inicio() {
         <div className="filter-overlay" role="dialog" aria-modal="true" aria-labelledby="filtroReservasHoyTitulo">
           <div className="filter-modal">
             <div className="filter-modal__header">
-              <h2 id="filtroReservasHoyTitulo">FILTRO RESERVAS HOY</h2>
+              <h2 id="filtroReservasHoyTitulo">FILTRO RESERVAS</h2>
               <button type="button" className="filter-modal__close" onClick={cerrarFiltroSinCambios} aria-label="Cerrar">×</button>
             </div>
             <div className="filter-modal__options">
