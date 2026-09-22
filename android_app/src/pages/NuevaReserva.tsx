@@ -6,6 +6,9 @@ const HORAS = ['09','10','11','12','13','14','15','16','17','18','19','20','21',
 const MINUTOS = ['00','15','30','45'];
 
 const todayMadrid = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
+const parseISODate = (iso:string) => { const [y,m,d]=iso.split('-').map(Number); return new Date(y,m-1,d); };
+const formatDateES = (iso:string) => { const [y,m,d]=iso.split('-'); return d+'/'+m+'/'+y; };
+const isoDate = (d:Date) => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 
 function Wheel({ values, value, onChange, kind }: { values:string[]; value:string; onChange:(v:string)=>void; kind:'hora'|'minutos' }) {
   const ref=useRef<HTMLSpanElement>(null);
@@ -41,6 +44,9 @@ export default function NuevaReserva(){
   const[fecha,setFecha]=useState(todayMadrid()),[hora,setHora]=useState('13'),[minutos,setMinutos]=useState('15');
   const[mesa,setMesa]=useState(''),[observaciones,setObservaciones]=useState('');
   const[saving,setSaving]=useState(false),[message,setMessage]=useState(''),[error,setError]=useState('');
+  const [calendarOpen,setCalendarOpen]=useState(false);
+  const [calendarMonth,setCalendarMonth]=useState(()=>{const d=parseISODate(todayMadrid());return new Date(d.getFullYear(),d.getMonth(),1)});
+  const [calendarDraft,setCalendarDraft]=useState(fecha);
   const horaReserva=useMemo(()=>hora+':'+minutos,[hora,minutos]);
 
   async function guardar(e:React.FormEvent){
@@ -80,12 +86,28 @@ export default function NuevaReserva(){
         </label>
         <label className="cr-nueva-reserva__hora-bloque">Hora<Wheel values={HORAS} value={hora} onChange={setHora} kind="hora"/></label>
         <label className="cr-nueva-reserva__minutos-bloque">Minutos<Wheel values={MINUTOS} value={minutos} onChange={setMinutos} kind="minutos"/></label>
-        <label className="cr-nueva-reserva__fecha">Fecha<input type="date" min={todayMadrid()} value={fecha} onChange={e=>setFecha(e.target.value)} required /></label>
+        <label className="cr-nueva-reserva__fecha">Fecha
+          <input className="cr-nueva-reserva__fecha-input-oculto" type="date" min={todayMadrid()} value={fecha} onChange={e=>setFecha(e.target.value)} required aria-hidden="true" tabIndex={-1} />
+          <button className="cr-nueva-reserva__fecha-boton" type="button" onClick={()=>{setCalendarDraft(fecha);const d=parseISODate(fecha);setCalendarMonth(new Date(d.getFullYear(),d.getMonth(),1));setCalendarOpen(true)}}>{formatDateES(fecha)}<span aria-hidden="true">▾</span></button>
+        </label>
         <button className="cr-nueva-reserva__mesa" type="button" onClick={()=>setMesa('')}><span>Mesa asignada</span><strong>{mesa.trim()?'MESA '+mesa.trim():'SIN ASIGNAR'}</strong></button>
         <label className="cr-nueva-reserva__campo-completo">Observaciones<textarea rows={2} value={observaciones} onChange={e=>setObservaciones(e.target.value)} placeholder="Observaciones sobre la reserva"/></label>
         {(error||message)&&<div className="cr-nueva-reserva__mensaje" data-tipo={error?'error':'info'}>{error||message}</div>}
         <div className="cr-nueva-reserva__acciones"><button className="cr-button cr-button--primary" type="submit" disabled={saving}>{saving?'GUARDANDO...':'CREAR RESERVA'}</button></div>
       </form>
+      {calendarOpen && <div className="cr-fecha-picker" role="dialog" aria-modal="true" aria-label="Seleccionar fecha">
+        <button className="cr-fecha-picker__backdrop" type="button" aria-label="Cerrar calendario" onClick={()=>setCalendarOpen(false)}/>
+        <section className="cr-fecha-picker__panel">
+          <header className="cr-fecha-picker__header"><div><span>SELECCIONA UNA FECHA</span><strong>{formatDateES(calendarDraft)}</strong></div><button type="button" onClick={()=>setCalendarOpen(false)}>X</button></header>
+          <div className="cr-fecha-picker__nav"><button type="button" onClick={()=>setCalendarMonth(d=>new Date(d.getFullYear(),d.getMonth()-1,1))}>‹</button><strong>{calendarMonth.toLocaleDateString('es-ES',{month:'long',year:'numeric'}).toUpperCase()}</strong><button type="button" onClick={()=>setCalendarMonth(d=>new Date(d.getFullYear(),d.getMonth()+1,1))}>›</button></div>
+          <div className="cr-fecha-picker__week">{['L','M','X','J','V','S','D'].map(x=><span key={x}>{x}</span>)}</div>
+          <div className="cr-fecha-picker__grid">
+            {Array.from({length:(calendarMonth.getDay()+6)%7}).map((_,i)=><span key={'e'+i}/>)}
+            {Array.from({length:new Date(calendarMonth.getFullYear(),calendarMonth.getMonth()+1,0).getDate()}).map((_,i)=>{const d=i+1;const iso=isoDate(new Date(calendarMonth.getFullYear(),calendarMonth.getMonth(),d));const today=iso===todayMadrid();const selected=iso===calendarDraft;const past=iso<todayMadrid();return <button key={iso} type="button" disabled={past} className={(today?'today ':'')+(selected?'selected ':'')+(past?'past':'')} onClick={()=>setCalendarDraft(iso)}>{d}</button>})}
+          </div>
+          <div className="cr-fecha-picker__actions"><button type="button" onClick={()=>setCalendarOpen(false)}>CANCELAR</button><button type="button" onClick={()=>{setFecha(calendarDraft);setCalendarOpen(false)}}>ACEPTAR</button></div>
+        </section>
+      </div>}
     </div>
   </section>;
 }
