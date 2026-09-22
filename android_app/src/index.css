@@ -2118,79 +2118,77 @@ html.light .cr-nueva-reserva__rueda-item--cerca{color:#666!important}
 html.light .cr-busqueda-ficha__bloque--mesa strong{font-size:22px!important;color:#171717!important}
 
 
-/* ===== 1.0.022: selector fijo de hora/minutos + ocre uniforme en modo día ===== */
-/* La rueda ya no es una lista desplazable: siempre hay tres posiciones fijas:
-   anterior arriba, valor seleccionado en el centro, siguiente abajo. */
+/* ===== 1.0.023: rueda nativa V2 + turnos con un mínimo activo ===== */
 .cr-nueva-reserva__rueda{
   height:96px!important;
   min-height:96px!important;
-  display:grid!important;
-  grid-template-rows:repeat(3,32px)!important;
-  overflow:hidden!important;
+  display:block!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
   padding:0 8px!important;
   scroll-behavior:auto!important;
-  scroll-snap-type:none!important;
-  touch-action:none!important;
-  overscroll-behavior:none!important;
+  scroll-snap-type:y mandatory!important;
+  scrollbar-width:none!important;
+  -webkit-overflow-scrolling:touch!important;
+  touch-action:pan-y!important;
+  overscroll-behavior:contain!important;
+  user-select:none!important;
 }
+.cr-nueva-reserva__rueda::-webkit-scrollbar{display:none}
 .cr-nueva-reserva__rueda-item{
+  position:relative;
+  z-index:1;
+  display:grid!important;
+  place-items:center!important;
   height:32px!important;
   min-height:32px!important;
   margin:0!important;
   padding:0!important;
-  display:flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  overflow:hidden!important;
+  scroll-snap-align:center!important;
   line-height:1!important;
   transform:none!important;
-}
-.cr-nueva-reserva__rueda-item--cerca{
-  font-size:15px!important;
-  opacity:.72!important;
+  transition:transform 120ms ease,opacity 120ms ease,color 120ms ease,font-size 120ms ease!important;
 }
 .cr-nueva-reserva__rueda-item--actual{
   font-size:30px!important;
   font-weight:1000!important;
   opacity:1!important;
 }
+.cr-nueva-reserva__rueda-item--cerca{
+  font-size:15px!important;
+  opacity:.72!important;
+}
+.cr-nueva-reserva__rueda-item--lejos{
+  opacity:0!important;
+  transform:scale(.82)!important;
+}
+.cr-nueva-reserva__rueda-item--vacio{
+  color:transparent!important;
+  opacity:0!important;
+  pointer-events:none!important;
+}
 html.light .cr-nueva-reserva__rueda{
   background:#f7f5f0!important;
+  box-shadow:inset 0 22px 18px rgba(0,0,0,.10),inset 0 -22px 18px rgba(0,0,0,.10)!important;
 }
-html.light .cr-nueva-reserva__rueda-item--cerca{
-  color:#666!important;
+html.light .cr-nueva-reserva__rueda-item{color:#777!important}
+html.light .cr-nueva-reserva__rueda-item--actual{color:#171717!important}
+html.light .cr-nueva-reserva__rueda-item--cerca{color:#666!important}
+
+/* En modo día, un turno activo es ocre; uno desactivado es blanco. */
+html.light .turn-button:not(.selected){
+  background:#fff!important;
+  color:#8b6800!important;
+  border-color:#b89a42!important;
 }
-html.light .cr-nueva-reserva__rueda-item--actual{
-  color:#171717!important;
+html.light .turn-button.selected{
+  background:linear-gradient(145deg,#d2ad4d 0,#b88925 100%)!important;
+  color:#fff!important;
+  border-color:#b88925!important;
 }
 
-/* En modo día, el acento de esta pantalla es ocre, no amarillo. */
-html.light .cr-nueva-reserva__acciones .cr-button--primary,
-html.light .cr-buscar-reserva__boton{
-  background:#b89a42!important;
-  border-color:#a48735!important;
-  color:#fff!important;
-  box-shadow:none!important;
-}
-html.light .cr-nueva-reserva__acciones .cr-button--primary:hover,
-html.light .cr-buscar-reserva__boton:hover{
-  background:#a88b37!important;
-}
-html.light .cr-buscar-reserva__label,
-html.light .cr-buscar-reserva__boton,
-html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha__volver,
-html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha__contador span,
-html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha__codigo,
-html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha__bloque span,
-html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha__observaciones>span{
-  color:#8b6800!important;
-}
-html.light .cr-buscar-reserva__boton{
-  color:#fff!important;
-}
-html.light .cr-nueva-reserva__fecha-boton span{
-  color:#8b6800!important;
-}
-html.light .cr-nueva-reserva__panel .cr-button--primary{
-  text-shadow:none!important;
+/* En modo noche se mantiene el contraste oscuro del control desactivado. */
+html:not(.light) .turn-button:not(.selected){
+  background:#050505!important;
+  color:#ff9f1a!important;
 }
