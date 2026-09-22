@@ -3,6 +3,7 @@ import type { CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import FechaPicker from '../components/FechaPicker';
 
 type Turno = 'COMIDA' | 'CENA';
 type Zona = 'terraza' | 'salon' | 'chillout';
@@ -118,7 +119,8 @@ function normalizarMesasConfig(data: any[]) {
 export default function Mesas() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [fecha] = useState(todayMadrid);
+  const [fecha, setFecha] = useState(todayMadrid());
+  const [calendarOpen, setCalendarOpen] = useState(false);
   const [turno, setTurno] = useState<Turno>('COMIDA');
   const [zona, setZona] = useState<Zona>('salon');
   const [reservas, setReservas] = useState<Reserva[]>([]);
@@ -238,7 +240,7 @@ export default function Mesas() {
           <button type="button" className="cr-planos-mesas__cerrar" onClick={() => navigate('/')}>CERRAR</button>
         </header>
 
-        <div className="cr-planos-mesas__fecha">📅 {formatHeaderDate(fecha)}</div>
+        <button className="cr-planos-mesas__fecha" type="button" onClick={() => setCalendarOpen(true)} aria-label="Cambiar fecha">📅 {formatHeaderDate(fecha)}</button>
 
         <div className="cr-planos-mesas__turnos" role="tablist" aria-label="Turnos">
           <button type="button" className={turno === 'COMIDA' ? 'activo' : ''} onClick={() => setTurno('COMIDA')}>☀ COMIDA</button>
@@ -352,4 +354,4 @@ export default function Mesas() {
       )}
     </section>
   );
-}
+}      {calendarOpen && <FechaPicker value={fecha} onChange={setFecha} onClose={() => setCalendarOpen(false)} />}\n
