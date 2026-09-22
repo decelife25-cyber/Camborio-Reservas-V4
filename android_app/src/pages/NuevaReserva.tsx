@@ -165,7 +165,7 @@ export default function NuevaReserva(){
       </form>
       {calendarOpen && <FechaPicker value={fecha} onChange={setFecha} onClose={() => setCalendarOpen(false)} />}
     </div>
-  </section>;ef, useState } from 'react';
+  </section>;
 import { supabase } from '../lib/supabase';
 import FechaPicker from '../components/FechaPicker';
 import { getTurnoFromHora } from '../utils/shifts';
