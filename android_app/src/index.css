@@ -2192,3 +2192,29 @@ html:not(.light) .turn-button:not(.selected){
   background:#050505!important;
   color:#ff9f1a!important;
 }
+
+/* ===== 1.0.024: acento ocre unificado en modo día ===== */
+html.light .cr-nueva-reserva__acciones .cr-button,
+html.light .cr-nueva-reserva__acciones .cr-button--primary{
+  background:#b89a42!important;
+  border-color:#a48735!important;
+  color:#fff!important;
+  box-shadow:none!important;
+}
+html.light .cr-buscar-reserva__boton{
+  background:#b89a42!important;
+  border-color:#a48735!important;
+  color:#fff!important;
+  box-shadow:none!important;
+}
+html.light .cr-observaciones-modal__cerrar{
+  background:#b89a42!important;
+  border-color:#a48735!important;
+  color:#fff!important;
+  box-shadow:none!important;
+}
+html.light .observation-button{
+  background:#b89a42!important;
+  border-color:#a48735!important;
+  color:#fff!important;
+}
