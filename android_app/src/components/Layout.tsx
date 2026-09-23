@@ -26,6 +26,9 @@ export default function Layout() {
     setDarkMode(isDark);
     document.documentElement.classList.toggle('dark', isDark);
     document.documentElement.classList.toggle('light', !isDark);
+    const syncTheme = () => setDarkMode(localStorage.getItem('theme') !== 'light');
+    window.addEventListener('camborio-theme-change', syncTheme);
+    return () => window.removeEventListener('camborio-theme-change', syncTheme);
   }, []);
 
   useEffect(() => {
