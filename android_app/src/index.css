@@ -2718,7 +2718,7 @@ html.light .cr-config-modal__theme{
   display:block;
   overflow:hidden;
   background:#020202;
-  padding:72px 0 150px;
+  padding:0;
 }
 .cr-horarios-fullscreen__surface{
   box-sizing:border-box;
