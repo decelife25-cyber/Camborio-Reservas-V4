@@ -2511,28 +2511,119 @@ button{font:inherit;text-transform:uppercase;color:inherit;border:0;cursor:point
 @media(max-width:620px){.cr-button{min-height:74px;padding:8px 2px;flex-direction:column;gap:5px;font-size:var(--cr-text-button);line-height:1.05}.cr-button span{font-size:30px}}
 
 
+/* V4.040 — Horarios: misma escala visual que V2 + adaptación día. */
+/*
+ * V2 ocupa visualmente ~550 px de ancho en el mismo dispositivo.
+ * En V4 la calibración global actual (0.57) estaba reduciendo esta
+ * pantalla a ~392 px. Se corrige SOLO la pantalla de Configuración:
+ * el origen superior mantiene la posición y la escala recupera la
+ * proporción observada en V2 sin tocar el resto de la aplicación.
+ */
+.cr-config-modal__box{
+  /*
+   * V2 has a ~760px CSS panel. The Android WebView viewport is ~390px,
+   * so the panel must be wider in CSS but MUST NOT scale its contents.
+   * The previous 1.403 transform enlarged every control and was the
+   * reason the V4 table squares/rows were much larger than V2.
+   */
+  width:min(760px,140.3vw);
+  transform:none;
+  transform-origin:initial;
+}
+
 /* Modo DÍA: misma geometría V2; solo se adapta el contraste para fondo claro. */
-html.light .cr-config-modal{background:#fff}
-html.light .cr-config-modal__box{background:#fff;color:#111;border-color:#b89a42;box-shadow:0 20px 50px rgba(0,0,0,.18)}
-html.light .cr-config-modal__header h2{color:#111}
-html.light .cr-config-modal__close{background:#f2f0eb;color:#222;border-color:#c9c5bd}
-html.light .cr-config-horarios h3,html.light .cr-horario-form h3{color:#8b6800}
-html.light .cr-horario-bloque{background:#f7f5f0;border-color:#d4d0c8}
-html.light .cr-horario-bloque[data-servicio=COMIDA] h4{color:#a56f00}
-html.light .cr-horario-bloque[data-servicio=CENA] h4{color:#3f6fae}
-html.light .cr-horario-margen-servicio{color:#444}
-html.light .cr-horario-margen-servicio input{background:#fff;color:#111;border-color:#aaa}
-html.light .cr-horario-matriz{color:#111}
-html.light .cr-horario-matriz th{background:#eee;color:#555}
-html.light .cr-horario-matriz .cr-horario-col-hora{background:#f5f3ef;color:#111}
-html.light .cr-horario-matriz thead .cr-horario-col-hora{background:#eee}
-html.light .cr-horario-col-lunes{background:#fafafa;color:#777}
-html.light .cr-horario-matriz th,html.light .cr-horario-matriz td{border-bottom-color:#d8d5cf}
-html.light .cr-horario-hora{color:#111}
-html.light .cr-horario-form label{color:#444}
-html.light .cr-horario-form input[type=time]{background:#fff;color:#111;border-color:#bbb}
-html.light .cr-horario-confirmar{background:#fff;border-color:#aaa;box-shadow:0 0 0 100vmax rgba(0,0,0,.35)}
-html.light .cr-horario-confirmar p{color:#111}
+html.light .cr-config-modal{
+  background:#fff;
+}
+html.light .cr-config-modal__box{
+  background:#fff;
+  color:#111;
+  border-color:#b89a42;
+  box-shadow:0 20px 50px rgba(0,0,0,.18);
+}
+html.light .cr-config-modal__header h2{
+  color:#111;
+}
+html.light .cr-config-modal__close{
+  background:#f2f0eb;
+  color:#222;
+  border-color:#c9c5bd;
+}
+html.light .cr-config-parametros h3,
+html.light .cr-config-proximamente h3,
+html.light .cr-config-horarios h3,
+html.light .cr-horario-form h3{
+  color:#8b6800;
+}
+html.light .cr-horario-bloque{
+  background:#f7f5f0;
+  border-color:#d4d0c8;
+}
+html.light .cr-horario-bloque[data-servicio=COMIDA] h4{
+  color:#a56f00;
+}
+html.light .cr-horario-bloque[data-servicio=CENA] h4{
+  color:#3f6fae;
+}
+html.light .cr-horario-margen-servicio{
+  color:#444;
+}
+html.light .cr-horario-margen-servicio input{
+  background:#fff;
+  color:#111;
+  border-color:#aaa;
+}
+html.light .cr-horario-matriz{
+  color:#111;
+}
+html.light .cr-horario-matriz th{
+  background:#eee;
+  color:#555;
+}
+html.light .cr-horario-matriz .cr-horario-col-hora{
+  background:#f5f3ef;
+  color:#111;
+}
+html.light .cr-horario-matriz thead .cr-horario-col-hora{
+  background:#eee;
+}
+html.light .cr-horario-col-lunes{
+  background:#fafafa;
+  color:#777;
+}
+html.light .cr-horario-matriz th,
+html.light .cr-horario-matriz td{
+  border-bottom-color:#d8d5cf;
+}
+html.light .cr-horario-hora{
+  color:#111;
+}
+html.light .cr-config-parametros label,
+html.light .cr-horario-form label{
+  color:#444;
+}
+html.light .cr-config-parametros input,
+html.light .cr-horario-form input[type=time]{
+  background:#fff;
+  color:#111;
+  border-color:#bbb;
+}
+html.light .cr-horario-confirmar{
+  background:#fff;
+  border-color:#aaa;
+  box-shadow:0 0 0 100vmax rgba(0,0,0,.35);
+}
+html.light .cr-horario-confirmar p{
+  color:#111;
+}
+html.light .cr-config-mensaje{
+  color:#168a49;
+}
+html.light .cr-config-mensaje[data-tipo=error]{
+  color:#b51f2d;
+}
+
+
 /* CONFIRMACIÓN DE CIERRE DE SESIÓN — evita cierres accidentales. */
 .logout-confirm-overlay{position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;background:rgba(0,0,0,.82)}
 .logout-confirm-modal{width:min(460px,calc(100vw - 36px));box-sizing:border-box;padding:20px 18px 16px;border:1px solid #ffc400;border-radius:10px;background:linear-gradient(180deg,#181818,#080808);box-shadow:0 18px 50px rgba(0,0,0,.7);text-align:center}

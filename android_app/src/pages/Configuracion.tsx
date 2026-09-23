@@ -3,91 +3,30 @@ import HorarioConfiguracion from '../components/HorarioConfiguracion';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 
-type Vista='menu'|'parametros'|'horarios'|'formulario'|'confirmar'|'mesas';
-type Servicio='COMIDA'|'CENA';
-type Dia='Lunes'|'Martes'|'Miércoles'|'Jueves'|'Viernes'|'Sábado'|'Domingo';
-const DIAS:Array<{nombre:Dia;corto:string}>=[
- {nombre:'Lunes',corto:'LUN'},{nombre:'Martes',corto:'MAR'},{nombre:'Miércoles',corto:'MIÉ'},
- {nombre:'Jueves',corto:'JUE'},{nombre:'Viernes',corto:'VIE'},{nombre:'Sábado',corto:'SÁB'},{nombre:'Domingo',corto:'DOM'}
-];
-type Horario={DiaSemana:string;Servicio:Servicio;Hora:string;MargenHoras:number|null;Activo:boolean};
+type Vista='menu'|'parametros'|'horarios'|'mesas';
 const defaultParametros={TelefonoReservas:'956254532',TelefonoPrincipal:'956254532',HORA_CORTE_COMIDA_CENA:'18:00'};
-const mins=(h:string)=>{const p=h.slice(0,5).split(':').map(Number);return (p[0]||0)*60+(p[1]||0)};
-const normalDia=(v:string):Dia=>{const s=String(v||'').trim().toLowerCase();const d=DIAS.find(x=>x.nombre.toLowerCase()===s);return d?.nombre||(String(v||'') as Dia)};
-const hora=(v:string)=>String(v||'').slice(0,5);
-
 export default function Configuracion(){
+ const navigate=useNavigate();
  const navigate=useNavigate();
  const [vista,setVista]=useState<Vista>('menu');
  const [param,setParam]=useState(defaultParametros);
- const [horarios,setHorarios]=useState<Horario[]>([]);
- const [inicial,setInicial]=useState<Horario[]>([]);
- const [margenes,setMargenes]=useState<Record<Servicio,number|null>>({COMIDA:null,CENA:null});
- const [incons,setIncons]=useState<Record<Servicio,number[]>>({COMIDA:[],CENA:[]});
- const [eliminaciones,setEliminaciones]=useState<Array<{Servicio:Servicio;Hora:string}>>([]);
- const [servicioNuevo,setServicioNuevo]=useState<Servicio|null>(null);
- const [horaNueva,setHoraNueva]=useState('');
- const [diasNuevos,setDiasNuevos]=useState<Record<Dia,boolean>>({Lunes:false,Martes:true,Miércoles:true,Jueves:true,Viernes:true,Sábado:true,Domingo:true});
- const [pendiente,setPendiente]=useState<{Servicio:Servicio;Hora:string}|null>(null);
  const [mensaje,setMensaje]=useState(''); const [error,setError]=useState(false);
  const [cargando,setCargando]=useState(false); const [guardando,setGuardando]=useState(false);
-
- const mostrar=(m:string,e=false)=>{setMensaje(m);setError(e)};
- const ocultar=()=>setMensaje('');
-
+ const mostrar=(m:string,e=false)=>{setMensaje(m);setError(e)}; const ocultar=()=>{setMensaje('');setError(false)};
  const cargarParametros=async()=>{
-  setCargando(true); ocultar();
-  const {data,error}=await supabase.from('Configuracion').select('Parametro,Valor');
-  if(error){setParam(defaultParametros);mostrar('No se pudieron cargar los parámetros.',true)}
-  else{const p={...defaultParametros};(data||[]).forEach((r:any)=>{if(r.Parametro in p&&r.Valor!=null)(p as any)[r.Parametro]=String(r.Valor).slice(0,5)==='00:00'&&String(r.Valor).length>5?String(r.Valor).slice(0,5):String(r.Valor)});setParam(p)}
-  setCargando(false);
- };
- const cargarHorarios=async()=>{
   setCargando(true);ocultar();
-  const {data,error}=await supabase.from('Horarios').select('DiaSemana,Servicio,Hora,MargenHoras,Activo');
-  if(error){setHorarios([]);setInicial([]);setMargenes({COMIDA:null,CENA:null});mostrar('No se pudieron cargar los horarios.',true);setCargando(false);return}
-  const rows:(Horario[])=(data||[]).map((r:any)=>({DiaSemana:normalDia(r.DiaSemana),Servicio:String(r.Servicio).toUpperCase() as Servicio,Hora:hora(r.Hora),MargenHoras:r.MargenHoras==null?null:Number(r.MargenHoras),Activo:Boolean(r.Activo)}));
-  rows.sort((a,b)=>{const s=['COMIDA','CENA'].indexOf(a.Servicio)-['COMIDA','CENA'].indexOf(b.Servicio);return s||mins(a.Hora)-mins(b.Hora)||a.DiaSemana.localeCompare(b.DiaSemana)});
-  setHorarios(rows);setInicial(rows.map(r=>({...r})));
-  const mm:{COMIDA:number[];CENA:number[]}={COMIDA:[],CENA:[]};
-  rows.forEach(r=>{if(r.MargenHoras!=null&&!mm[r.Servicio].includes(r.MargenHoras))mm[r.Servicio].push(r.MargenHoras)});
-  mm.COMIDA.sort((a,b)=>a-b);mm.CENA.sort((a,b)=>a-b);
-  setIncons(mm);setMargenes({COMIDA:mm.COMIDA.length===1?mm.COMIDA[0]:mm.COMIDA.length?null:3,CENA:mm.CENA.length===1?mm.CENA[0]:mm.CENA.length?null:3});
+  const {data,error:e}=await supabase.from('Configuracion').select('Parametro,Valor');
+  if(e){setParam(defaultParametros);mostrar('No se pudieron cargar los parámetros.',true)}
+  else{const p={...defaultParametros};(data||[]).forEach((r:any)=>{if(r.Parametro in p&&r.Valor!=null)(p as any)[r.Parametro]=String(r.Valor).slice(0,5)==='00:00'&&String(r.Valor).length>5?String(r.Valor).slice(0,5):String(r.Valor)});setParam(p)}
   setCargando(false);
  };
  const guardarParametros=async()=>{
   setGuardando(true);ocultar();
-  try{for(const [Parametro,Valor] of Object.entries(param)){
-   const {data,error:e}=await supabase.from('Configuracion').select('Parametro').eq('Parametro',Parametro).limit(1);if(e)throw e;
-   if(data?.length){const {error:e2}=await supabase.from('Configuracion').update({Valor}).eq('Parametro',Parametro);if(e2)throw e2}
-   else{const {error:e2}=await supabase.from('Configuracion').insert({Parametro,Valor});if(e2)throw e2}
-  }mostrar('Parámetros guardados correctamente.')}catch(e){console.error(e);mostrar('No se pudieron guardar los parámetros.',true)}finally{setGuardando(false)}
+  try{for(const [Parametro,Valor] of Object.entries(param)){const q=await supabase.from('Configuracion').select('Parametro').eq('Parametro',Parametro).limit(1);if(q.error)throw q.error;if(q.data?.length){const u=await supabase.from('Configuracion').update({Valor}).eq('Parametro',Parametro);if(u.error)throw u.error}else{const i=await supabase.from('Configuracion').insert({Parametro,Valor});if(i.error)throw i.error}}mostrar('Parámetros guardados correctamente.')}
+  catch(e){console.error(e);mostrar('No se pudieron guardar los parámetros.',true)}
+  finally{setGuardando(false)}
  };
- const cambiar=(s:Servicio,h:string,d:Dia,v:boolean)=>setHorarios(x=>x.map(r=>r.Servicio===s&&r.Hora===h&&r.DiaSemana===d?{...r,Activo:v}:r));
- const filas=(s:Servicio)=>Array.from(new Set(horarios.filter(r=>r.Servicio===s).map(r=>r.Hora))).sort((a,b)=>mins(a)-mins(b));
- const activo=(s:Servicio,h:string,d:Dia)=>horarios.find(r=>r.Servicio===s&&r.Hora===h&&r.DiaSemana===d)?.Activo??false;
- const eliminarHora=()=>{if(!pendiente)return;setEliminaciones(e=>[...e,pendiente]);setHorarios(h=>h.filter(r=>!(r.Servicio===pendiente.Servicio&&r.Hora===pendiente.Hora)));setPendiente(null)};
- const guardarHorarios=async()=>{
-  if(incons.COMIDA.length>1||incons.CENA.length>1){mostrar('No se sobrescribirán márgenes distintos sin una regla de migración confirmada.',true);return}
-  if(margenes.COMIDA==null||margenes.CENA==null||margenes.COMIDA<0||margenes.CENA<0||margenes.COMIDA>999.99||margenes.CENA>999.99){mostrar('Indica una antelación mínima válida para COMIDA y CENA.',true);return}
-  setGuardando(true);ocultar();
-  try{
-   const cambios:Horario[]=[];const old=new Map(inicial.map(r=>[r.DiaSemana+'|'+r.Servicio+'|'+r.Hora,r]));
-   horarios.forEach(r=>{const item={...r,MargenHoras:margenes[r.Servicio]};const prev=old.get(r.DiaSemana+'|'+r.Servicio+'|'+r.Hora);if(!prev||prev.Activo!==r.Activo||prev.MargenHoras!==item.MargenHoras)cambios.push(item)});
-   for(const r of cambios){
-    const {data,error:e}=await supabase.from('Horarios').select('DiaSemana').eq('DiaSemana',r.DiaSemana).eq('Servicio',r.Servicio).eq('Hora',r.Hora+':00').limit(1);if(e)throw e;
-    if(data?.length){const {error:e2}=await supabase.from('Horarios').update({Activo:r.Activo,MargenHoras:r.MargenHoras}).eq('DiaSemana',r.DiaSemana).eq('Servicio',r.Servicio).eq('Hora',r.Hora+':00');if(e2)throw e2}
-    else{const {error:e2}=await supabase.from('Horarios').insert({DiaSemana:r.DiaSemana,Servicio:r.Servicio,Hora:r.Hora+':00',MargenHoras:r.MargenHoras,Activo:r.Activo});if(e2)throw e2}
-   }
-   for(const e of eliminaciones){const {error:e2}=await supabase.from('Horarios').delete().eq('Servicio',e.Servicio).eq('Hora',e.Hora+':00');if(e2)throw e2}
-   setEliminaciones([]);await cargarHorarios();mostrar('Horarios guardados correctamente.')
-  }catch(e){console.error(e);mostrar('No se pudieron guardar los horarios.',true)}finally{setGuardando(false)}
- };
- const inconsistencia=useMemo(()=>{const a=(['COMIDA','CENA'] as Servicio[]).filter(s=>incons[s].length>1).map(s=>s+': '+incons[s].join(' h, ')+' h');return a.length?'No se guardará ningún cambio: existen márgenes distintos en '+a.join('; ')+'. Confirma primero una regla de migración.':''},[incons]);
-
- const abrirNuevo=(s:Servicio)=>{setServicioNuevo(s);setHoraNueva(s==='COMIDA'?'12:30':'20:30');setDiasNuevos({Lunes:false,Martes:true,Miércoles:true,Jueves:true,Viernes:true,Sábado:true,Domingo:true});setVista('formulario');ocultar()};
- const anadir=()=>{if(!servicioNuevo)return;if(!/^\d{2}:\d{2}$/.test(horaNueva)||mins(horaNueva)%15!==0){mostrar('Selecciona una hora en intervalos de 15 minutos.',true);return}if(filas(servicioNuevo).includes(horaNueva)){mostrar('Ya existe una hora igual para ese servicio.',true);return}const nuevos=DIAS.map(d=>({DiaSemana:d.nombre,Servicio:servicioNuevo,Hora:horaNueva,MargenHoras:margenes[servicioNuevo],Activo:diasNuevos[d.nombre]}));setHorarios(h=>[...h,...nuevos]);setServicioNuevo(null);setVista('horarios');ocultar()};
- useEffect(()=>{if(vista==='parametros')void cargarParametros();if(vista==='horarios')void cargarHorarios()},[vista]);
+ useEffect(()=>{if(vista==='parametros')void cargarParametros()},[vista]);
 
  return <div className="cr-config-modal" role="dialog" aria-modal="true" aria-labelledby="cr-configuracion-titulo">
   <div className="cr-config-modal__box">
