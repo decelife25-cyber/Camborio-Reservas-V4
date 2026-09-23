@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import HorarioConfiguracion from '../components/HorarioConfiguracion';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
@@ -6,7 +6,6 @@ import { supabase } from '../lib/supabase';
 type Vista='menu'|'parametros'|'horarios'|'mesas';
 const defaultParametros={TelefonoReservas:'956254532',TelefonoPrincipal:'956254532',HORA_CORTE_COMIDA_CENA:'18:00'};
 export default function Configuracion(){
- const navigate=useNavigate();
  const navigate=useNavigate();
  const [vista,setVista]=useState<Vista>('menu');
  const [param,setParam]=useState(defaultParametros);
