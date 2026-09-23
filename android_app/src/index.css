@@ -2639,3 +2639,81 @@ html.light .logout-confirm-modal h2{color:#8b6800}
 html.light .logout-confirm-modal p{color:#222}
 html.light .logout-confirm-cancel{background:#f2f0eb;border-color:#c9c5bd;color:#222}
 html.light .logout-confirm-accept{background:#a52b33;border-color:#8f2029;color:#fff}
+
+
+/* HORARIOS — pantalla completa con cabecera fija y scroll solo en el contenido. */
+.cr-config-modal--horarios{
+  align-items:stretch;
+  justify-content:stretch;
+  padding:0;
+}
+.cr-config-modal--horarios .cr-config-modal__box{
+  width:100%;
+  height:100dvh;
+  max-height:none;
+  padding:0;
+  border:0;
+  border-radius:0;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+.cr-config-modal--horarios .cr-config-modal__header{
+  flex:0 0 auto;
+  position:relative;
+  z-index:20;
+  margin:0;
+  padding:10px 10px 10px;
+  min-height:68px;
+  box-sizing:border-box;
+  background:#050505;
+  border-bottom:1px solid #292929;
+}
+.cr-config-modal--horarios .cr-config-modal__header-actions{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex:0 0 auto;
+}
+.cr-config-modal__theme{
+  width:48px;
+  min-height:48px;
+  border:1px solid var(--cr-line);
+  border-radius:8px;
+  background:#141414;
+  color:#ffc400;
+  display:grid;
+  place-items:center;
+}
+.cr-config-modal--horarios .cr-config-horarios,
+.cr-config-modal--horarios .cr-horario-form{
+  flex:1 1 auto;
+  min-height:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding:10px;
+  box-sizing:border-box;
+  align-content:start;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+html.light .cr-config-modal--horarios .cr-config-modal__header{
+  background:#fff;
+  border-bottom-color:#d4d0c8;
+}
+html.light .cr-config-modal__theme{
+  background:#f2f0eb;
+  color:#8b6800;
+  border-color:#c9c5bd;
+}
+@media(max-width:620px){
+  .cr-config-modal--horarios{
+    padding:0;
+  }
+  .cr-config-modal--horarios .cr-config-modal__box{
+    width:100%;
+    height:100dvh;
+    max-height:none;
+    padding:0;
+  }
+}
