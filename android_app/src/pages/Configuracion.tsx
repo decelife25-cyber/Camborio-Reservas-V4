@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Moon, Sun } from 'lucide-react';
 import HorarioConfiguracion from '../components/HorarioConfiguracion';
 import { useNavigate } from 'react-router-dom';
@@ -41,7 +42,7 @@ export default function Configuracion(){
   window.dispatchEvent(new Event('camborio-theme-change'));
  };
 
- return <div className={`cr-config-modal ${vista==='horarios'?'cr-config-modal--horarios':''}`} role="dialog" aria-modal="true" aria-labelledby="cr-configuracion-titulo">
+ const contenido=<div className={`cr-config-modal ${vista==='horarios'?'cr-config-modal--horarios':''}`} role="dialog" aria-modal="true" aria-labelledby="cr-configuracion-titulo">
   <div className="cr-config-modal__box">
    <div className="cr-config-modal__header"><h2 id="cr-configuracion-titulo">⚙ CONFIGURACIÓN</h2><div className="cr-config-modal__header-actions"><button className="cr-config-modal__theme" type="button" onClick={toggleDarkMode} aria-label="Cambiar modo día/noche" title="Modo día/noche">{darkMode?<Sun size={22}/>:<Moon size={22}/>}</button><button className="cr-config-modal__close" type="button" onClick={()=>navigate('/')}>×</button></div></div>
    {vista==='menu'&&<section className="cr-config-menu">
@@ -61,4 +62,5 @@ export default function Configuracion(){
    {vista==='mesas'&&<section className="cr-config-proximamente"><h3>🍽 MESAS</h3><p>PRÓXIMAMENTE</p><button className="cr-button cr-button--dark" type="button" onClick={()=>setVista('menu')}>← VOLVER</button></section>}
   </div>
  </div>;
+ return createPortal(contenido, document.body);
 }
