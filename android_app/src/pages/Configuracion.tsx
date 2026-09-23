@@ -2,124 +2,130 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 
-type Vista = 'menu' | 'parametros' | 'horarios' | 'mesas';
-type Servicio = 'COMIDA' | 'CENA';
-type Dia = 'Lunes'|'Martes'|'Miércoles'|'Jueves'|'Viernes'|'Sábado'|'Domingo';
-const DIAS:{nombre:Dia;corto:string}[]=[
+type Vista='menu'|'parametros'|'horarios'|'formulario'|'confirmar'|'mesas';
+type Servicio='COMIDA'|'CENA';
+type Dia='Lunes'|'Martes'|'Miércoles'|'Jueves'|'Viernes'|'Sábado'|'Domingo';
+const DIAS:Array<{nombre:Dia;corto:string}>=[
  {nombre:'Lunes',corto:'LUN'},{nombre:'Martes',corto:'MAR'},{nombre:'Miércoles',corto:'MIÉ'},
  {nombre:'Jueves',corto:'JUE'},{nombre:'Viernes',corto:'VIE'},{nombre:'Sábado',corto:'SÁB'},{nombre:'Domingo',corto:'DOM'}
 ];
-type Fila={Servicio:Servicio;Hora:string;dias:Record<Dia,boolean>};
-type Row={DiaSemana:string;Servicio:Servicio;Hora:string;MargenHoras:number|string|null;Activo:boolean};
-const DEFAULT={TelefonoReservas:'956254532',TelefonoPrincipal:'956254532',HORA_CORTE_COMIDA_CENA:'18:00'};
-const emptyDays=()=>Object.fromEntries(DIAS.map(d=>[d.nombre,false])) as Record<Dia,boolean>;
-const mins=(h:string)=>{const [a,b]=h.slice(0,5).split(':').map(Number);return (a||0)*60+(b||0)};
-const group=(rows:Row[])=>{
- const m:Record<string,Fila>={};
- rows.forEach(r=>{const h=String(r.Hora).slice(0,5),k=r.Servicio+'|'+h;
-  if(!m[k])m[k]={Servicio:r.Servicio,Hora:h,dias:emptyDays()};
-  if(DIAS.some(d=>d.nombre===r.DiaSemana))m[k].dias[r.DiaSemana as Dia]=!!r.Activo;
- });
- return Object.values(m).sort((a,b)=>a.Servicio===b.Servicio?mins(a.Hora)-mins(b.Hora):a.Servicio==='COMIDA'?-1:1);
-};
+type Horario={DiaSemana:string;Servicio:Servicio;Hora:string;MargenHoras:number|null;Activo:boolean};
+const defaultParametros={TelefonoReservas:'956254532',TelefonoPrincipal:'956254532',HORA_CORTE_COMIDA_CENA:'18:00'};
+const mins=(h:string)=>{const p=h.slice(0,5).split(':').map(Number);return (p[0]||0)*60+(p[1]||0)};
+const normalDia=(v:string):Dia=>{const s=String(v||'').trim().toLowerCase();const d=DIAS.find(x=>x.nombre.toLowerCase()===s);return d?.nombre||(String(v||'') as Dia)};
+const hora=(v:string)=>String(v||'').slice(0,5);
 
 export default function Configuracion(){
  const navigate=useNavigate();
  const [vista,setVista]=useState<Vista>('menu');
- const [param,setParam]=useState(DEFAULT);
- const [filas,setFilas]=useState<Fila[]>([]);
- const [inicial,setInicial]=useState<Fila[]>([]);
- const [margen,setMargen]=useState<Record<Servicio,number|null>>({COMIDA:null,CENA:null});
+ const [param,setParam]=useState(defaultParametros);
+ const [horarios,setHorarios]=useState<Horario[]>([]);
+ const [inicial,setInicial]=useState<Horario[]>([]);
+ const [margenes,setMargenes]=useState<Record<Servicio,number|null>>({COMIDA:null,CENA:null});
  const [incons,setIncons]=useState<Record<Servicio,number[]>>({COMIDA:[],CENA:[]});
- const [eliminadas,setEliminadas]=useState<{Servicio:Servicio;Hora:string}[]>([]);
- const [nuevo,setNuevo]=useState<Servicio|null>(null);
- const [nuevaHora,setNuevaHora]=useState('12:30');
- const [diasNuevos,setDiasNuevos]=useState<Record<Dia,boolean>>({...emptyDays(),Martes:true,Miércoles:true,Jueves:true,Viernes:true,Sábado:true,Domingo:true});
- const [eliminar,setEliminar]=useState<{Servicio:Servicio;Hora:string}|null>(null);
- const [loading,setLoading]=useState(false),[saving,setSaving]=useState(false),[msg,setMsg]=useState(''),[err,setErr]=useState(false);
+ const [eliminaciones,setEliminaciones]=useState<Array<{Servicio:Servicio;Hora:string}>>([]);
+ const [servicioNuevo,setServicioNuevo]=useState<Servicio|null>(null);
+ const [horaNueva,setHoraNueva]=useState('');
+ const [diasNuevos,setDiasNuevos]=useState<Record<Dia,boolean>>({Lunes:false,Martes:true,Miércoles:true,Jueves:true,Viernes:true,Sábado:true,Domingo:true});
+ const [pendiente,setPendiente]=useState<{Servicio:Servicio;Hora:string}|null>(null);
+ const [mensaje,setMensaje]=useState(''); const [error,setError]=useState(false);
+ const [cargando,setCargando]=useState(false); const [guardando,setGuardando]=useState(false);
 
- const message=(s:string,e=false)=>{setMsg(s);setErr(e)};
- const loadParams=async()=>{
-  setLoading(true);message('');
+ const mostrar=(m:string,e=false)=>{setMensaje(m);setError(e)};
+ const ocultar=()=>setMensaje('');
+
+ const cargarParametros=async()=>{
+  setCargando(true); ocultar();
   const {data,error}=await supabase.from('Configuracion').select('Parametro,Valor');
-  if(error)message('No se pudieron cargar los parámetros.',true);
-  else{const p={...DEFAULT};(data||[]).forEach((r:any)=>{if(r.Parametro in p&&r.Valor!=null)(p as any)[r.Parametro]=String(r.Valor)});setParam(p);}
-  setLoading(false);
+  if(error){setParam(defaultParametros);mostrar('No se pudieron cargar los parámetros.',true)}
+  else{const p={...defaultParametros};(data||[]).forEach((r:any)=>{if(r.Parametro in p&&r.Valor!=null)(p as any)[r.Parametro]=String(r.Valor).slice(0,5)==='00:00'&&String(r.Valor).length>5?String(r.Valor).slice(0,5):String(r.Valor)});setParam(p)}
+  setCargando(false);
  };
- const openParams=()=>{setVista('parametros');void loadParams()};
- const saveParams=async()=>{
-  setSaving(true);message('');
+ const cargarHorarios=async()=>{
+  setCargando(true);ocultar();
+  const {data,error}=await supabase.from('Horarios').select('DiaSemana,Servicio,Hora,MargenHoras,Activo');
+  if(error){setHorarios([]);setInicial([]);setMargenes({COMIDA:null,CENA:null});mostrar('No se pudieron cargar los horarios.',true);setCargando(false);return}
+  const rows:(Horario[])=(data||[]).map((r:any)=>({DiaSemana:normalDia(r.DiaSemana),Servicio:String(r.Servicio).toUpperCase() as Servicio,Hora:hora(r.Hora),MargenHoras:r.MargenHoras==null?null:Number(r.MargenHoras),Activo:Boolean(r.Activo)}));
+  rows.sort((a,b)=>{const s=['COMIDA','CENA'].indexOf(a.Servicio)-['COMIDA','CENA'].indexOf(b.Servicio);return s||mins(a.Hora)-mins(b.Hora)||a.DiaSemana.localeCompare(b.DiaSemana)});
+  setHorarios(rows);setInicial(rows.map(r=>({...r})));
+  const mm:{COMIDA:number[];CENA:number[]}={COMIDA:[],CENA:[]};
+  rows.forEach(r=>{if(r.MargenHoras!=null&&!mm[r.Servicio].includes(r.MargenHoras))mm[r.Servicio].push(r.MargenHoras)});
+  mm.COMIDA.sort((a,b)=>a-b);mm.CENA.sort((a,b)=>a-b);
+  setIncons(mm);setMargenes({COMIDA:mm.COMIDA.length===1?mm.COMIDA[0]:mm.COMIDA.length?null:3,CENA:mm.CENA.length===1?mm.CENA[0]:mm.CENA.length?null:3});
+  setCargando(false);
+ };
+ const guardarParametros=async()=>{
+  setGuardando(true);ocultar();
   try{for(const [Parametro,Valor] of Object.entries(param)){
-   const {data,error}=await supabase.from('Configuracion').select('Parametro').eq('Parametro',Parametro).limit(1);if(error)throw error;
-   if(data?.length){const {error:e}=await supabase.from('Configuracion').update({Valor}).eq('Parametro',Parametro);if(e)throw e}
-   else{const {error:e}=await supabase.from('Configuracion').insert({Parametro,Valor});if(e)throw e}
-  }message('Parámetros guardados correctamente.')}catch(e){console.error(e);message('No se pudieron guardar los parámetros.',true)}finally{setSaving(false)}
+   const {data,error:e}=await supabase.from('Configuracion').select('Parametro').eq('Parametro',Parametro).limit(1);if(e)throw e;
+   if(data?.length){const {error:e2}=await supabase.from('Configuracion').update({Valor}).eq('Parametro',Parametro);if(e2)throw e2}
+   else{const {error:e2}=await supabase.from('Configuracion').insert({Parametro,Valor});if(e2)throw e2}
+  }mostrar('Parámetros guardados correctamente.')}catch(e){console.error(e);mostrar('No se pudieron guardar los parámetros.',true)}finally{setGuardando(false)}
  };
- const loadHours=async(text='')=>{
-  setLoading(true);message('');
-  const {data,error}=await supabase.from('Horarios').select('DiaSemana,Servicio,Hora,MargenHoras,Activo').order('Hora',{ascending:true});
-  if(error){message('No se pudieron cargar los horarios.',true);setLoading(false);return}
-  const rows=(data||[]) as Row[], fs=group(rows);setFilas(fs);setInicial(fs.map(f=>({...f,dias:{...f.dias}})));
-  const mm={COMIDA:[] as number[],CENA:[] as number[]};
-  rows.forEach(r=>{const n=Number(r.MargenHoras);if(!mm[r.Servicio].includes(n))mm[r.Servicio].push(n)});
-  (['COMIDA','CENA'] as Servicio[]).forEach(s=>mm[s].sort((a,b)=>a-b));
-  setIncons(mm);setMargen({COMIDA:mm.COMIDA.length===1?mm.COMIDA[0]:mm.COMIDA.length?null:2,CENA:mm.CENA.length===1?mm.CENA[0]:mm.CENA.length?null:2});
-  setLoading(false);if(text)message(text);
- };
- const openHours=()=>{setVista('horarios');void loadHours()};
- const toggleDay=(s:Servicio,h:string,d:Dia,v:boolean)=>setFilas(fs=>fs.map(f=>f.Servicio===s&&f.Hora===h?{...f,dias:{...f.dias,[d]:v}}:f));
- const addHour=()=>{
-  if(!nuevo)return;
-  if(!/^\d{2}:\d{2}$/.test(nuevaHora)||mins(nuevaHora)%15!==0){message('Selecciona una hora en intervalos de 15 minutos.',true);return}
-  if(filas.some(f=>f.Servicio===nuevo&&f.Hora===nuevaHora)){message('Ya existe esa hora para este servicio.',true);return}
-  setFilas(fs=>[...fs,{Servicio:nuevo,Hora:nuevaHora,dias:{...diasNuevos}}].sort((a,b)=>a.Servicio===b.Servicio?mins(a.Hora)-mins(b.Hora):a.Servicio==='COMIDA'?-1:1));setNuevo(null);
- };
- const saveHours=async()=>{
-  if(incons.COMIDA.length>1||incons.CENA.length>1){message('No se sobrescribirán márgenes distintos sin una regla de migración confirmada.',true);return}
-  if(margen.COMIDA==null||margen.CENA==null||margen.COMIDA<0||margen.CENA<0){message('Indica una antelación mínima válida para COMIDA y CENA.',true);return}
-  setSaving(true);message('');
+ const cambiar=(s:Servicio,h:string,d:Dia,v:boolean)=>setHorarios(x=>x.map(r=>r.Servicio===s&&r.Hora===h&&r.DiaSemana===d?{...r,Activo:v}:r));
+ const filas=(s:Servicio)=>Array.from(new Set(horarios.filter(r=>r.Servicio===s).map(r=>r.Hora))).sort((a,b)=>mins(a)-mins(b));
+ const activo=(s:Servicio,h:string,d:Dia)=>horarios.find(r=>r.Servicio===s&&r.Hora===h&&r.DiaSemana===d)?.Activo??false;
+ const eliminarHora=()=>{if(!pendiente)return;setEliminaciones(e=>[...e,pendiente]);setHorarios(h=>h.filter(r=>!(r.Servicio===pendiente.Servicio&&r.Hora===pendiente.Hora)));setPendiente(null)};
+ const guardarHorarios=async()=>{
+  if(incons.COMIDA.length>1||incons.CENA.length>1){mostrar('No se sobrescribirán márgenes distintos sin una regla de migración confirmada.',true);return}
+  if(margenes.COMIDA==null||margenes.CENA==null||margenes.COMIDA<0||margenes.CENA<0||margenes.COMIDA>999.99||margenes.CENA>999.99){mostrar('Indica una antelación mínima válida para COMIDA y CENA.',true);return}
+  setGuardando(true);ocultar();
   try{
-   for(const x of eliminadas){const {error}=await supabase.from('Horarios').delete().eq('Servicio',x.Servicio).eq('Hora',x.Hora+':00');if(error)throw error}
-   const old=new Map(inicial.map(f=>[f.Servicio+'|'+f.Hora,f]));
-   for(const f of filas)for(const d of DIAS){
-    const before=old.get(f.Servicio+'|'+f.Hora)?.dias[d.nombre],active=f.dias[d.nombre];
-    if(before===active&&old.has(f.Servicio+'|'+f.Hora))continue;
-    const q=await supabase.from('Horarios').select('DiaSemana').eq('Servicio',f.Servicio).eq('Hora',f.Hora+':00').eq('DiaSemana',d.nombre).limit(1);if(q.error)throw q.error;
-    if(q.data?.length){const {error}=await supabase.from('Horarios').update({Activo:active,MargenHoras:margen[f.Servicio]}).eq('Servicio',f.Servicio).eq('Hora',f.Hora+':00').eq('DiaSemana',d.nombre);if(error)throw error}
-    else{const {error}=await supabase.from('Horarios').insert({DiaSemana:d.nombre,Servicio:f.Servicio,Hora:f.Hora+':00',MargenHoras:margen[f.Servicio],Activo:active});if(error)throw error}
+   const cambios:Horario[]=[];const old=new Map(inicial.map(r=>[r.DiaSemana+'|'+r.Servicio+'|'+r.Hora,r]));
+   horarios.forEach(r=>{const item={...r,MargenHoras:margenes[r.Servicio]};const prev=old.get(r.DiaSemana+'|'+r.Servicio+'|'+r.Hora);if(!prev||prev.Activo!==r.Activo||prev.MargenHoras!==item.MargenHoras)cambios.push(item)});
+   for(const r of cambios){
+    const {data,e}=await supabase.from('Horarios').select('DiaSemana').eq('DiaSemana',r.DiaSemana).eq('Servicio',r.Servicio).eq('Hora',r.Hora+':00').limit(1);if(e)throw e;
+    if(data?.length){const {error:e2}=await supabase.from('Horarios').update({Activo:r.Activo,MargenHoras:r.MargenHoras}).eq('DiaSemana',r.DiaSemana).eq('Servicio',r.Servicio).eq('Hora',r.Hora+':00');if(e2)throw e2}
+    else{const {error:e2}=await supabase.from('Horarios').insert({DiaSemana:r.DiaSemana,Servicio:r.Servicio,Hora:r.Hora+':00',MargenHoras:r.MargenHoras,Activo:r.Activo});if(e2)throw e2}
    }
-   setEliminadas([]);await loadHours('Horarios guardados correctamente.');
-  }catch(e){console.error(e);message('No se pudieron guardar los horarios.',true)}finally{setSaving(false)}
+   for(const e of eliminaciones){const {error:e2}=await supabase.from('Horarios').delete().eq('Servicio',e.Servicio).eq('Hora',e.Hora+':00');if(e2)throw e2}
+   setEliminaciones([]);await cargarHorarios();mostrar('Horarios guardados correctamente.')
+  }catch(e){console.error(e);mostrar('No se pudieron guardar los horarios.',true)}finally{setGuardando(false)}
  };
- const inconsText=useMemo(()=> (['COMIDA','CENA'] as Servicio[]).filter(s=>incons[s].length>1).map(s=>s+': '+incons[s].join(' h, ')+' h').join('; '),[incons]);
- useEffect(()=>{if(vista==='menu')message('')},[vista]);
+ const inconsistencia=useMemo(()=>{const a=(['COMIDA','CENA'] as Servicio[]).filter(s=>incons[s].length>1).map(s=>s+': '+incons[s].join(' h, ')+' h');return a.length?'No se guardará ningún cambio: existen márgenes distintos en '+a.join('; ')+'. Confirma primero una regla de migración.':''},[incons]);
 
- return <section className="cr-config-v4" aria-label="Configuración">
-  <button className="cr-config-v4__backdrop" type="button" aria-label="Cerrar configuración" onClick={()=>navigate('/')}/>
-  <div className="cr-config-v4__box">
-   <header className="cr-config-v4__header"><h2>⚙ CONFIGURACIÓN</h2><button type="button" className="cr-config-v4__close" onClick={()=>navigate('/')}>×</button></header>
-   {vista==='menu'&&<section className="cr-config-v4__menu">
-    <button className="cr-config-v4__button cr-config-v4__button--green" onClick={openParams}>⚙ PARÁMETROS</button>
-    <button className="cr-config-v4__button cr-config-v4__button--blue" onClick={openHours}>🕒 HORARIOS</button>
-    <button className="cr-config-v4__button cr-config-v4__button--gold" onClick={()=>setVista('mesas')}>🍽 MESAS</button>
+ const abrirNuevo=(s:Servicio)=>{setServicioNuevo(s);setHoraNueva(s==='COMIDA'?'12:30':'20:30');setDiasNuevos({Lunes:false,Martes:true,Miércoles:true,Jueves:true,Viernes:true,Sábado:true,Domingo:true});setVista('formulario');ocultar()};
+ const anadir=()=>{if(!servicioNuevo)return;if(!/^\d{2}:\d{2}$/.test(horaNueva)||mins(horaNueva)%15!==0){mostrar('Selecciona una hora en intervalos de 15 minutos.',true);return}if(filas(servicioNuevo).includes(horaNueva)){mostrar('Ya existe una hora igual para ese servicio.',true);return}const nuevos=DIAS.map(d=>({DiaSemana:d.nombre,Servicio:servicioNuevo,Hora:horaNueva,MargenHoras:margenes[servicioNuevo],Activo:diasNuevos[d.nombre]}));setHorarios(h=>[...h,...nuevos]);setServicioNuevo(null);setVista('horarios');ocultar()};
+ useEffect(()=>{if(vista==='parametros')void cargarParametros();if(vista==='horarios')void cargarHorarios()},[vista]);
+
+ return <div className="cr-config-modal" role="dialog" aria-modal="true" aria-labelledby="cr-configuracion-titulo">
+  <div className="cr-config-modal__box">
+   <div className="cr-config-modal__header"><h2 id="cr-configuracion-titulo">⚙ CONFIGURACIÓN</h2><button className="cr-config-modal__close" type="button" onClick={()=>navigate('/')}>×</button></div>
+   {vista==='menu'&&<section className="cr-config-menu">
+    <button className="cr-button cr-button--success" type="button" onClick={()=>setVista('parametros')}>⚙ PARÁMETROS</button>
+    <button className="cr-button cr-config-button--horarios" type="button" onClick={()=>setVista('horarios')}>🕒 HORARIOS</button>
+    <button className="cr-button cr-button--primary" type="button" onClick={()=>setVista('mesas')}>🍽 MESAS</button>
    </section>}
-   {vista==='parametros'&&<section className="cr-config-v4__view"><h3>PARÁMETROS</h3>{loading?<div className="cr-config-v4__loading">CARGANDO PARÁMETROS...</div>:<>
-    <label><span>TELÉFONO DE RESERVAS</span><input type="tel" value={param.TelefonoReservas} onChange={e=>setParam(p=>({...p,TelefonoReservas:e.target.value}))}/></label>
-    <label><span>TELÉFONO PRINCIPAL</span><input type="tel" value={param.TelefonoPrincipal} onChange={e=>setParam(p=>({...p,TelefonoPrincipal:e.target.value}))}/></label>
-    <label><span>HORA DE CORTE COMIDA/CENA</span><input type="time" value={param.HORA_CORTE_COMIDA_CENA} onChange={e=>setParam(p=>({...p,HORA_CORTE_COMIDA_CENA:e.target.value}))}/><small>Define desde qué hora una reserva pertenece al turno de cena.</small></label>
-    <button className="cr-config-v4__action cr-config-v4__action--green" disabled={saving} onClick={()=>void saveParams()}>{saving?'GUARDANDO...':'GUARDAR'}</button>
-   </>}{msg&&<div className={'cr-config-v4__message '+(err?'is-error':'')}>{msg}</div>}<button className="cr-config-v4__action cr-config-v4__action--dark" onClick={()=>setVista('menu')}>← VOLVER</button></section>}
-   {vista==='horarios'&&<section className="cr-config-v4__view cr-config-v4__horarios"><h3>🕒 HORARIOS</h3>{loading?<div className="cr-config-v4__loading">CARGANDO HORARIOS...</div>:<>
-    {inconsText&&<p className="cr-config-v4__warning">No se guardará ningún cambio: existen márgenes distintos en {inconsText}. Confirma primero una regla de migración.</p>}
-    {(['COMIDA','CENA'] as Servicio[]).map(s=><section className="cr-config-v4__bloque" key={s}><div className="cr-config-v4__bloque-head"><h4>{s==='COMIDA'?'☀ COMIDA':'☾ CENA'}</h4><div className="cr-config-v4__bloque-actions"><label>Antelación mínima: <input type="number" min="0" max="999.99" step="0.01" value={margen[s]??''} disabled={!!incons[s].length} onChange={e=>setMargen(m=>({...m,[s]:e.target.value===''?null:Number(e.target.value)}))}/> h</label><button type="button" onClick={()=>{setNuevo(s);setNuevaHora(s==='COMIDA'?'12:30':'20:30');setDiasNuevos({...emptyDays(),Martes:true,Miércoles:true,Jueves:true,Viernes:true,Sábado:true,Domingo:true})}} disabled={!!incons[s].length}>+ AÑADIR HORA</button></div></div>
-    <div className="cr-config-v4__matrix-wrap"><table className="cr-config-v4__matrix"><thead><tr><th className="hora-col">HORA</th>{DIAS.map(d=><th key={d.nombre} className={d.nombre==='Lunes'?'lunes-col':''}>{d.corto}</th>)}<th/></tr></thead><tbody>
-    {filas.filter(f=>f.Servicio===s).map(f=><tr key={s+f.Hora}><td className="hora-col"><strong>{f.Hora}</strong></td>{DIAS.map(d=><td key={d.nombre} className={d.nombre==='Lunes'?'lunes-col':''}><input type="checkbox" checked={f.dias[d.nombre]} disabled={!!incons[s].length} onChange={e=>toggleDay(s,f.Hora,d.nombre,e.target.checked)}/></td>)}<td><button type="button" className="cr-config-v4__delete" disabled={!!incons[s].length} onClick={()=>setEliminar({Servicio:s,Hora:f.Hora})}>×</button></td></tr>)}</tbody></table></div>
-    {!filas.some(f=>f.Servicio===s)&&<p className="cr-config-v4__empty">Sin horas</p>}</section>)}
-    <button className="cr-config-v4__action cr-config-v4__action--green" disabled={saving} onClick={()=>void saveHours()}>{saving?'GUARDANDO...':'GUARDAR CAMBIOS'}</button>
-   </>}{msg&&<div className={'cr-config-v4__message '+(err?'is-error':'')}>{msg}</div>}<button className="cr-config-v4__action cr-config-v4__action--dark" onClick={()=>setVista('menu')}>← VOLVER</button></section>}
-   {vista==='mesas'&&<section className="cr-config-v4__view cr-config-v4__proximamente"><h3>🍽 MESAS</h3><p>PRÓXIMAMENTE</p><button className="cr-config-v4__action cr-config-v4__action--dark" onClick={()=>setVista('menu')}>← VOLVER</button></section>}
-   {nuevo&&<div className="cr-config-v4__submodal"><div className="cr-config-v4__submodal-box"><h3>AÑADIR HORA</h3><div className="cr-config-v4__fixed">SERVICIO: <strong>{nuevo}</strong></div><label>HORA<input type="time" step="900" value={nuevaHora} onChange={e=>setNuevaHora(e.target.value)}/></label><fieldset><legend>DÍAS ACTIVOS</legend>{DIAS.map(d=><label key={d.nombre}><input type="checkbox" checked={diasNuevos[d.nombre]} onChange={e=>setDiasNuevos(n=>({...n,[d.nombre]:e.target.checked}))}/><span>{d.corto}</span></label>)}</fieldset><button className="cr-config-v4__action cr-config-v4__action--green" onClick={addHour}>AÑADIR</button><button className="cr-config-v4__action cr-config-v4__action--dark" onClick={()=>setNuevo(null)}>← VOLVER</button></div></div>}
-   {eliminar&&<div className="cr-config-v4__submodal cr-config-v4__submodal--confirm"><div className="cr-config-v4__confirm-box"><p>¿Eliminar esta hora de todos los días de este servicio?</p><div><button className="cr-config-v4__action cr-config-v4__action--dark" onClick={()=>setEliminar(null)}>CANCELAR</button><button className="cr-config-v4__action cr-config-v4__action--danger" onClick={()=>{setFilas(fs=>fs.filter(f=>!(f.Servicio===eliminar.Servicio&&f.Hora===eliminar.Hora)));setEliminadas(es=>[...es,eliminar]);setEliminar(null)}}>ELIMINAR</button></div></div></div>}
+   {vista==='parametros'&&<section className="cr-config-parametros">
+    <h3>PARÁMETROS</h3>{cargando?<div>CARGANDO PARÁMETROS...</div>:<>
+    <label><span>TELÉFONO DE RESERVAS</span><input name="TelefonoReservas" type="tel" autoComplete="tel" value={param.TelefonoReservas} onChange={e=>setParam(p=>({...p,TelefonoReservas:e.target.value}))}/></label>
+    <label><span>TELÉFONO PRINCIPAL</span><input name="TelefonoPrincipal" type="tel" autoComplete="tel" value={param.TelefonoPrincipal} onChange={e=>setParam(p=>({...p,TelefonoPrincipal:e.target.value}))}/></label>
+    <label><span>HORA DE CORTE COMIDA/CENA</span><input name="HORA_CORTE_COMIDA_CENA" type="time" required value={param.HORA_CORTE_COMIDA_CENA} onChange={e=>setParam(p=>({...p,HORA_CORTE_COMIDA_CENA:e.target.value}))}/><small>Define desde qué hora una reserva pertenece al turno de cena.</small></label>
+    <button className="cr-button cr-button--success" type="button" disabled={guardando} onClick={()=>void guardarParametros()}>{guardando?'GUARDANDO...':'GUARDAR'}</button></>}
+    {mensaje&&<div className="cr-config-mensaje" data-tipo={error?'error':'ok'}>{mensaje}</div>}<button className="cr-button cr-button--dark" type="button" onClick={()=>setVista('menu')}>← VOLVER</button>
+   </section>}
+   {vista==='horarios'&&<section className="cr-config-horarios">
+    <h3>🕒 HORARIOS</h3><p className="cr-horarios-inconsistencia" hidden={!inconsistencia}>{inconsistencia}</p>
+    <div>
+     {(['COMIDA','CENA'] as Servicio[]).map(s=><section className="cr-horario-bloque" data-servicio={s} key={s}>
+      <div className="cr-horario-bloque__cabecera"><h4>{s==='COMIDA'?'☀ COMIDA':'☾ CENA'}</h4><div className="cr-horario-bloque__acciones">
+       <label className="cr-horario-margen-servicio"><span>Antelación mínima:</span><input type="number" min="0" max="999.99" step="0.01" inputMode="decimal" aria-label={'Antelación mínima '+s} value={margenes[s]??''} disabled={!!incons[s].length} onChange={e=>setMargenes(m=>({...m,[s]:e.target.value===''?null:Number(e.target.value)}))}/><span>h</span></label>
+       <button className="cr-horario-anadir" type="button" disabled={!!incons[s].length} onClick={()=>abrirNuevo(s)}>+ AÑADIR HORA</button>
+      </div></div>
+      <div className="cr-horario-matriz-wrap">{filas(s).length?<table className="cr-horario-matriz"><thead><tr>{['HORA',...DIAS.map(d=>d.corto),''].map((x,i)=><th key={i} className={i===0?'cr-horario-col-hora':i===1?'cr-horario-col-lunes':''}>{x}</th>)}</tr></thead><tbody>{filas(s).map(h=><tr key={s+h}><td className="cr-horario-col-hora"><span className="cr-horario-hora">{h}</span></td>{DIAS.map((d,i)=><td key={d.nombre} className={i===0?'cr-horario-col-lunes':''}><input className="cr-horario-check" type="checkbox" checked={activo(s,h,d.nombre)} disabled={!!incons[s].length} aria-label={h+' '+d.nombre} onChange={e=>cambiar(s,h,d.nombre,e.target.checked)}/></td>)}<td><button className="cr-horario-eliminar-fila" type="button" aria-label="Eliminar hora" disabled={!!incons[s].length} onClick={()=>setPendiente({Servicio:s,Hora:h})}>×</button></td></tr>)}</tbody></table>:<p className="cr-horario-vacio">Sin horas</p>}</div>
+     </section>)}
+    </div>
+    <button className="cr-button cr-button--success" type="button" disabled={guardando} onClick={()=>void guardarHorarios()}>{guardando?'GUARDANDO...':'GUARDAR CAMBIOS'}</button>
+    {mensaje&&<div className="cr-config-mensaje" data-tipo={error?'error':'ok'}>{mensaje}</div>}<button className="cr-button cr-button--dark" type="button" onClick={()=>setVista('menu')}>← VOLVER</button>
+   </section>}
+   {vista==='formulario'&&<section className="cr-horario-form">
+    <h3>AÑADIR HORA</h3><div className="cr-horario-fijos"><span>SERVICIO: <strong>{servicioNuevo}</strong></span></div>
+    <label><span>HORA</span><input type="time" step="900" value={horaNueva} onChange={e=>setHoraNueva(e.target.value)}/></label>
+    <fieldset className="cr-horario-dias-form"><legend>DÍAS ACTIVOS</legend>{DIAS.map(d=><label key={d.nombre}><input type="checkbox" checked={diasNuevos[d.nombre]} onChange={e=>setDiasNuevos(x=>({...x,[d.nombre]:e.target.checked}))}/><span>{d.corto}</span></label>)}</fieldset>
+    <button className="cr-button cr-button--success" type="button" onClick={anadir}>AÑADIR</button><button className="cr-button cr-button--dark" type="button" onClick={()=>setVista('horarios')}>← VOLVER</button>
+   </section>}
+   {vista==='confirmar'&&pendiente&&<section className="cr-horario-confirmar"><p>¿Eliminar esta hora de todos los días de este servicio?</p><div><button className="cr-button cr-button--dark" type="button" onClick={()=>setPendiente(null)}>CANCELAR</button><button className="cr-button cr-button--danger" type="button" onClick={eliminarHora}>ELIMINAR</button></div></section>}
+   {vista==='mesas'&&<section className="cr-config-proximamente"><h3>🍽 MESAS</h3><p>PRÓXIMAMENTE</p><button className="cr-button cr-button--dark" type="button" onClick={()=>setVista('menu')}>← VOLVER</button></section>}
   </div>
- </section>;
+ </div>;
 }
