@@ -74,7 +74,7 @@ export default function Configuracion(){
    const cambios:Horario[]=[];const old=new Map(inicial.map(r=>[r.DiaSemana+'|'+r.Servicio+'|'+r.Hora,r]));
    horarios.forEach(r=>{const item={...r,MargenHoras:margenes[r.Servicio]};const prev=old.get(r.DiaSemana+'|'+r.Servicio+'|'+r.Hora);if(!prev||prev.Activo!==r.Activo||prev.MargenHoras!==item.MargenHoras)cambios.push(item)});
    for(const r of cambios){
-    const {data,e}=await supabase.from('Horarios').select('DiaSemana').eq('DiaSemana',r.DiaSemana).eq('Servicio',r.Servicio).eq('Hora',r.Hora+':00').limit(1);if(e)throw e;
+    const {data,error:e}=await supabase.from('Horarios').select('DiaSemana').eq('DiaSemana',r.DiaSemana).eq('Servicio',r.Servicio).eq('Hora',r.Hora+':00').limit(1);if(e)throw e;
     if(data?.length){const {error:e2}=await supabase.from('Horarios').update({Activo:r.Activo,MargenHoras:r.MargenHoras}).eq('DiaSemana',r.DiaSemana).eq('Servicio',r.Servicio).eq('Hora',r.Hora+':00');if(e2)throw e2}
     else{const {error:e2}=await supabase.from('Horarios').insert({DiaSemana:r.DiaSemana,Servicio:r.Servicio,Hora:r.Hora+':00',MargenHoras:r.MargenHoras,Activo:r.Activo});if(e2)throw e2}
    }
