@@ -2622,3 +2622,20 @@ html.light .cr-config-mensaje{
 html.light .cr-config-mensaje[data-tipo=error]{
   color:#b51f2d;
 }
+
+
+/* CONFIRMACIÓN DE CIERRE DE SESIÓN — evita cierres accidentales. */
+.logout-confirm-overlay{position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;background:rgba(0,0,0,.82)}
+.logout-confirm-modal{width:min(460px,calc(100vw - 36px));box-sizing:border-box;padding:20px 18px 16px;border:1px solid #ffc400;border-radius:10px;background:linear-gradient(180deg,#181818,#080808);box-shadow:0 18px 50px rgba(0,0,0,.7);text-align:center}
+.logout-confirm-modal h2{margin:0 0 12px;color:#ffc400;font-size:26px;line-height:1.05;font-weight:1000}
+.logout-confirm-modal p{margin:0;color:#fff;font-size:19px;line-height:1.25;font-weight:800}
+.logout-confirm-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:18px}
+.logout-confirm-actions button{min-height:50px;border-radius:8px;padding:8px 10px;font-size:14px;font-weight:1000}
+.logout-confirm-cancel{border:1px solid #555;background:#171717;color:#fff}
+.logout-confirm-accept{border:1px solid #a52b33;background:#5a151c;color:#fff}
+html.light .logout-confirm-overlay{background:rgba(0,0,0,.42)}
+html.light .logout-confirm-modal{background:linear-gradient(180deg,#fff,#f1efea);border-color:#b89a42}
+html.light .logout-confirm-modal h2{color:#8b6800}
+html.light .logout-confirm-modal p{color:#222}
+html.light .logout-confirm-cancel{background:#f2f0eb;border-color:#c9c5bd;color:#222}
+html.light .logout-confirm-accept{background:#a52b33;border-color:#8f2029;color:#fff}
