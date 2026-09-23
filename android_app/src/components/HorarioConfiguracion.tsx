@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { Moon, Sun } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 type Servicio='COMIDA'|'CENA';
@@ -8,12 +10,12 @@ const DIAS:Array<{nombre:Dia;corto:string}>= [
  {nombre:'Jueves',corto:'JUE'},{nombre:'Viernes',corto:'VIE'},{nombre:'Sábado',corto:'SÁB'},{nombre:'Domingo',corto:'DOM'}
 ];
 type Horario={DiaSemana:Dia;Servicio:Servicio;Hora:string;MargenHoras:number|null;Activo:boolean};
-type Props={onBack:()=>void};
+type Props={onBack:()=>void;darkMode:boolean;onToggleTheme:()=>void};
 const minutos=(v:string)=>{const p=String(v).split(':').map(Number);return (p[0]||0)*60+(p[1]||0)};
 const dia=(v:unknown):Dia=>DIAS.find(d=>d.nombre.toLowerCase()===String(v??'').trim().toLowerCase())?.nombre||(String(v??'') as Dia);
 const hora=(v:unknown)=>String(v??'').slice(0,5);
 
-export default function HorarioConfiguracion({onBack}:Props){
+export default function HorarioConfiguracion({onBack,darkMode,onToggleTheme}:Props){
  const [rows,setRows]=useState<Horario[]>([]),[initial,setInitial]=useState<Horario[]>([]);
  const [deleted,setDeleted]=useState<Array<{Servicio:Servicio;Hora:string}>>([]);
  const [pending,setPending]=useState<{Servicio:Servicio;Hora:string}|null>(null);
