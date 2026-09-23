@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Moon, Sun } from 'lucide-react';
 import HorarioConfiguracion from '../components/HorarioConfiguracion';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
@@ -11,6 +12,7 @@ export default function Configuracion(){
  const [param,setParam]=useState(defaultParametros);
  const [mensaje,setMensaje]=useState(''); const [error,setError]=useState(false);
  const [cargando,setCargando]=useState(false); const [guardando,setGuardando]=useState(false);
+ const [darkMode,setDarkMode]=useState(()=>localStorage.getItem('theme')!=='light');
  const mostrar=(m:string,e=false)=>{setMensaje(m);setError(e)}; const ocultar=()=>{setMensaje('');setError(false)};
  const cargarParametros=async()=>{
   setCargando(true);ocultar();
@@ -26,10 +28,22 @@ export default function Configuracion(){
   finally{setGuardando(false)}
  };
  useEffect(()=>{if(vista==='parametros')void cargarParametros()},[vista]);
+ useEffect(()=>{
+  const syncTheme=()=>setDarkMode(localStorage.getItem('theme')!=='light');
+  window.addEventListener('camborio-theme-change',syncTheme);
+  return()=>window.removeEventListener('camborio-theme-change',syncTheme);
+ },[]);
+ const toggleDarkMode=()=>{
+  const next=!darkMode; setDarkMode(next);
+  document.documentElement.classList.toggle('dark',next);
+  document.documentElement.classList.toggle('light',!next);
+  localStorage.setItem('theme',next?'dark':'light');
+  window.dispatchEvent(new Event('camborio-theme-change'));
+ };
 
- return <div className="cr-config-modal" role="dialog" aria-modal="true" aria-labelledby="cr-configuracion-titulo">
+ return <div className={`cr-config-modal ${vista==='horarios'?'cr-config-modal--horarios':''}`} role="dialog" aria-modal="true" aria-labelledby="cr-configuracion-titulo">
   <div className="cr-config-modal__box">
-   <div className="cr-config-modal__header"><h2 id="cr-configuracion-titulo">⚙ CONFIGURACIÓN</h2><button className="cr-config-modal__close" type="button" onClick={()=>navigate('/')}>×</button></div>
+   <div className="cr-config-modal__header"><h2 id="cr-configuracion-titulo">⚙ CONFIGURACIÓN</h2><div className="cr-config-modal__header-actions"><button className="cr-config-modal__theme" type="button" onClick={toggleDarkMode} aria-label="Cambiar modo día/noche" title="Modo día/noche">{darkMode?<Sun size={22}/>:<Moon size={22}/>}</button><button className="cr-config-modal__close" type="button" onClick={()=>navigate('/')}>×</button></div></div>
    {vista==='menu'&&<section className="cr-config-menu">
     <button className="cr-button cr-button--success" type="button" onClick={()=>setVista('parametros')}>⚙ PARÁMETROS</button>
     <button className="cr-button cr-config-button--horarios" type="button" onClick={()=>setVista('horarios')}>🕒 HORARIOS</button>
