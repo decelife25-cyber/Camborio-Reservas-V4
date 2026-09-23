@@ -2645,11 +2645,13 @@ html.light .logout-confirm-accept{background:#a52b33;border-color:#8f2029;color:
 .cr-config-modal--horarios{
   align-items:stretch;
   justify-content:stretch;
-  padding:0;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  box-sizing:border-box;
 }
 .cr-config-modal--horarios .cr-config-modal__box{
   width:100%;
-  height:100dvh;
+  height:100%;
+  min-height:0;
   max-height:none;
   padding:0;
   border:0;
@@ -2691,7 +2693,7 @@ html.light .logout-confirm-accept{background:#a52b33;border-color:#8f2029;color:
   min-height:0;
   overflow-y:auto;
   overflow-x:hidden;
-  padding:10px;
+  padding:10px 10px max(10px, env(safe-area-inset-bottom));
   box-sizing:border-box;
   align-content:start;
   overscroll-behavior:contain;
