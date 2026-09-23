@@ -703,7 +703,9 @@ html.light .calendar-day.past { color:#aaa; }
 html.light .calendar-weekdays,
 html.light .calendar-grid { border-color:#ddd; }
 html.light .calendar-weekdays span { border-color:#ddd; color:#777; }
-html.light .calendar-month-header { background:#fff; }\nhtml.light .calendar-weekdays { background:#fff; }\nhtml.light .calendar-month-header button { background:#fff; color:#222; border-color:#ccc; }
+html.light .calendar-month-header { background:#fff; }
+html.light .calendar-weekdays { background:#fff; }
+html.light .calendar-month-header button { background:#fff; color:#222; border-color:#ccc; }
 html.light .confirm-empty,
 html.light .calendar-empty-message { color:#444; border-color:#bbb; }
 @media (max-width: 500px) {
