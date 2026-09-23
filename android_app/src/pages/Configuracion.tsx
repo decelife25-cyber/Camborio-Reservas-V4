@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { createPortal } from 'react-dom';
 import { Moon, Sun } from 'lucide-react';
 import HorarioConfiguracion from '../components/HorarioConfiguracion';
 import { useNavigate } from 'react-router-dom';
@@ -58,9 +57,9 @@ export default function Configuracion(){
     <button className="cr-button cr-button--success" type="button" disabled={guardando} onClick={()=>void guardarParametros()}>{guardando?'GUARDANDO...':'GUARDAR'}</button></>}
     {mensaje&&<div className="cr-config-mensaje" data-tipo={error?'error':'ok'}>{mensaje}</div>}<button className="cr-button cr-button--dark" type="button" onClick={()=>setVista('menu')}>← VOLVER</button>
    </section>}
-   {vista==='horarios'&&<HorarioConfiguracion onBack={()=>setVista('menu')}/>}
+   {vista==='horarios'&&<HorarioConfiguracion onBack={()=>setVista('menu')} darkMode={darkMode} onToggleTheme={toggleDarkMode}/>}
    {vista==='mesas'&&<section className="cr-config-proximamente"><h3>🍽 MESAS</h3><p>PRÓXIMAMENTE</p><button className="cr-button cr-button--dark" type="button" onClick={()=>setVista('menu')}>← VOLVER</button></section>}
   </div>
  </div>;
- return createPortal(contenido, document.body);
+ return contenido;
 }
