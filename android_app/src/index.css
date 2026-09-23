@@ -2439,3 +2439,444 @@ html.light .cr-planos-mesas__leyenda .reservada{background:#f28c00!important}
 html.light .cr-planos-mesas__leyenda .ocupada{background:#e20d22!important}
 html.light .cr-planos-mesas__leyenda .desactivada{background:#555!important}html.light .cr-planos-mesas__reserva-grid>div{background:#fff;border-color:#ccc}html.light .cr-planos-mesas__reserva-grid span{color:#666}html.light .cr-planos-mesas__reserva-grid strong{color:#8b6800}html.light .cr-planos-mesas__reserva-info>div:first-child strong{color:#8b6800}html.light .cr-planos-mesas__reserva-fecha{color:#111}
 @media(max-width:620px){.cr-planos-mesas__reserva-grid{grid-template-columns:1.3fr 1.08fr .78fr .9fr;gap:6px}.cr-planos-mesas__reserva-grid>div{padding:9px 6px;min-height:62px}.cr-planos-mesas__reserva-grid span{font-size:12px;line-height:1.05}.cr-planos-mesas__reserva-grid strong{font-size:24px;line-height:1.05;margin-top:6px;white-space:nowrap}.cr-planos-mesas__reserva-fecha{font-size:20px}.cr-planos-mesas__assignment-actions{font-size:11px}}
+
+
+/* CONFIGURACIÓN V4 — réplica visual/funcional de V2. */
+.cr-config-v4{position:fixed;inset:0;z-index:109;display:flex;align-items:center;justify-content:center;padding:14px;background:#000;overflow-x:hidden;overscroll-behavior:contain}
+.cr-config-v4__backdrop{position:absolute;inset:0;border:0;background:transparent}
+.cr-config-v4__box{position:relative;box-sizing:border-box;width:min(760px,100%);max-height:calc(100dvh - 28px);overflow:auto;overflow-x:hidden;border:1px solid var(--cr-line,#292929);border-radius:8px;background:#050505;padding:18px;box-shadow:0 20px 50px rgba(0,0,0,.55);color:#fff}
+.cr-config-v4__header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.cr-config-v4__header h2{margin:0;font-size:var(--cr-text-panel-title,24px);color:#fff}
+.cr-config-v4__close{width:48px;min-height:48px;border:1px solid var(--cr-line,#292929);border-radius:8px;background:#141414;color:#fff;font-size:32px;font-weight:900}
+.cr-config-v4__menu,.cr-config-v4__view{display:grid;gap:12px}
+.cr-config-v4__button{width:100%;min-height:76px;border:0;border-radius:7px;font-size:var(--cr-text-button,18px);font-weight:900}
+.cr-config-v4__button--green,.cr-config-v4__action--green{background:linear-gradient(135deg,#00c96b,#00a957);color:#fff}
+.cr-config-v4__button--blue{background:linear-gradient(135deg,#238cff,#0755a8);color:#fff}
+.cr-config-v4__button--gold{background:linear-gradient(135deg,#ffd21a,#f2ae00);color:#111}
+.cr-config-v4__view h3{margin:0;color:var(--cr-gold,#ffc400);font-size:var(--cr-text-panel-title,24px)}
+.cr-config-v4__view label{display:grid;gap:6px;color:var(--cr-muted,#aaa);font-size:18px}
+.cr-config-v4__view input[type=text],.cr-config-v4__view input[type=tel],.cr-config-v4__view input[type=time],.cr-config-v4__view input[type=number]{box-sizing:border-box;width:100%;min-height:56px;border:2px solid var(--cr-line,#292929);border-radius:8px;background:#090909;color:#fff;padding:8px 12px;font:900 22px Arial,sans-serif}
+.cr-config-v4__view small{color:#aaa;font:400 15px/1.3 Arial,sans-serif}
+.cr-config-v4__action{width:100%;min-height:56px;border:1px solid #333;border-radius:7px;font:900 18px/1 Arial,sans-serif}
+.cr-config-v4__action--dark{background:linear-gradient(#181818,#090909);color:#fff}
+.cr-config-v4__action--danger{background:#b51f2d;color:#fff}
+.cr-config-v4__message{color:#35d06f;font:900 18px Arial,sans-serif}
+.cr-config-v4__message.is-error{color:#ffb3b8}
+.cr-config-v4__loading,.cr-config-v4__empty{padding:14px;text-align:center;color:#888}
+.cr-config-v4__warning{margin:0;padding:9px;border-radius:7px;background:#35171a;color:#ffb3b8;font:700 14px/1.3 Arial,sans-serif}
+.cr-config-v4__bloque{margin:4px 0;padding:8px;border:1px solid #292929;border-radius:8px;background:#0b0b0b}
+.cr-config-v4__bloque-head{display:grid;gap:7px;margin-bottom:8px}
+.cr-config-v4__bloque-head h4{margin:0;font:900 20px Arial,sans-serif}
+.cr-config-v4__bloque:first-of-type h4{color:#ffbf3f}
+.cr-config-v4__bloque-actions{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.cr-config-v4__bloque-actions label{display:flex;align-items:center;gap:5px;min-width:0;color:#ddd;font:700 12px Arial,sans-serif;white-space:nowrap}
+.cr-config-v4__bloque-actions input{box-sizing:border-box;width:54px;height:42px;min-height:42px;padding:4px;text-align:center}
+.cr-config-v4__bloque-actions button{flex:0 0 auto;min-height:44px;border:1px solid #2777c7;border-radius:7px;background:#123b64;color:#fff;padding:7px 9px;font:900 13px Arial,sans-serif}
+.cr-config-v4__matrix-wrap{max-width:100%;overflow-x:auto}
+.cr-config-v4__matrix{width:100%;min-width:320px;table-layout:fixed;border-collapse:separate;border-spacing:0;color:#fff;font-family:Arial,sans-serif}
+.cr-config-v4__matrix th,.cr-config-v4__matrix td{box-sizing:border-box;width:calc((100% - 96px)/7);height:43px;border-bottom:1px solid #292929;padding:2px;text-align:center}
+.cr-config-v4__matrix th{position:sticky;top:0;z-index:1;background:#111;color:#bbb;font-size:10px}
+.cr-config-v4__matrix .hora-col{position:sticky;left:0;z-index:2;width:50px;background:#0b0b0b;text-align:left}
+.cr-config-v4__matrix thead .hora-col{z-index:3;background:#111}
+.cr-config-v4__matrix th:last-child,.cr-config-v4__matrix td:last-child{width:46px;padding-left:10px}
+.cr-config-v4__matrix input[type=checkbox]{width:28px;height:28px;margin:0;accent-color:#29b765}
+.cr-config-v4__delete{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border:1px solid #a52b33;border-radius:7px;background:#3b1115;color:#ff9aa0;font:900 25px/1 Arial,sans-serif}
+.cr-config-v4__proximamente p{margin:18px 0;color:#aaa;font:900 24px Arial,sans-serif;text-align:center}
+.cr-config-v4__submodal{position:absolute;inset:0;z-index:4;display:grid;place-items:center;background:rgba(0,0,0,.8);padding:14px}
+.cr-config-v4__submodal-box,.cr-config-v4__confirm-box{width:min(440px,100%);box-sizing:border-box;border:1px solid #555;border-radius:9px;background:#111;padding:18px;box-shadow:0 20px 50px rgba(0,0,0,.7)}
+.cr-config-v4__submodal-box h3{margin:0 0 14px;color:#ffc400}
+.cr-config-v4__fixed{color:#aaa;font:700 15px Arial,sans-serif;margin-bottom:12px}
+.cr-config-v4__fixed strong{color:#fff}
+.cr-config-v4__submodal-box fieldset{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin:0;border:1px solid #333;padding:9px}
+.cr-config-v4__submodal-box legend{color:#aaa;font:900 13px Arial,sans-serif}
+.cr-config-v4__submodal-box fieldset label{display:flex;align-items:center;gap:3px;color:#ddd;font-size:11px}
+.cr-config-v4__submodal-box fieldset input{width:25px;height:25px;min-height:25px}
+.cr-config-v4__confirm-box p{margin:0 0 18px;color:#fff;font:900 20px/1.35 Arial,sans-serif;text-align:center}
+.cr-config-v4__confirm-box>div{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:620px){.cr-config-v4{align-items:flex-start;padding:72px 6px 6px}.cr-config-v4__box{width:calc(100vw - 12px);max-height:calc(100dvh - 78px);padding:10px}.cr-config-v4__bloque-actions{gap:5px}.cr-config-v4__bloque-actions label{font-size:11px}.cr-config-v4__bloque-actions button{padding-inline:7px;font-size:12px}.cr-config-v4__submodal-box fieldset{grid-template-columns:repeat(4,1fr)}}
+html.light .cr-config-v4__box{background:#fff;color:#111;border-color:#b89a42}
+html.light .cr-config-v4__header h2{color:#111}
+html.light .cr-config-v4__view h3{color:#8b6800}
+html.light .cr-config-v4__view input{background:#fff;color:#111;border-color:#bbb}
+html.light .cr-config-v4__bloque{background:#f7f5f0;border-color:#d4d0c8}
+html.light .cr-config-v4__matrix{color:#111}
+html.light .cr-config-v4__matrix th{background:#eee;color:#555}
+html.light .cr-config-v4__matrix .hora-col{background:#f5f3ef}
+
+
+/* CONFIGURACIÓN V4 — CSS trasladado literalmente de V2. */
+button{font:inherit;text-transform:uppercase;color:inherit;border:0;cursor:pointer;touch-action:manipulation}button:active{transform:scale(.97);filter:brightness(1.18)}.cr-button{min-height:78px;border-radius:8px;border:1px solid var(--cr-line);display:flex;align-items:center;justify-content:center;gap:10px;font-size:var(--cr-text-button);font-weight:1000;box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}.cr-button span{font-size:36px}.cr-button--primary{background:linear-gradient(135deg,#ffd32a,#f1ad00);color:#050505}.cr-button--dark{background:linear-gradient(180deg,#171717,#060606);color:#fff}.cr-button--success{background:linear-gradient(135deg,#05b966,#007c42)}
+.cr-config-modal{position:fixed;inset:0;z-index:109;display:flex;align-items:center;justify-content:center;padding:14px;background:#000;overflow-x:hidden;overscroll-behavior:contain;touch-action:none}.cr-config-modal__box{box-sizing:border-box;width:min(760px,100%);max-height:calc(100dvh - 28px);overflow:auto;overflow-x:hidden;border:1px solid var(--cr-line);border-radius:8px;background:#050505;padding:18px;box-shadow:0 20px 50px rgba(0,0,0,.55);touch-action:auto}.cr-config-modal__header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.cr-config-modal__header h2,.cr-config-parametros h3,.cr-config-proximamente h3{margin:0;font-size:var(--cr-text-panel-title)}.cr-config-modal__header h2{color:#fff}.cr-config-parametros h3,.cr-config-proximamente h3{color:var(--cr-gold)}.cr-config-modal__close{width:48px;min-height:48px;border:1px solid var(--cr-line);border-radius:8px;background:#141414;color:#fff;font-size:32px;font-weight:900}.cr-config-menu,.cr-config-parametros,.cr-config-proximamente{display:grid;gap:12px}.cr-config-menu .cr-button{width:100%;min-height:76px;font-size:var(--cr-text-button)}.cr-config-button--horarios{background:linear-gradient(135deg,#238cff,#0755a8);color:#fff}.cr-config-parametros label{display:grid;gap:6px;color:var(--cr-muted);font-size:18px}.cr-config-parametros small{color:var(--cr-muted);font:400 15px/1.3 Arial,sans-serif;text-transform:none}.cr-config-parametros input{width:100%;min-height:56px;border:2px solid var(--cr-line);border-radius:8px;background:#090909;color:var(--cr-text);padding:8px 12px;font:900 22px Arial,sans-serif}.cr-config-parametros input:focus{outline:0;border-color:var(--cr-gold);box-shadow:0 0 0 3px rgba(255,196,0,.18)}.cr-config-proximamente p{margin:18px 0;color:var(--cr-muted);font:900 24px Arial,sans-serif;text-align:center}.cr-config-mensaje{margin-top:12px;color:#35d06f;font:900 18px Arial,sans-serif;text-transform:none}.cr-config-mensaje[data-tipo=error]{color:#ffb3b8}@media(max-width:620px){.cr-config-modal{align-items:flex-start;padding:72px 6px 6px}.cr-config-modal__box{width:calc(100vw - 12px);max-height:calc(100dvh - 78px);padding:10px}}
+.cr-config-horarios,.cr-horario-form{display:grid;gap:12px}.cr-config-horarios h3,.cr-horario-form h3{margin:0;color:var(--cr-gold);font-size:var(--cr-text-panel-title)}.cr-horarios-inconsistencia{margin:0;padding:9px;border-radius:7px;background:#35171a;color:#ffb3b8;font:700 14px/1.3 Arial,sans-serif;text-transform:none}.cr-horario-bloque{margin:4px 0;padding:8px;border:1px solid #292929;border-radius:8px;background:#0b0b0b}.cr-horario-bloque__cabecera{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:8px;margin-bottom:8px}.cr-horario-bloque__acciones{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;min-width:0}.cr-horario-bloque h4{margin:0;white-space:nowrap;font:900 20px Arial,sans-serif}.cr-horario-bloque[data-servicio=COMIDA] h4{color:#ffbf3f}.cr-horario-bloque[data-servicio=CENA] h4{color:#7db7ff}.cr-horario-margen-servicio{display:flex;align-items:center;justify-content:center;gap:5px;min-width:0;color:#ddd;font:700 14px Arial,sans-serif;text-transform:none;white-space:nowrap}.cr-horario-margen-servicio input{box-sizing:border-box;width:64px;height:46px;border:1px solid #555;border-radius:6px;background:#080808;color:#fff;padding:4px;text-align:center;font:900 16px Arial,sans-serif}.cr-horario-anadir{flex:0 0 auto;min-height:44px;border:1px solid #2777c7;border-radius:7px;background:#123b64;color:#fff;padding:7px 9px;font:900 13px Arial,sans-serif;white-space:nowrap}.cr-horario-anadir:disabled,.cr-horario-margen-servicio input:disabled,.cr-horario-eliminar-fila:disabled{opacity:.45}.cr-horario-matriz-wrap{max-width:100%;overflow-x:auto;overscroll-behavior-inline:contain}.cr-horario-matriz{width:100%;min-width:320px;table-layout:fixed;border-collapse:separate;border-spacing:0;color:#fff;font-family:Arial,sans-serif}.cr-horario-matriz th,.cr-horario-matriz td{box-sizing:border-box;width:calc((100% - 96px)/7);height:43px;border-bottom:1px solid #292929;padding:2px;text-align:center}.cr-horario-matriz th{position:sticky;top:0;z-index:1;background:#111;color:#bbb;font-size:10px}.cr-horario-matriz .cr-horario-col-hora{position:sticky;left:0;z-index:2;width:50px;background:#0b0b0b;text-align:left}.cr-horario-matriz thead .cr-horario-col-hora{z-index:3;background:#111}.cr-horario-matriz th:last-child,.cr-horario-matriz td:last-child{width:46px;padding-left:10px}.cr-horario-hora{display:block;font-size:15px;font-weight:900}.cr-horario-check{width:28px;height:28px;margin:0;accent-color:#29b765}.cr-horario-check:disabled{opacity:.3}.cr-horario-col-lunes{background:#101010;color:#666}.cr-horario-eliminar-fila{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border:1px solid #a52b33;border-radius:7px;background:#3b1115;color:#ff9aa0;font:900 25px/1 Arial,sans-serif}.cr-horario-vacio{padding:12px;color:#888;text-align:center;text-transform:none}.cr-horario-form label{display:grid;gap:6px;color:var(--cr-muted);font-size:17px}.cr-horario-form small{font:400 14px/1.3 Arial,sans-serif;text-transform:none}.cr-horario-form input[type=time]{min-height:54px;border:2px solid var(--cr-line);border-radius:8px;background:#090909;color:#fff;padding:8px 12px;font:900 21px Arial,sans-serif}.cr-horario-fijos{color:#aaa;font:700 15px Arial,sans-serif}.cr-horario-fijos strong{color:#fff}.cr-horario-dias-form{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin:0;border:1px solid #333;padding:9px}.cr-horario-dias-form legend{color:#aaa;font:900 13px Arial,sans-serif}.cr-horario-dias-form label{display:flex;align-items:center;gap:3px;font-size:11px}.cr-horario-dias-form input{width:25px;height:25px;margin:0;accent-color:#29b765}.cr-horario-confirmar{position:absolute;inset:50% auto auto 50%;z-index:4;width:min(440px,calc(100% - 28px));transform:translate(-50%,-50%);border:1px solid #555;border-radius:9px;background:#111;padding:18px;box-shadow:0 0 0 100vmax rgba(0,0,0,.8)}.cr-horario-confirmar p{margin:0 0 18px;color:#fff;font:900 20px/1.35 Arial,sans-serif;text-align:center;text-transform:none}.cr-horario-confirmar div{display:grid;grid-template-columns:1fr 1fr;gap:8px}.cr-horario-confirmar .cr-button{min-width:0;padding:10px}.cr-horario-confirmar [data-cr-horario-eliminar-cancelar]{background:#171717;color:#fff}.cr-horario-confirmar [data-cr-horario-eliminar-confirmar]{background:#b51f2d;color:#fff}@media(max-width:390px){.cr-horario-bloque__acciones{gap:5px}.cr-horario-margen-servicio{font-size:11px}.cr-horario-anadir{padding-inline:7px;font-size:12px}.cr-horario-dias-form{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:620px){.cr-button{min-height:74px;padding:8px 2px;flex-direction:column;gap:5px;font-size:var(--cr-text-button);line-height:1.05}.cr-button span{font-size:30px}}
+
+
+/* V4.040 — Horarios: misma escala visual que V2 + adaptación día. */
+/*
+ * V2 ocupa visualmente ~550 px de ancho en el mismo dispositivo.
+ * En V4 la calibración global actual (0.57) estaba reduciendo esta
+ * pantalla a ~392 px. Se corrige SOLO la pantalla de Configuración:
+ * el origen superior mantiene la posición y la escala recupera la
+ * proporción observada en V2 sin tocar el resto de la aplicación.
+ */
+.cr-config-modal__box{
+  /*
+   * V2 has a ~760px CSS panel. The Android WebView viewport is ~390px,
+   * so the panel must be wider in CSS but MUST NOT scale its contents.
+   * The previous 1.403 transform enlarged every control and was the
+   * reason the V4 table squares/rows were much larger than V2.
+   */
+  width:min(760px,140.3vw);
+  transform:none;
+  transform-origin:initial;
+}
+
+/* Modo DÍA: misma geometría V2; solo se adapta el contraste para fondo claro. */
+html.light .cr-config-modal{
+  background:#fff;
+}
+html.light .cr-config-modal__box{
+  background:#fff;
+  color:#111;
+  border-color:#b89a42;
+  box-shadow:0 20px 50px rgba(0,0,0,.18);
+}
+html.light .cr-config-modal__header h2{
+  color:#111;
+}
+html.light .cr-config-modal__close{
+  background:#f2f0eb;
+  color:#222;
+  border-color:#c9c5bd;
+}
+html.light .cr-config-parametros h3,
+html.light .cr-config-proximamente h3,
+html.light .cr-config-horarios h3,
+html.light .cr-horario-form h3{
+  color:#8b6800;
+}
+html.light .cr-horario-bloque{
+  background:#f7f5f0;
+  border-color:#d4d0c8;
+}
+html.light .cr-horario-bloque[data-servicio=COMIDA] h4{
+  color:#a56f00;
+}
+html.light .cr-horario-bloque[data-servicio=CENA] h4{
+  color:#3f6fae;
+}
+html.light .cr-horario-margen-servicio{
+  color:#444;
+}
+html.light .cr-horario-margen-servicio input{
+  background:#fff;
+  color:#111;
+  border-color:#aaa;
+}
+html.light .cr-horario-matriz{
+  color:#111;
+}
+html.light .cr-horario-matriz th{
+  background:#eee;
+  color:#555;
+}
+html.light .cr-horario-matriz .cr-horario-col-hora{
+  background:#f5f3ef;
+  color:#111;
+}
+html.light .cr-horario-matriz thead .cr-horario-col-hora{
+  background:#eee;
+}
+html.light .cr-horario-col-lunes{
+  background:#fafafa;
+  color:#777;
+}
+html.light .cr-horario-matriz th,
+html.light .cr-horario-matriz td{
+  border-bottom-color:#d8d5cf;
+}
+html.light .cr-horario-hora{
+  color:#111;
+}
+html.light .cr-config-parametros label,
+html.light .cr-horario-form label{
+  color:#444;
+}
+html.light .cr-config-parametros input,
+html.light .cr-horario-form input[type=time]{
+  background:#fff;
+  color:#111;
+  border-color:#bbb;
+}
+html.light .cr-horario-confirmar{
+  background:#fff;
+  border-color:#aaa;
+  box-shadow:0 0 0 100vmax rgba(0,0,0,.35);
+}
+html.light .cr-horario-confirmar p{
+  color:#111;
+}
+html.light .cr-config-mensaje{
+  color:#168a49;
+}
+html.light .cr-config-mensaje[data-tipo=error]{
+  color:#b51f2d;
+}
+
+
+/* CONFIRMACIÓN DE CIERRE DE SESIÓN — evita cierres accidentales. */
+.logout-confirm-overlay{position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;background:rgba(0,0,0,.82)}
+.logout-confirm-modal{width:min(460px,calc(100vw - 36px));box-sizing:border-box;padding:20px 18px 16px;border:1px solid #ffc400;border-radius:10px;background:linear-gradient(180deg,#181818,#080808);box-shadow:0 18px 50px rgba(0,0,0,.7);text-align:center}
+.logout-confirm-modal h2{margin:0 0 12px;color:#ffc400;font-size:26px;line-height:1.05;font-weight:1000}
+.logout-confirm-modal p{margin:0;color:#fff;font-size:19px;line-height:1.25;font-weight:800}
+.logout-confirm-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:18px}
+.logout-confirm-actions button{min-height:50px;border-radius:8px;padding:8px 10px;font-size:14px;font-weight:1000}
+.logout-confirm-cancel{border:1px solid #555;background:#171717;color:#fff}
+.logout-confirm-accept{border:1px solid #a52b33;background:#5a151c;color:#fff}
+html.light .logout-confirm-overlay{background:rgba(0,0,0,.42)}
+html.light .logout-confirm-modal{background:linear-gradient(180deg,#fff,#f1efea);border-color:#b89a42}
+html.light .logout-confirm-modal h2{color:#8b6800}
+html.light .logout-confirm-modal p{color:#222}
+html.light .logout-confirm-cancel{background:#f2f0eb;border-color:#c9c5bd;color:#222}
+html.light .logout-confirm-accept{background:#a52b33;border-color:#8f2029;color:#fff}
+
+
+/* HORARIOS — pantalla completa con cabecera fija y scroll solo en el contenido. */
+.cr-config-modal--horarios{display:none;}
+.cr-config-modal--horarios .cr-config-modal__header{
+  flex:0 0 auto;
+  position:relative;
+  z-index:20;
+  margin:0;
+  padding:10px 10px 10px;
+  min-height:68px;
+  box-sizing:border-box;
+  background:#050505;
+  border-bottom:1px solid #292929;
+}
+.cr-config-modal--horarios .cr-config-modal__header-actions{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex:0 0 auto;
+}
+.cr-config-modal__theme{
+  width:48px;
+  min-height:48px;
+  border:1px solid var(--cr-line);
+  border-radius:8px;
+  background:#141414;
+  color:#ffc400;
+  display:grid;
+  place-items:center;
+}
+.cr-config-modal--horarios .cr-config-horarios,
+.cr-config-modal--horarios .cr-horario-form{
+  flex:1 1 auto;
+  min-height:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding:10px 10px max(10px, env(safe-area-inset-bottom));
+  box-sizing:border-box;
+  align-content:start;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+html.light .cr-config-modal--horarios .cr-config-modal__header{
+  background:#fff;
+  border-bottom-color:#d4d0c8;
+}
+html.light .cr-config-modal__theme{
+  background:#f2f0eb;
+  color:#8b6800;
+  border-color:#c9c5bd;
+}
+
+
+
+.cr-config-menu .cr-button{
+  width:100%;
+  min-height:76px;
+  padding:8px 4px;
+  font-size:var(--cr-text-button);
+}
+@media(max-width:620px){
+  .cr-config-menu .cr-button{
+    min-height:76px;
+    padding:8px 4px;
+    font-size:var(--cr-text-button);
+  }
+}
+
+
+/* Horarios: viewport propio, fuera del contenedor escalado, conservando exactamente la escala visual V2. */
+.cr-horarios-fullscreen{
+  position:fixed;
+  inset:0;
+  z-index:10000;
+  box-sizing:border-box;
+  display:block;
+  overflow:hidden;
+  background:#020202;
+  padding-top:max(24px, env(safe-area-inset-top, 24px));
+  padding-right:0;
+  padding-bottom:max(0px, env(safe-area-inset-bottom, 0px));
+  padding-left:0;
+}
+.cr-horarios-fullscreen__surface{
+  box-sizing:border-box;
+  width:175.44%;
+  height:175.44%;
+  min-width:0;
+  min-height:0;
+  transform:scale(.57);
+  transform-origin:top left;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+.cr-horarios-fullscreen__header{
+  flex:0 0 auto;
+  box-sizing:border-box;
+  min-height:68px;
+  padding:10px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  background:#050505;
+  border-bottom:1px solid #292929;
+}
+.cr-horarios-fullscreen__header h2{
+  margin:0;
+  color:#fff;
+  font-size:var(--cr-text-panel-title);
+  font-weight:400;
+}
+.cr-horarios-fullscreen__header .cr-config-modal__header-actions{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex:0 0 auto;
+}
+.cr-horarios-fullscreen__save{
+  min-width:96px;
+  height:42px;
+  padding:0 12px;
+  border:1px solid #087d48;
+  border-radius:8px;
+  background:#05b966;
+  color:#fff;
+  font:900 13px Arial,sans-serif;
+}
+.cr-horarios-fullscreen__save:disabled{
+  border-color:#444;
+  background:#252525;
+  color:#888;
+  opacity:1;
+  cursor:default;
+}
+.cr-horarios-fullscreen__header .cr-config-modal__theme,
+.cr-horarios-fullscreen__header .cr-config-modal__close{
+  width:48px;
+  min-height:48px;
+}
+.cr-horarios-fullscreen > .cr-horarios-fullscreen__surface > .cr-config-horarios{
+  flex:1 1 auto;
+  min-height:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding:10px;
+  box-sizing:border-box;
+  align-content:start;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+html.light .cr-horarios-fullscreen{
+  background:#f5f5f5;
+}
+html.light .cr-horarios-fullscreen__header{
+  background:#f7f5f0;
+  border-bottom:1px solid #bdb7aa;
+  color:#222;
+}
+html.light .cr-horarios-fullscreen__header h2{
+  color:#222;
+}
+html.light .cr-horarios-fullscreen__header .cr-config-modal__close{
+  background:#ece9e2;
+  color:#222;
+  border-color:#bdb7aa;
+}
+html.light .cr-horarios-fullscreen__save{
+  border-color:#9f9a90;
+}
+
+
+/* Menú Configuración: misma escala/tamaño V2, pero centrado en el espacio disponible. */
+.cr-config-modal:not(.cr-config-modal--horarios) .cr-config-menu{
+  margin-top:auto;
+  margin-bottom:auto;
+}
+.cr-config-modal:not(.cr-config-modal--horarios) .cr-config-modal__box{
+  display:flex;
+  flex-direction:column;
+}
+
+/* Horarios: confirmación de salida cuando existen cambios sin guardar. */
+.cr-horario-salir-confirmar{
+  position:fixed;
+  inset:0;
+  z-index:10020;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  box-sizing:border-box;
+  background:rgba(0,0,0,.78);
+}
+.cr-horario-salir-confirmar__box{
+  width:min(460px,calc(100vw - 36px));
+  box-sizing:border-box;
+  padding:20px 18px 16px;
+  border:1px solid #555;
+  border-radius:10px;
+  background:linear-gradient(180deg,#181818,#080808);
+  box-shadow:0 18px 50px rgba(0,0,0,.7);
+  text-align:center;
+}
+.cr-horario-salir-confirmar__box h3{
+  margin:0 0 12px;
+  color:#ffc400;
+  font:900 24px/1.05 Arial,sans-serif;
+}
+.cr-horario-salir-confirmar__box p{
+  margin:0;
+  color:#fff;
+  font:700 17px/1.3 Arial,sans-serif;
+}
+.cr-horario-salir-confirmar__acciones{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:18px;
+}
+.cr-horario-salir-confirmar__acciones .cr-button{
+  min-width:0;
+  min-height:52px;
+  padding:8px 10px;
+  font-size:14px;
+}
+html.light .cr-horario-salir-confirmar{
+  background:rgba(0,0,0,.35);
+}
+html.light .cr-horario-salir-confirmar__box{
+  background:linear-gradient(180deg,#fff,#f1efea);
+  border-color:#aaa;
+}
+html.light .cr-horario-salir-confirmar__box h3{
+  color:#8b6800;
+}
+html.light .cr-horario-salir-confirmar__box p{
+  color:#222;
+}
