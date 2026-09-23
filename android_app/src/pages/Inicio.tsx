@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import ReservationCard from '../components/ReservationCard';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 type Reserva = {
   ReservaID: string;
@@ -64,6 +65,7 @@ function formatDateParts(value: Date) {
 }
 
 export default function Inicio() {
+  const { session } = useAuth();
   const navigate = useNavigate();
   const [reservas, setReservas] = useState<Reserva[]>([]);
   const [turnos, setTurnos] = useState({ COMIDA: true, CENA: true });
@@ -96,8 +98,11 @@ export default function Inicio() {
   }
 
   useEffect(() => {
-    fetchReservas();
-  }, []);
+    if (session?.access_token) {
+      console.log('Inicio: access_token detectado/refrescado, cargando reservas...');
+      fetchReservas();
+    }
+  }, [session?.access_token]);
 
   const comida = useMemo(() => reservas.filter(r => r.Turno === 'COMIDA'), [reservas]);
   const cena = useMemo(() => reservas.filter(r => r.Turno === 'CENA'), [reservas]);
