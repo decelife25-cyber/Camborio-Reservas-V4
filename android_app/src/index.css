@@ -2520,8 +2520,15 @@ button{font:inherit;text-transform:uppercase;color:inherit;border:0;cursor:point
  * proporción observada en V2 sin tocar el resto de la aplicación.
  */
 .cr-config-modal__box{
-  transform:scale(1.403);
-  transform-origin:top center;
+  /*
+   * V2 has a ~760px CSS panel. The Android WebView viewport is ~390px,
+   * so the panel must be wider in CSS but MUST NOT scale its contents.
+   * The previous 1.403 transform enlarged every control and was the
+   * reason the V4 table squares/rows were much larger than V2.
+   */
+  width:min(760px,140.3vw);
+  transform:none;
+  transform-origin:initial;
 }
 
 /* Modo DÍA: misma geometría V2; solo se adapta el contraste para fondo claro. */
