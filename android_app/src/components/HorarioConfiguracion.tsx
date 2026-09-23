@@ -31,7 +31,6 @@ export default function HorarioConfiguracion({onBack,darkMode,onToggleTheme}:Pro
   setLoading(true);setMessage('');setError(false);
   const q=await supabase.from('Horarios').select('DiaSemana,Servicio,Hora,MargenHoras,Activo');
   if(q.error){console.error('[Horarios] load',q.error);setRows([]);setInitial([]);setBad({});setMargin({COMIDA:null,CENA:null});setMessage('No se pudieron cargar los horarios.');setError(true);setLoading(false);return}
-  const dataRaw:(Horario[])=(q.data||[]).map((r:any)=>({DiaSemana:dia(r.DiaSemana),Servicio:String(r.Servicio).toUpperCase() as Servicio,Hora:hora(r.Hora),MargenHoras:r.MargenHoras==null?null:Number(r.MargenHoras),Activo:Boolean(r.Activo)})).filter(r=>r.Servicio==='COMIDA'||r.Servicio==='CENA');
   const dataMap=new Map<string,Horario>();
   (q.data||[]).forEach((raw:any)=>{
    const d=dia(raw.DiaSemana),s=String(raw.Servicio).toUpperCase() as Servicio,h=hora(raw.Hora);
