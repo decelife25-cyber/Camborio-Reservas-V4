@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Check, ArrowLeft } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
 
 type Reserva = {
   ReservaID: string;
@@ -33,6 +34,7 @@ function formatTime(value: string) {
 }
 
 export default function Confirmar() {
+  const { session } = useAuth();
   const [reservas, setReservas] = useState<Reserva[]>([]);
   const [loading, setLoading] = useState(true);
   const [confirming, setConfirming] = useState<string | null>(null);
@@ -63,8 +65,11 @@ export default function Confirmar() {
   }
 
   useEffect(() => {
-    fetchPendientes();
-  }, []);
+    if (session?.access_token) {
+      console.log('Confirmar: access_token detectado/refrescado, cargando reservas pendientes...');
+      fetchPendientes();
+    }
+  }, [session?.access_token]);
 
   async function confirmarReserva(reserva: Reserva) {
     setConfirming(reserva.ReservaID);

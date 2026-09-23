@@ -16,7 +16,7 @@ const menuItems = [
 export default function Layout() {
   const [darkMode, setDarkMode] = useState(true);
   const [pendingCount, setPendingCount] = useState(0);
-  const { user } = useAuth();
+  const { user, session } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,8 +38,10 @@ export default function Layout() {
       if (!error) setPendingCount(count || 0);
     }
 
-    if (user) fetchPendingCount();
-  }, [user]);
+    if (session?.access_token) {
+      fetchPendingCount();
+    }
+  }, [session?.access_token]);
 
   const toggleDarkMode = () => {
     const next = !darkMode;
