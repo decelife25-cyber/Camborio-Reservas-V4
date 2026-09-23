@@ -16,6 +16,7 @@ const menuItems = [
 export default function Layout() {
   const [darkMode, setDarkMode] = useState(true);
   const [pendingCount, setPendingCount] = useState(0);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -50,6 +51,7 @@ export default function Layout() {
   };
 
   const handleLogout = async () => {
+    setShowLogoutConfirm(false);
     await supabase.auth.signOut();
     navigate('/login');
   };
@@ -77,7 +79,7 @@ export default function Layout() {
           <button className="header-icon" onClick={() => navigate('/configuracion')} aria-label="Configuración" title="Configuración">
             <Settings size={22} />
           </button>
-          <button className="logout-button" onClick={handleLogout}>CERRAR SESIÓN</button>
+          <button className="logout-button" onClick={() => setShowLogoutConfirm(true)}>CERRAR SESIÓN</button>
         </div>
         <div className="app-version" aria-label="Versión de la aplicación">V1.0.042</div>
       </header>
@@ -106,6 +108,19 @@ export default function Layout() {
           </NavLink>
         ))}
       </nav>
+
+      {showLogoutConfirm && (
+        <div className="logout-confirm-overlay" role="dialog" aria-modal="true" aria-labelledby="logout-confirm-title" onClick={() => setShowLogoutConfirm(false)}>
+          <div className="logout-confirm-modal" onClick={(event) => event.stopPropagation()}>
+            <h2 id="logout-confirm-title">CERRAR SESIÓN</h2>
+            <p>¿Estás seguro de que quieres cerrar sesión?</p>
+            <div className="logout-confirm-actions">
+              <button type="button" className="logout-confirm-cancel" onClick={() => setShowLogoutConfirm(false)}>CANCELAR</button>
+              <button type="button" className="logout-confirm-accept" onClick={handleLogout}>CERRAR SESIÓN</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <main className="private-content">
         <Outlet />
