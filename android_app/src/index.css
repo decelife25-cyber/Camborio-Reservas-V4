@@ -2718,7 +2718,10 @@ html.light .cr-config-modal__theme{
   display:block;
   overflow:hidden;
   background:#020202;
-  padding:0;
+  padding-top:max(24px, env(safe-area-inset-top, 24px));
+  padding-right:0;
+  padding-bottom:max(0px, env(safe-area-inset-bottom, 0px));
+  padding-left:0;
 }
 .cr-horarios-fullscreen__surface{
   box-sizing:border-box;
@@ -2754,6 +2757,21 @@ html.light .cr-config-modal__theme{
   display:flex;
   align-items:center;
   gap:6px;
+  flex:0 0 auto;
+}
+.cr-horarios-fullscreen__save{
+  min-width:82px;
+  height:42px;
+  padding:0 10px;
+  border:1px solid #087d48;
+  border-radius:8px;
+  background:#05b966;
+  color:#fff;
+  font:900 13px Arial,sans-serif;
+}
+.cr-horarios-fullscreen__save:disabled{
+  opacity:.35;
+  cursor:default;
 }
 .cr-horarios-fullscreen__header .cr-config-modal__theme,
 .cr-horarios-fullscreen__header .cr-config-modal__close{
