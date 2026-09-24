@@ -2932,3 +2932,30 @@ html.light .v2-state-modal .v2-edit-cancel-full {
   background: linear-gradient(180deg,#ffe27a,#d6d0bd);
   color: #161616;
 }
+
+
+/* V4.056 — Reservas Hoy: estado CANCELADA siempre rojo y modal CAMBIAR ESTADO compatible con modo DÍA. */
+.status-cancelada {
+  color:#ff4d58;
+  border-color:#ff4d58;
+  background:rgba(255,77,88,.12);
+}
+html.light .v2-edit-overlay {
+  background:rgba(0,0,0,.42) !important;
+}
+html.light .v2-state-modal {
+  background:linear-gradient(180deg,#fff,#f1efea) !important;
+  color:#222 !important;
+  border-color:#b89a42 !important;
+  box-shadow:0 20px 60px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.8) !important;
+}
+html.light .v2-state-modal h3 {
+  color:#8b6800 !important;
+}
+html.light .v2-state-modal .v2-state-current {
+  background:rgba(0,0,0,.04) !important;
+}
+html.light .v2-state-modal .v2-edit-cancel-full {
+  background:linear-gradient(180deg,#ffe27a,#d6d0bd) !important;
+  color:#161616 !important;
+}
