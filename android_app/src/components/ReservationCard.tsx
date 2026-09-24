@@ -169,7 +169,7 @@ export default function ReservationCard({
       : reserva.Estado === 'CONFIRMADA'
         ? [['SENTADA', 'SENTAR', 'sentar'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar']]
         : reserva.Estado === 'SENTADA'
-          ? [['FINALIZADA', 'FINALIZAR', 'finalizar'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']]
+          ? [['FINALIZADA', 'FINALIZAR', 'finalizar'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']]
           : [];
 
   return (
