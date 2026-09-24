@@ -168,6 +168,7 @@ export default function ReservationCard({
     setSaving(false);
     const next = { ...reserva, ...data, Estado: nextState } as ReservationCardData;
     onUpdate?.(next);
+    window.dispatchEvent(new Event('camborio-reservation-changed'));
     setStateOpen(false);
   };
 
