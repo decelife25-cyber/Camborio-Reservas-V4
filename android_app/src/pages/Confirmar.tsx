@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Check, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Check, ArrowLeft, FilePenLine } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 type Reserva = {
@@ -113,6 +114,15 @@ export default function Confirmar() {
               </div>
               <div className="confirm-pax">{reserva.Personas || 0} PAX</div>
               <div className="confirm-client">
+                <button
+                  className="confirm-edit"
+                  type="button"
+                  onClick={() => navigate('/buscar?codigo=' + encodeURIComponent(reserva.CodigoReserva || ''))}
+                  aria-label={'Editar reserva ' + (reserva.CodigoReserva || '')}
+                  title="Editar reserva"
+                >
+                  <FilePenLine size={25} strokeWidth={2.5} />
+                </button>
                 <strong>👤 {reserva.Nombre || 'SIN NOMBRE'}</strong>
                 <span>☎ {reserva.Telefono || '—'} · <b>{reserva.CodigoReserva || '—'}</b></span>
               </div>
