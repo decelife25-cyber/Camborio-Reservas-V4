@@ -43,6 +43,11 @@ export default function Layout() {
     }
 
     if (user) fetchPendingCount();
+    const handleReservationChange = () => {
+      if (user) fetchPendingCount();
+    };
+    window.addEventListener('camborio-reservation-changed', handleReservationChange);
+    return () => window.removeEventListener('camborio-reservation-changed', handleReservationChange);
   }, [user]);
 
   const toggleDarkMode = () => {
