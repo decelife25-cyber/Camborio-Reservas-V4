@@ -112,7 +112,7 @@ export default function Calendario() {
     return () => window.removeEventListener('camborio-reservation-changed', handleReservationChange);
   }, [year, month, daysInMonth, refreshToken]);
 
-  const handleUpdate = (updatedReserva: Reserva) => {
+  const handleUpdate = (updatedReserva: Partial<Reserva> & { ReservaID: string }) => {
     setReservasMes(current => current.map(r => r.ReservaID === updatedReserva.ReservaID ? { ...r, ...updatedReserva } : r));
   };
 
