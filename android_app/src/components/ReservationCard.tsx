@@ -213,11 +213,17 @@ export default function ReservationCard({ reserva, onAssignTable, onUpdate }: { 
         <div className="v2-edit-overlay" onClick={() => setStateOpen(false)}>
           <div className="v2-edit-modal" onClick={e => e.stopPropagation()}>
             <h3>CAMBIAR ESTADO</h3>
-            <div className="v2-state-current">{statusLabel(reserva.Estado)}</div>
+            <div className={'v2-state-current v2-state-current--' + reserva.Estado.toLowerCase().replaceAll('_', '-')}>{statusLabel(reserva.Estado)}</div>
             {error && <div className="cr-nueva-reserva__mensaje" data-tipo="error" style={{ marginBottom: '14px' }}>{error}</div>}
             <div className="v2-edit-actions">
               {stateActions.map(([s, label]) => (
-                <button key={s} type="button" onClick={() => changeState(s)} disabled={saving}>
+                <button
+                  key={s}
+                  className={'v2-state-action v2-state-action--' + s.toLowerCase().replaceAll('_', '-')}
+                  type="button"
+                  onClick={() => changeState(s)}
+                  disabled={saving}
+                >
                   {saving ? '...' : label}
                 </button>
               ))}
