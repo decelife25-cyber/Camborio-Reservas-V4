@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 
@@ -61,7 +61,15 @@ export default function ReservationCard({
   const [stateOpen, setStateOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [lightTheme, setLightTheme] = useState(() => document.documentElement.classList.contains('light'));
   const hasObservations = Boolean(reserva.Observaciones?.trim());
+
+  useEffect(() => {
+    const syncTheme = () => setLightTheme(document.documentElement.classList.contains('light'));
+    syncTheme();
+    window.addEventListener('camborio-theme-change', syncTheme);
+    return () => window.removeEventListener('camborio-theme-change', syncTheme);
+  }, []);
 
   const readOnly = ['FINALIZADA', 'CANCELADA_CLIENTE', 'CANCELADA_LOCAL', 'NO_PRESENTADO'].includes(reserva.Estado);
 
@@ -228,7 +236,7 @@ export default function ReservationCard({
 
       {stateOpen && (
         <div className="v2-edit-overlay" onClick={() => setStateOpen(false)}>
-          <div className="v2-edit-modal v2-state-modal" onClick={e => e.stopPropagation()}>
+          <div className={'v2-edit-modal v2-state-modal' + (lightTheme ? ' light-theme' : '')} onClick={e => e.stopPropagation()}>
             <h3>CAMBIAR ESTADO</h3>
             <div className={'v2-state-current status-modal-' + reserva.Estado.toLowerCase().replaceAll('_', '-')}>
               {statusLabel(reserva.Estado)}
