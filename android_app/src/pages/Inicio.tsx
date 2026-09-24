@@ -102,6 +102,11 @@ export default function Inicio() {
     if (session?.access_token) {
       fetchReservas();
     }
+    const handleReservationChange = () => {
+      if (session?.access_token) fetchReservas();
+    };
+    window.addEventListener('camborio-reservation-changed', handleReservationChange);
+    return () => window.removeEventListener('camborio-reservation-changed', handleReservationChange);
   }, [session?.access_token]);
 
   const handleUpdate = (updatedReserva: any) => {
