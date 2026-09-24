@@ -69,9 +69,9 @@ export default function ReservationCard({ reserva, onAssignTable, onUpdate }: { 
   return (
     <>
       <article className="reservation-card">
-        <div className="reservation-time" onClick={() => !readOnly && setStateOpen(true)} style={{ cursor: readOnly ? 'default' : 'pointer' }} role="button" aria-label="Cambiar estado" aria-disabled={readOnly}>
+        <div className="reservation-time" onClick={() => !readOnly && setStateOpen(true)}>
           <span className={'status-pill status-' + reserva.Estado.toLowerCase().replaceAll('_', '-')}>
-            {statusLabel(reserva.Estado)}{!readOnly ? ' ▼' : ''}
+            {statusLabel(reserva.Estado)}
           </span>
           <strong>{formatTime(reserva.HoraReserva)}</strong>
         </div>
