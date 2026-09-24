@@ -38,21 +38,89 @@ export default function ReservationCard({ reserva, onAssignTable, onUpdate }: { 
   const readOnly = ['FINALIZADA', 'CANCELADA_CLIENTE', 'CANCELADA_LOCAL', 'NO_PRESENTADO'].includes(reserva.Estado);
 
   const changeState = async (nextState: string) => {
-    if (nextState === 'SENTADA' && !reserva.Mesa) {
-      setError('Debes asignar una mesa antes de sentar la reserva.');
+    setSaving(true);
+    setError('');
+
+    // Validaciones de negocio estilo V2
+    if (nextState === 'CONFIRMADA' && reserva.Estado !== 'PENDIENTE') {
+      setError('Solo se pueden confirmar reservas pendientes.');
+      setSaving(false);
       return;
     }
 
-    setSaving(true);
-    setError('');
-    const { data, error: e } = await supabase.from('Reservas').update({ Estado: nextState }).eq('ReservaID', reserva.ReservaID).select('*').single();
-    setSaving(false);
+    if (nextState === 'SENTADA') {
+      if (reserva.Estado !== 'PENDIENTE' && reserva.Estado !== 'CONFIRMADA') {
+        setError('La reserva debe estar PENDIENTE o CONFIRMADA para sentarse.');
+        setSaving(false);
+        return;
+      }
+      if (!reserva.Mesa) {
+        setError('Debes asignar una mesa antes de sentar la reserva.');
+        setSaving(false);
+        return;
+      }
+
+      // Check if table is already occupied in the same shift by another reservation
+      const { data: ocupadas, error: checkError } = await supabase
+        .from('Reservas')
+        .select('ReservaID')
+        .eq('FechaReserva', reserva.FechaReserva)
+        .eq('Turno', reserva.Turno)
+        .eq('Mesa', reserva.Mesa)
+        .eq('Estado', 'SENTADA')
+        .neq('ReservaID', reserva.ReservaID);
+
+      if (checkError) {
+        setError('Error al comprobar disponibilidad de mesa.');
+        setSaving(false);
+        return;
+      }
+      if (ocupadas && ocupadas.length > 0) {
+        setError('La mesa asignada ya está OCUPADA en este turno.');
+        setSaving(false);
+        return;
+      }
+    }
+
+    if (['CANCELADA_LOCAL', 'CANCELADA_CLIENTE', 'NO_PRESENTADO'].includes(nextState)) {
+      if (reserva.Estado !== 'PENDIENTE' && reserva.Estado !== 'CONFIRMADA') {
+        setError('No se puede cancelar una reserva que no está PENDIENTE o CONFIRMADA.');
+        setSaving(false);
+        return;
+      }
+    }
+
+    if (nextState === 'FINALIZADA' && reserva.Estado !== 'SENTADA') {
+      setError('Solo se pueden finalizar reservas SENTADAS.');
+      setSaving(false);
+      return;
+    }
+
+    // Attempt the update directly against public."Reservas"
+    const { data, error: e } = await supabase
+      .from('Reservas')
+      .update({ Estado: nextState })
+      .eq('ReservaID', reserva.ReservaID)
+      .select('*')
+      .single();
 
     if (e) {
       setError(e.message);
+      setSaving(false);
       return;
     }
 
+    // Registra en log de Supabase la acción efectuada como en V2 (CR_Reservas_registrarLog)
+    const userSession = await supabase.auth.getSession();
+    const userId = userSession.data.session?.user?.id;
+    await supabase.from('log').insert({
+      reserva_id: reserva.ReservaID,
+      usuario_id: userId || null,
+      accion: 'ESTADO_MODIFICADO',
+      detalles: `Cambio de ${reserva.Estado} a ${nextState}`
+    });
+
+    setSaving(false);
     const next = { ...reserva, ...data, Estado: nextState } as ReservationCardData;
     if (onUpdate) onUpdate(next);
     setStateOpen(false);
