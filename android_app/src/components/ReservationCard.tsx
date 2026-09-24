@@ -176,7 +176,7 @@ export default function ReservationCard({
     <>
       <article className="reservation-card">
         <div className="reservation-time" onClick={() => !readOnly && setStateOpen(true)}>
-          <span className={'status-pill status-' + reserva.Estado.toLowerCase().replaceAll('_', '-')}>
+          <span className={'status-pill status-' + reserva.Estado.toLowerCase().replaceAll('_', '-').replaceAll(' ', '-')}>
             {statusLabel(reserva.Estado)}
           </span>
           <strong>{formatTime(reserva.HoraReserva)}</strong>
