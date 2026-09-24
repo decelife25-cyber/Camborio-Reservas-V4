@@ -538,12 +538,28 @@ html.light .app-version { color: rgba(0,0,0,.58); }
   font-weight:1000;
 }
 .confirm-client {
+  position:relative;
   display:flex;
   flex-direction:column;
   justify-content:center;
   gap:7px;
-  padding:8px 12px;
+  padding:8px 58px 8px 12px;
 }
+.confirm-edit {
+  position:absolute;
+  top:50%;
+  right:8px;
+  transform:translateY(-50%);
+  width:42px;
+  height:42px;
+  border:1px solid #555;
+  border-radius:7px;
+  background:#101010;
+  color:#fff;
+  display:grid;
+  place-items:center;
+}
+.confirm-edit:active { transform:translateY(-50%) scale(.96); }
 .confirm-client strong { font-size:22px; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .confirm-client span { color:#bbb; font-size:16px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .confirm-client b { color:#ffc400; }
@@ -693,6 +709,7 @@ html.light .subscreen-header h1 { color:#222; }
 html.light .subscreen-back { background:#fff; color:#222; border-color:#bbb; }
 html.light .confirm-card { background:linear-gradient(#fff,#f3f1ec); border-color:#d4d0c8; }
 html.light .confirm-date { background:#f3f1ec; }
+html.light .confirm-edit { background:#fff; color:#222; border-color:#aaa; }
 html.light .confirm-client strong,
 html.light .confirm-day strong { color:#222; }
 html.light .confirm-day span,
