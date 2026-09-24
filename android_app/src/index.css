@@ -2909,3 +2909,26 @@ html.light .cr-horario-salir-confirmar__box h3{
 html.light .cr-horario-salir-confirmar__box p{
   color:#222;
 }
+
+
+/* Modal CAMBIAR ESTADO: seguir el tema activo, igual que el resto del panel. */
+html.light .v2-edit-overlay {
+  background: rgba(0,0,0,.42);
+}
+html.light .v2-edit-modal,
+html.light .v2-state-modal {
+  background: linear-gradient(180deg,#fff,#f1efea);
+  color: #222;
+  border-color: #b89a42;
+  box-shadow: 0 20px 60px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.8);
+}
+html.light .v2-state-modal h3 {
+  color: #8b6800;
+}
+html.light .v2-state-modal .v2-state-current {
+  background: rgba(0,0,0,.04);
+}
+html.light .v2-state-modal .v2-edit-cancel-full {
+  background: linear-gradient(180deg,#ffe27a,#d6d0bd);
+  color: #161616;
+}
