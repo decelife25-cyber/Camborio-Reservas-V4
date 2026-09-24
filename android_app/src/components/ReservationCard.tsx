@@ -29,7 +29,33 @@ function statusLabel(status: string) {
   return status.replaceAll('_', ' ');
 }
 
-export default function ReservationCard({ reserva, onAssignTable, onUpdate }: { reserva: ReservationCardData; onAssignTable?: (reserva: ReservationCardData) => void; onUpdate?: (reserva: ReservationCardData) => void }) {
+function isToday(fecha: string) {
+  return fecha === new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
+}
+
+function getActiveTurno(): 'COMIDA' | 'CENA' {
+  const hour = Number(new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Europe/Madrid',
+    hour: '2-digit',
+    hour12: false,
+  }).format(new Date()));
+  return hour >= 18 ? 'CENA' : 'COMIDA';
+}
+
+function mesaValida(mesa: string | null) {
+  const value = String(mesa || '').trim().toUpperCase();
+  return Boolean(value && !['SIN ASIGNAR', 'NULL', 'UNDEFINED'].includes(value));
+}
+
+export default function ReservationCard({
+  reserva,
+  onAssignTable,
+  onUpdate,
+}: {
+  reserva: ReservationCardData;
+  onAssignTable?: (reserva: ReservationCardData) => void;
+  onUpdate?: (reserva: ReservationCardData) => void;
+}) {
   const navigate = useNavigate();
   const [showObservations, setShowObservations] = useState(false);
   const [stateOpen, setStateOpen] = useState(false);
@@ -43,7 +69,6 @@ export default function ReservationCard({ reserva, onAssignTable, onUpdate }: { 
     setSaving(true);
     setError('');
 
-    // Validaciones de negocio estilo V2
     if (nextState === 'CONFIRMADA' && reserva.Estado !== 'PENDIENTE') {
       setError('Solo se pueden confirmar reservas pendientes.');
       setSaving(false);
@@ -52,37 +77,22 @@ export default function ReservationCard({ reserva, onAssignTable, onUpdate }: { 
 
     if (nextState === 'SENTADA') {
       if (reserva.Estado !== 'CONFIRMADA') {
-        setError('Solo se puede sentar una reserva CONFIRMADA.');
+        setError('La reserva debe estar CONFIRMADA para sentarla.');
         setSaving(false);
         return;
       }
-      if (!reserva.Mesa || reserva.Mesa.trim().toUpperCase() === 'SIN ASIGNAR') {
+      if (!isToday(reserva.FechaReserva)) {
+        setError('Solo se puede sentar una reserva de HOY.');
+        setSaving(false);
+        return;
+      }
+      if (reserva.Turno !== getActiveTurno()) {
+        setError('La reserva pertenece a otro turno. Cambia al turno activo para sentarla.');
+        setSaving(false);
+        return;
+      }
+      if (!mesaValida(reserva.Mesa)) {
         setError('Debes asignar una mesa antes de sentar la reserva.');
-        setSaving(false);
-        return;
-      }
-      const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
-      if (reserva.FechaReserva !== today) {
-        setError('Solo se pueden sentar reservas de hoy.');
-        setSaving(false);
-        return;
-      }
-      const { data: ocupadas, error: checkError } = await supabase
-        .from('Reservas')
-        .select('ReservaID')
-        .eq('FechaReserva', reserva.FechaReserva)
-        .eq('Turno', reserva.Turno)
-        .eq('Mesa', reserva.Mesa)
-        .eq('Estado', 'SENTADA')
-        .neq('ReservaID', reserva.ReservaID);
-
-      if (checkError) {
-        setError('Error al comprobar disponibilidad de mesa.');
-        setSaving(false);
-        return;
-      }
-      if (ocupadas && ocupadas.length > 0) {
-        setError('La mesa asignada ya está OCUPADA en este turno.');
         setSaving(false);
         return;
       }
@@ -90,7 +100,7 @@ export default function ReservationCard({ reserva, onAssignTable, onUpdate }: { 
 
     if (nextState === 'CANCELADA_LOCAL') {
       if (!['PENDIENTE', 'CONFIRMADA', 'SENTADA'].includes(reserva.Estado)) {
-        setError('No se puede cancelar esta reserva desde su estado actual.');
+        setError('No se puede cancelar la reserva en este estado.');
         setSaving(false);
         return;
       }
@@ -98,25 +108,32 @@ export default function ReservationCard({ reserva, onAssignTable, onUpdate }: { 
 
     if (nextState === 'NO_PRESENTADO') {
       if (!['PENDIENTE', 'CONFIRMADA', 'SENTADA'].includes(reserva.Estado)) {
-        setError('No se puede marcar como NO ASISTIÓ desde su estado actual.');
+        setError('No se puede marcar NO ASISTIÓ desde este estado.');
         setSaving(false);
         return;
       }
     }
 
-    if (nextState === 'FINALIZADA') {
-      const past = new Date(reserva.FechaReserva + 'T' + String(reserva.HoraReserva).slice(0, 5) + ':00').getTime() < Date.now();
-      if (reserva.Estado !== 'SENTADA' && !(['PENDIENTE', 'CONFIRMADA'].includes(reserva.Estado) && past)) {
-        setError('Esta reserva todavía no se puede finalizar.');
+    if (nextState === 'FINALIZADA' && !['SENTADA', 'PENDIENTE', 'CONFIRMADA'].includes(reserva.Estado)) {
+      setError('No se puede finalizar la reserva en este estado.');
+      setSaving(false);
+      return;
+    }
+
+    if (nextState === 'FINALIZADA' && ['PENDIENTE', 'CONFIRMADA'].includes(reserva.Estado)) {
+      const fechaHora = new Date(
+        reserva.FechaReserva + 'T' + formatTime(reserva.HoraReserva) + ':00'
+      ).getTime();
+      if (!Number.isNaN(fechaHora) && fechaHora > Date.now()) {
+        setError('Solo se puede finalizar una reserva pendiente o confirmada cuando ya ha pasado su hora.');
         setSaving(false);
         return;
       }
     }
 
-    const now = new Date().toISOString();
     const { data, error: e } = await supabase
       .from('Reservas')
-      .update({ Estado: nextState, FechaEstado: now, FechaModificacion: now })
+      .update({ Estado: nextState })
       .eq('ReservaID', reserva.ReservaID)
       .select('*')
       .single();
@@ -127,31 +144,33 @@ export default function ReservationCard({ reserva, onAssignTable, onUpdate }: { 
       return;
     }
 
-    // Registra en log de Supabase la acción efectuada como en V2 (CR_Reservas_registrarLog)
-    const userSession = await supabase.auth.getSession();
-    const userId = userSession.data.session?.user?.id;
-    await supabase.from('Log').insert({
-      FechaHora: now,
+    const session = await supabase.auth.getSession();
+    const userId = session.data.session?.user?.id;
+    const { error: logError } = await supabase.from('Log').insert({
+      ReservaID: reserva.ReservaID,
       Usuario: userId || null,
       Accion: 'ESTADO_MODIFICADO',
-      ReservaID: reserva.ReservaID,
-      Detalle: `Cambio de ${reserva.Estado} a ${nextState}`
+      Detalle: 'Cambio de estado: ' + reserva.Estado + ' → ' + nextState,
     });
+
+    if (logError) {
+      console.warn('No se pudo registrar el log de estado', logError);
+    }
 
     setSaving(false);
     const next = { ...reserva, ...data, Estado: nextState } as ReservationCardData;
-    if (onUpdate) onUpdate(next);
+    onUpdate?.(next);
     setStateOpen(false);
   };
 
-  const reservaPasada = new Date(reserva.FechaReserva + 'T' + String(reserva.HoraReserva).slice(0, 5) + ':00').getTime() < Date.now();
-  const stateActions = reserva.Estado === 'PENDIENTE'
-    ? (reservaPasada ? [['FINALIZADA', 'FINALIZAR'], ['NO_PRESENTADO', 'NO ASISTIÓ']] : [['CONFIRMADA', 'CONFIRMAR'], ['CANCELADA_LOCAL', 'CANCELAR']])
-    : reserva.Estado === 'CONFIRMADA'
-      ? (reservaPasada ? [['FINALIZADA', 'FINALIZAR'], ['NO_PRESENTADO', 'NO ASISTIÓ']] : [['SENTADA', 'SENTAR'], ['CANCELADA_LOCAL', 'CANCELAR']])
-      : reserva.Estado === 'SENTADA'
-        ? [['FINALIZADA', 'FINALIZAR'], ...(reservaPasada ? [['NO_PRESENTADO', 'NO ASISTIÓ']] : [])]
-        : [];
+  const stateActions =
+    reserva.Estado === 'PENDIENTE'
+      ? [['CONFIRMADA', 'CONFIRMAR', 'confirmar'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar']]
+      : reserva.Estado === 'CONFIRMADA'
+        ? [['SENTADA', 'SENTAR', 'sentar'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar']]
+        : reserva.Estado === 'SENTADA'
+          ? [['FINALIZADA', 'FINALIZAR', 'finalizar'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']]
+          : [];
 
   return (
     <>
@@ -168,16 +187,14 @@ export default function ReservationCard({ reserva, onAssignTable, onUpdate }: { 
             <span className="phone-icon">☎</span>
             <span>{reserva.Telefono || '—'}</span>
             <span>•</span>
-            <span
-              className="reservation-code"
-              role="button"
-              tabIndex={reserva.CodigoReserva ? 0 : -1}
+            <button
+              type="button"
+              className="reservation-code reservation-code-button"
               onClick={() => reserva.CodigoReserva && navigate('/buscar?codigo=' + encodeURIComponent(reserva.CodigoReserva))}
-              onKeyDown={event => {
-                if (event.key === 'Enter' && reserva.CodigoReserva) navigate('/buscar?codigo=' + encodeURIComponent(reserva.CodigoReserva));
-              }}
-              title={reserva.CodigoReserva ? 'Abrir reserva' : undefined}
-            >{reserva.CodigoReserva || '—'}</span>
+              disabled={!reserva.CodigoReserva}
+            >
+              {reserva.CodigoReserva || '—'}
+            </button>
             {hasObservations && (
               <button
                 type="button"
@@ -211,16 +228,18 @@ export default function ReservationCard({ reserva, onAssignTable, onUpdate }: { 
 
       {stateOpen && (
         <div className="v2-edit-overlay" onClick={() => setStateOpen(false)}>
-          <div className="v2-edit-modal" onClick={e => e.stopPropagation()}>
+          <div className="v2-edit-modal v2-state-modal" onClick={e => e.stopPropagation()}>
             <h3>CAMBIAR ESTADO</h3>
-            <div className={'v2-state-current v2-state-current--' + reserva.Estado.toLowerCase().replaceAll('_', '-')}>{statusLabel(reserva.Estado)}</div>
-            {error && <div className="cr-nueva-reserva__mensaje" data-tipo="error" style={{ marginBottom: '14px' }}>{error}</div>}
+            <div className={'v2-state-current status-modal-' + reserva.Estado.toLowerCase().replaceAll('_', '-')}>
+              {statusLabel(reserva.Estado)}
+            </div>
+            {error && <div className="cr-nueva-reserva__mensaje" data-tipo="error">{error}</div>}
             <div className="v2-edit-actions">
-              {stateActions.map(([s, label]) => (
+              {stateActions.map(([s, label, kind]) => (
                 <button
                   key={s}
-                  className={'v2-state-action v2-state-action--' + s.toLowerCase().replaceAll('_', '-')}
                   type="button"
+                  className={'v2-state-action v2-state-action--' + kind}
                   onClick={() => changeState(s)}
                   disabled={saving}
                 >
