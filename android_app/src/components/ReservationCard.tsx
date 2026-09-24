@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 
 export type ReservationCardData = {
@@ -29,6 +30,7 @@ function statusLabel(status: string) {
 }
 
 export default function ReservationCard({ reserva, onAssignTable, onUpdate }: { reserva: ReservationCardData; onAssignTable?: (reserva: ReservationCardData) => void; onUpdate?: (reserva: ReservationCardData) => void }) {
+  const navigate = useNavigate();
   const [showObservations, setShowObservations] = useState(false);
   const [stateOpen, setStateOpen] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -49,18 +51,22 @@ export default function ReservationCard({ reserva, onAssignTable, onUpdate }: { 
     }
 
     if (nextState === 'SENTADA') {
-      if (reserva.Estado !== 'PENDIENTE' && reserva.Estado !== 'CONFIRMADA') {
-        setError('La reserva debe estar PENDIENTE o CONFIRMADA para sentarse.');
+      if (reserva.Estado !== 'CONFIRMADA') {
+        setError('Solo se puede sentar una reserva CONFIRMADA.');
         setSaving(false);
         return;
       }
-      if (!reserva.Mesa) {
+      if (!reserva.Mesa || reserva.Mesa.trim().toUpperCase() === 'SIN ASIGNAR') {
         setError('Debes asignar una mesa antes de sentar la reserva.');
         setSaving(false);
         return;
       }
-
-      // Check if table is already occupied in the same shift by another reservation
+      const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
+      if (reserva.FechaReserva !== today) {
+        setError('Solo se pueden sentar reservas de hoy.');
+        setSaving(false);
+        return;
+      }
       const { data: ocupadas, error: checkError } = await supabase
         .from('Reservas')
         .select('ReservaID')
@@ -82,24 +88,35 @@ export default function ReservationCard({ reserva, onAssignTable, onUpdate }: { 
       }
     }
 
-    if (['CANCELADA_LOCAL', 'CANCELADA_CLIENTE', 'NO_PRESENTADO'].includes(nextState)) {
-      if (reserva.Estado !== 'PENDIENTE' && reserva.Estado !== 'CONFIRMADA') {
-        setError('No se puede cancelar una reserva que no está PENDIENTE o CONFIRMADA.');
+    if (nextState === 'CANCELADA_LOCAL') {
+      if (!['PENDIENTE', 'CONFIRMADA', 'SENTADA'].includes(reserva.Estado)) {
+        setError('No se puede cancelar esta reserva desde su estado actual.');
         setSaving(false);
         return;
       }
     }
 
-    if (nextState === 'FINALIZADA' && reserva.Estado !== 'SENTADA') {
-      setError('Solo se pueden finalizar reservas SENTADAS.');
-      setSaving(false);
-      return;
+    if (nextState === 'NO_PRESENTADO') {
+      if (!['PENDIENTE', 'CONFIRMADA', 'SENTADA'].includes(reserva.Estado)) {
+        setError('No se puede marcar como NO ASISTIÓ desde su estado actual.');
+        setSaving(false);
+        return;
+      }
     }
 
-    // Attempt the update directly against public."Reservas"
+    if (nextState === 'FINALIZADA') {
+      const past = new Date(reserva.FechaReserva + 'T' + String(reserva.HoraReserva).slice(0, 5) + ':00').getTime() < Date.now();
+      if (reserva.Estado !== 'SENTADA' && !(['PENDIENTE', 'CONFIRMADA'].includes(reserva.Estado) && past)) {
+        setError('Esta reserva todavía no se puede finalizar.');
+        setSaving(false);
+        return;
+      }
+    }
+
+    const now = new Date().toISOString();
     const { data, error: e } = await supabase
       .from('Reservas')
-      .update({ Estado: nextState })
+      .update({ Estado: nextState, FechaEstado: now, FechaModificacion: now })
       .eq('ReservaID', reserva.ReservaID)
       .select('*')
       .single();
@@ -113,11 +130,12 @@ export default function ReservationCard({ reserva, onAssignTable, onUpdate }: { 
     // Registra en log de Supabase la acción efectuada como en V2 (CR_Reservas_registrarLog)
     const userSession = await supabase.auth.getSession();
     const userId = userSession.data.session?.user?.id;
-    await supabase.from('log').insert({
-      reserva_id: reserva.ReservaID,
-      usuario_id: userId || null,
-      accion: 'ESTADO_MODIFICADO',
-      detalles: `Cambio de ${reserva.Estado} a ${nextState}`
+    await supabase.from('Log').insert({
+      FechaHora: now,
+      Usuario: userId || null,
+      Accion: 'ESTADO_MODIFICADO',
+      ReservaID: reserva.ReservaID,
+      Detalle: `Cambio de ${reserva.Estado} a ${nextState}`
     });
 
     setSaving(false);
@@ -126,12 +144,13 @@ export default function ReservationCard({ reserva, onAssignTable, onUpdate }: { 
     setStateOpen(false);
   };
 
+  const reservaPasada = new Date(reserva.FechaReserva + 'T' + String(reserva.HoraReserva).slice(0, 5) + ':00').getTime() < Date.now();
   const stateActions = reserva.Estado === 'PENDIENTE'
-    ? [['CONFIRMADA', 'CONFIRMAR'], ['CANCELADA_LOCAL', 'CANCELAR'], ['NO_PRESENTADO', 'NO ASISTIÓ']]
+    ? (reservaPasada ? [['FINALIZADA', 'FINALIZAR'], ['NO_PRESENTADO', 'NO ASISTIÓ']] : [['CONFIRMADA', 'CONFIRMAR'], ['CANCELADA_LOCAL', 'CANCELAR']])
     : reserva.Estado === 'CONFIRMADA'
-      ? [['SENTADA', 'SENTAR'], ['CANCELADA_LOCAL', 'CANCELAR'], ['NO_PRESENTADO', 'NO ASISTIÓ']]
+      ? (reservaPasada ? [['FINALIZADA', 'FINALIZAR'], ['NO_PRESENTADO', 'NO ASISTIÓ']] : [['SENTADA', 'SENTAR'], ['CANCELADA_LOCAL', 'CANCELAR']])
       : reserva.Estado === 'SENTADA'
-        ? [['FINALIZADA', 'FINALIZAR']]
+        ? [['FINALIZADA', 'FINALIZAR'], ...(reservaPasada ? [['NO_PRESENTADO', 'NO ASISTIÓ']] : [])]
         : [];
 
   return (
@@ -149,7 +168,16 @@ export default function ReservationCard({ reserva, onAssignTable, onUpdate }: { 
             <span className="phone-icon">☎</span>
             <span>{reserva.Telefono || '—'}</span>
             <span>•</span>
-            <span className="reservation-code">{reserva.CodigoReserva || '—'}</span>
+            <span
+              className="reservation-code"
+              role="button"
+              tabIndex={reserva.CodigoReserva ? 0 : -1}
+              onClick={() => reserva.CodigoReserva && navigate('/buscar?codigo=' + encodeURIComponent(reserva.CodigoReserva))}
+              onKeyDown={event => {
+                if (event.key === 'Enter' && reserva.CodigoReserva) navigate('/buscar?codigo=' + encodeURIComponent(reserva.CodigoReserva));
+              }}
+              title={reserva.CodigoReserva ? 'Abrir reserva' : undefined}
+            >{reserva.CodigoReserva || '—'}</span>
             {hasObservations && (
               <button
                 type="button"
