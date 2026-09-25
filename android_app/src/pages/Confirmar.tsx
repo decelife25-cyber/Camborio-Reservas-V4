@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Check, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 
 type Reserva = {
@@ -114,7 +115,16 @@ export default function Confirmar() {
               <div className="confirm-pax">{reserva.Personas || 0} PAX</div>
               <div className="confirm-client">
                 <strong>👤 {reserva.Nombre || 'SIN NOMBRE'}</strong>
-                <span>☎ {reserva.Telefono || '—'} · <b>{reserva.CodigoReserva || '—'}</b></span>
+                <span>☎ {reserva.Telefono || '—'} · {reserva.CodigoReserva ? (
+                  <button
+                    type="button"
+                    className="confirm-code-button"
+                    onClick={() => navigate('/buscar?codigo=' + encodeURIComponent(reserva.CodigoReserva!))}
+                    aria-label={'Abrir reserva ' + reserva.CodigoReserva}
+                  >
+                    <b>{reserva.CodigoReserva}</b>
+                  </button>
+                ) : <b>—</b>}</span>
               </div>
               <button
                 className="confirm-check"
