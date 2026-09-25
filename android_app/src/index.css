@@ -3035,7 +3035,7 @@ html.light .v2-state-modal .v2-edit-cancel-full {
 .ficha-pax-control strong{font-size:clamp(30px,7vw,42px)!important}
 .ficha-time-picker{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
 .ficha-time-picker>div>span{display:block;margin-bottom:8px;color:#ffc400;font:1000 17px/1 Arial,sans-serif;text-align:center}
-.ficha-wheel{height:160px!important}
+
 .ficha-observaciones-input{width:100%;min-height:130px;box-sizing:border-box;padding:14px;border:1px solid #ffc400;border-radius:10px;background:#0b0b0b;color:#fff;font:700 20px/1.25 Arial,sans-serif;resize:vertical}
 html.light .ficha-edit-modal{background:linear-gradient(180deg,#fff,#f1efea)!important;color:#171717!important;border-color:#b89a42!important}
 html.light .ficha-edit-modal .cr-confirmacion-mesa__eyebrow,
@@ -3055,3 +3055,9 @@ html.light .ficha-edit-modal .v2-state-current{color:#8b6800;background:#f5f0df}
   .ficha-pax-control button{width:72px!important}
   .ficha-time-picker{gap:10px}
 }
+
+/* Corrección integral modales ficha: mismo control Wheel que NuevaReserva y modales legibles en día/noche. */
+.ficha-time-picker{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}.ficha-time-picker label{display:grid;gap:8px;color:#ffc400;font:1000 18px/1 var(--cr-font);text-transform:uppercase}.ficha-time-picker .cr-nueva-reserva__rueda{width:100%}
+.ficha-edit-modal{width:min(640px,94vw)!important;max-height:calc(100svh - 36px);overflow:auto;padding:28px!important;border-radius:18px!important}.ficha-edit-modal .cr-confirmacion-mesa__eyebrow{font-size:clamp(28px,7vw,38px)!important;margin:0 0 22px!important}.ficha-edit-actions button{min-height:64px!important;font-size:clamp(20px,5vw,28px)!important;padding:12px 14px!important}.ficha-state-actions{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.ficha-state-button{min-height:64px!important;border:0!important;border-radius:10px!important;color:#fff!important;font:1000 clamp(20px,5vw,28px)/1 var(--cr-font)!important;text-transform:uppercase}.ficha-state-button--confirmada{background:linear-gradient(180deg,#1bbf62,#087b35)!important}.ficha-state-button--sentada{background:linear-gradient(180deg,#2388ff,#0754bd)!important}.ficha-state-button--finalizada{background:linear-gradient(180deg,#475569,#1e293b)!important}.ficha-state-button--cancelada-local,.ficha-state-button--cancelada-cliente{background:linear-gradient(180deg,#ef4444,#991b1b)!important}.ficha-state-current{min-height:64px!important;min-width:min(360px,100%)!important;font-size:clamp(28px,7vw,42px)!important}
+html.light .ficha-edit-modal{background:linear-gradient(180deg,#fff,#f2f0eb)!important;color:#171717!important;border-color:#b89a42!important}.ficha-edit-modal .cr-confirmacion-mesa__eyebrow{color:#ffc400!important}html.light .ficha-edit-modal .cr-confirmacion-mesa__eyebrow,html.light .ficha-time-picker label{color:#8b6800!important}html.light .ficha-state-current{color:#8b6800!important;background:#f5f0df!important}html.light .ficha-state-button{color:#fff!important}html.light .ficha-edit-actions button:first-child{background:#f4f2ed!important;color:#171717!important;border-color:#b89a42!important}html.light .ficha-edit-actions button:last-child{background:linear-gradient(180deg,#ffd83a,#edae00)!important;color:#111!important}.ficha-observaciones-input{font-size:22px!important}
+@media(max-width:620px){.ficha-edit-modal{width:calc(100vw - 20px)!important;padding:22px 14px!important}.ficha-time-picker{gap:10px}.ficha-state-actions{grid-template-columns:1fr}.ficha-state-button{min-height:62px!important}.ficha-edit-actions button{min-height:60px!important}}
