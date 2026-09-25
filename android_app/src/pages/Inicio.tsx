@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import ReservationCard from '../components/ReservationCard';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';\nimport { BadgeNotification } from '../lib/badgeNotification';
+import { useAuth } from '../contexts/AuthContext';
+import { BadgeNotification } from '../lib/badgeNotification';
 
 type Reserva = {
   ReservaID: string;
