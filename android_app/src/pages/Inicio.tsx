@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import ReservationCard from '../components/ReservationCard';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext';\nimport { BadgeNotification } from '../lib/badgeNotification';
 
 type Reserva = {
   ReservaID: string;
@@ -95,8 +95,22 @@ export default function Inicio() {
       setReservas((data || []) as Reserva[]);
     }
 
+    const { count: pendientes, error: pendientesError } = await supabase
+      .from('Reservas')
+      .select('ReservaID', { count: 'exact', head: true })
+      .eq('Estado', 'PENDIENTE')
+      .gte('FechaReserva', today);
+
+    if (!pendientesError) {
+      await BadgeNotification.update({ count: pendientes ?? 0 });
+    }
+
     setLoading(false);
   }
+
+  useEffect(() => {
+    BadgeNotification.requestPermission().catch(() => undefined);
+  }, []);
 
   useEffect(() => {
     if (session?.access_token) {
