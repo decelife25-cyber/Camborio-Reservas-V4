@@ -132,6 +132,7 @@ export default function Mesas() {
   const [selectedTable, setSelectedTable] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const assignmentId = searchParams.get('asignar');
+  const volverCodigo = searchParams.get('volverCodigo') || '';
   const [assignmentReserva, setAssignmentReserva] = useState<Reserva | null>(null);
   const [assignmentTables, setAssignmentTables] = useState<string[]>([]);
   const assignmentMode = Boolean(assignmentId);
@@ -267,7 +268,8 @@ export default function Mesas() {
     const { error: updateError } = await supabase.from('Reservas').update({ Mesa: principal, MesasAdicionales: adicionales.length ? adicionales.join(', ') : null, Zona: zonaAsignada, Turno: turno, FechaModificacion: new Date().toISOString() }).eq('ReservaID', assignmentReserva.ReservaID);
     setSaving(false);
     if (updateError) { setError(updateError.message); return; }
-    navigate('/');
+    if (volverCodigo) navigate('/buscar?codigo=' + encodeURIComponent(volverCodigo));
+    else navigate('/');
   };
 
   const estado: 'disponible' | 'reservada' | 'ocupada' | 'desactivada' = selectedTable && mesasConfig[selectedTable]?.Activa === false ? 'desactivada' : (selectedTable ? visualState(reservaSeleccionada) : 'disponible');
