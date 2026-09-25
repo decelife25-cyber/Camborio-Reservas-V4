@@ -3,6 +3,8 @@ package com.camborio.reservas.privada;
 import android.content.Context;
 import android.content.Intent;
 
+import me.leolin.shortcutbadger.ShortcutBadger;
+
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
@@ -20,6 +22,13 @@ public class AppBadgePlugin extends Plugin {
         intent.putExtra("badge_count_package_name", context.getPackageName());
         intent.putExtra("badge_count_class_name", getMainActivityClassName());
         try { context.sendBroadcast(intent); } catch (Exception ignored) {}
+        try {
+            if (count > 0) {
+                ShortcutBadger.applyCount(context, count);
+            } else {
+                ShortcutBadger.removeCount(context);
+            }
+        } catch (Exception ignored) {}
         JSObject ret = new JSObject();
         ret.put("count", Math.max(0, count));
         call.resolve(ret);
