@@ -14,6 +14,7 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        registerPlugin(AppBadgePlugin.class);
         WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
 
         // Android 15+ enforces edge-to-edge for apps targeting SDK 35+.
