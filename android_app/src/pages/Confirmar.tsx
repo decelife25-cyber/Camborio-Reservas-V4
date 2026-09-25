@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, ArrowLeft, FilePenLine } from 'lucide-react';
+import { Check, ArrowLeft } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { setAppBadge } from '../lib/appBadge';
 
 type Reserva = {
   ReservaID: string;
@@ -58,7 +59,9 @@ export default function Confirmar() {
       setError('No se pudieron cargar las reservas.');
       setReservas([]);
     } else {
-      setReservas((data || []) as Reserva[]);
+      const pendientes = (data || []) as Reserva[];
+      setReservas(pendientes);
+      void setAppBadge(pendientes.length);
     }
 
     setLoading(false);
@@ -82,7 +85,11 @@ export default function Confirmar() {
       return;
     }
 
-    setReservas(current => current.filter(item => item.ReservaID !== reserva.ReservaID));
+    setReservas(current => {
+      const next = current.filter(item => item.ReservaID !== reserva.ReservaID);
+      void setAppBadge(next.length);
+      return next;
+    });
     setConfirming(null);
   }
 
@@ -115,17 +122,8 @@ export default function Confirmar() {
               </div>
               <div className="confirm-pax">{reserva.Personas || 0} PAX</div>
               <div className="confirm-client">
-                <button
-                  className="confirm-edit"
-                  type="button"
-                  onClick={() => navigate('/buscar?codigo=' + encodeURIComponent(reserva.CodigoReserva || ''))}
-                  aria-label={'Editar reserva ' + (reserva.CodigoReserva || '')}
-                  title="Editar reserva"
-                >
-                  <FilePenLine size={25} strokeWidth={2.5} />
-                </button>
                 <strong>👤 {reserva.Nombre || 'SIN NOMBRE'}</strong>
-                <span>☎ {reserva.Telefono || '—'} · <b>{reserva.CodigoReserva || '—'}</b></span>
+                <span>☎ {reserva.Telefono || '—'} · <button className="confirm-code" type="button" onClick={() => navigate('/buscar?codigo=' + encodeURIComponent(reserva.CodigoReserva || ''))}>{reserva.CodigoReserva || '—'}</button></span>
               </div>
               <button
                 className="confirm-check"
