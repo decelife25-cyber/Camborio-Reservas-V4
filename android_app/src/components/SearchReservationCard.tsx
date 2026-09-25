@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { getTurnoFromHora } from '../utils/shifts';
+import FechaPicker from './FechaPicker';
 
 export type SearchReservation = {
   ReservaID:string; CodigoReserva:string|null; FechaReserva:string; HoraReserva:string;
@@ -9,6 +10,34 @@ export type SearchReservation = {
   Mesa:string|null; MesasAdicionales?:string|null; Turno?:string|null;
   Observaciones?:string|null; FechaCreacion?:string|null;
 };
+
+
+const FICHA_HORAS=['09','10','11','12','13','14','15','16','17','18','19','20','21','22','23'];
+const FICHA_MINUTOS=['00','15','30','45'];
+
+function FichaWheel({values,value,onChange,kind}:{values:string[];value:string;onChange:(v:string)=>void;kind:'hora'|'minutos'}){
+  const ref=useRef<HTMLSpanElement|null>(null);
+  const timer=useRef<number|null>(null);
+  const H=32;
+  const index=Math.max(1,values.indexOf(value)+1);
+  const center=(i:number,smooth:boolean)=>{const el=ref.current;if(!el)return;el.scrollTo({top:Math.max(0,(i*H)-(el.clientHeight/2)+(H/2)),behavior:smooth?'smooth':'auto'});};
+  const limit=(i:number)=>Math.min(Math.max(Math.round(i),1),values.length);
+  useEffect(()=>{const frame=requestAnimationFrame(()=>center(index,false));return()=>cancelAnimationFrame(frame)},[index,values]);
+  const snap=()=>{const el=ref.current;if(!el)return;if(timer.current!==null)clearTimeout(timer.current);const i=limit((el.scrollTop+(el.clientHeight/2)-(H/2))/H);timer.current=window.setTimeout(()=>{const el2=ref.current;if(!el2)return;const j=limit((el2.scrollTop+(el2.clientHeight/2)-(H/2))/H);center(j,false);onChange(values[j-1]);timer.current=null},90)};
+  return <span ref={ref} className="cr-nueva-reserva__rueda ficha-wheel" role="listbox" aria-label={kind==='hora'?'Hora':'Minutos'} onScroll={snap}>
+    <span className="cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--vacio" aria-hidden="true"/>
+    {values.map((item,i)=>{const d=Math.abs(i+1-index);const cls=d===0?'cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--actual':d===1?'cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--cerca':'cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--lejos';return <span key={item} className={cls}>{item}</span>})}
+    <span className="cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--vacio" aria-hidden="true"/>
+  </span>;
+}
+
+function FichaHoraPicker({value,onChange}:{value:string;onChange:(v:string)=>void}){
+  const [hora,minutos]=value.split(':');
+  return <div className="ficha-time-picker">
+    <div><span>HORA</span><FichaWheel values={FICHA_HORAS} value={hora||'13'} onChange={v=>onChange(v+':'+(minutos||'00'))} kind="hora"/></div>
+    <div><span>MINUTOS</span><FichaWheel values={FICHA_MINUTOS} value={minutos||'00'} onChange={v=>onChange((hora||'13')+':'+v)} kind="minutos"/></div>
+  </div>;
+}
 
 function dateParts(v:string){
   const [y,m,d]=String(v||'').split('-').map(Number);
@@ -129,15 +158,16 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
       <button className="cr-busqueda-ficha__guardar" type="button" disabled={!dirty||saving||readOnly} onClick={()=>void save()}>{saving?'GUARDANDO...':'GUARDAR CAMBIOS'}</button>
     </article>
 
-    {editing&&<div className="cr-confirmacion-mesa v2-edit-overlay" onClick={()=>setEditing(null)}>
-      <div className="cr-confirmacion-mesa__panel v2-edit-modal" onClick={e=>e.stopPropagation()}>
-        <p className="cr-confirmacion-mesa__eyebrow">{editing==='fecha'?'CAMBIAR FECHA':editing==='hora'?'CAMBIAR HORA':editing==='personas'?'CAMBIAR PAX':'OBSERVACIONES'}</p>
-        {editing==='observaciones'
-          ? <textarea rows={4} value={value} onChange={e=>setValue(e.target.value)}/>
+    {editing==='fecha'&&<FechaPicker value={value} onChange={v=>{setValue(v);setR(prev=>({...prev,FechaReserva:v}));setDirty(true);setEditing(null)}} onClose={()=>setEditing(null)}/>}
+    {editing && editing!=='fecha'&&<div className="v2-edit-overlay" onClick={()=>setEditing(null)}>
+      <div className="v2-edit-modal ficha-edit-modal" onClick={e=>e.stopPropagation()}>
+        <p className="cr-confirmacion-mesa__eyebrow">{editing==='hora'?'CAMBIAR HORA':editing==='personas'?'CAMBIAR PAX':'OBSERVACIONES'}</p>
+        {editing==='hora'
+          ? <FichaHoraPicker value={value} onChange={setValue}/>
           : editing==='personas'
-            ? <div className="v2-edit-pax"><button type="button" onClick={()=>setValue(String(Math.max(1,Number(value||1)-1)))}>−</button><input type="number" min="1" value={value} onChange={e=>setValue(e.target.value)}/><button type="button" onClick={()=>setValue(String(Number(value||1)+1))}>+</button></div>
-            : <input type={editing==='fecha'?'date':'time'} value={value} onChange={e=>setValue(e.target.value)}/>}
-        <div className="cr-confirmacion-mesa__acciones v2-edit-actions"><button type="button" onClick={()=>setEditing(null)}>CANCELAR</button><button type="button" onClick={acceptEdit}>ACEPTAR</button></div>
+            ? <div className="v2-personas-control ficha-pax-control"><button type="button" onClick={()=>setValue(String(Math.max(1,Number(value||1)-1)))}>−</button><strong>{Number(value||1)} PAX</strong><button type="button" onClick={()=>setValue(String(Number(value||1)+1))}>+</button></div>
+            : <textarea className="ficha-observaciones-input" rows={4} value={value} onChange={e=>setValue(e.target.value)}/>}
+        <div className="v2-edit-actions ficha-edit-actions"><button type="button" onClick={()=>setEditing(null)}>CANCELAR</button><button type="button" onClick={acceptEdit}>ACEPTAR</button></div>
       </div>
     </div>}
 
