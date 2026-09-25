@@ -150,3 +150,4 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
       </div>
     </div>}
   </div>;
+}
