@@ -3022,3 +3022,36 @@ html.light .v2-state-modal .v2-edit-cancel-full {
 .cr-busqueda-estado__boton--cancelar{background:linear-gradient(180deg,#ef4444,#991b1b)}
 .cr-busqueda-estado__boton--no-presentado{background:linear-gradient(180deg,#f59e0b,#b45309)}
 .cr-busqueda-estado__cerrar{width:100%;margin-top:4px;border:1px solid #ffc400;background:linear-gradient(180deg,#ffe27a 0,#d6d0bd 100%);color:#161616}
+
+
+/* Ficha de reserva: modales grandes y legibles en móvil, usando los mismos controles de V2. */
+.ficha-edit-modal{width:min(620px,calc(100vw - 24px));padding:32px 24px;border-radius:18px}
+.ficha-edit-modal .cr-confirmacion-mesa__eyebrow{margin:0 0 24px;color:#ffc400;font:1000 clamp(28px,7vw,40px)/1 Arial,sans-serif;text-align:center}
+.ficha-edit-actions{gap:14px;margin-top:26px}
+.ficha-edit-actions button{min-height:64px;border:1px solid #ffc400;border-radius:10px;background:linear-gradient(180deg,#262626,#111);color:#fff;font:1000 clamp(18px,4.5vw,23px)/1 Arial,sans-serif;text-transform:uppercase;padding:10px 14px}
+.ficha-edit-actions button:last-child{background:linear-gradient(180deg,#ffd83a,#edae00);color:#111}
+.ficha-pax-control{grid-template-columns:82px minmax(130px,1fr) 82px!important;min-height:96px!important;padding:8px!important}
+.ficha-pax-control button{width:82px!important;height:76px!important;font-size:38px!important}
+.ficha-pax-control strong{font-size:clamp(30px,7vw,42px)!important}
+.ficha-time-picker{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+.ficha-time-picker>div>span{display:block;margin-bottom:8px;color:#ffc400;font:1000 17px/1 Arial,sans-serif;text-align:center}
+.ficha-wheel{height:160px!important}
+.ficha-observaciones-input{width:100%;min-height:130px;box-sizing:border-box;padding:14px;border:1px solid #ffc400;border-radius:10px;background:#0b0b0b;color:#fff;font:700 20px/1.25 Arial,sans-serif;resize:vertical}
+html.light .ficha-edit-modal{background:linear-gradient(180deg,#fff,#f1efea)!important;color:#171717!important;border-color:#b89a42!important}
+html.light .ficha-edit-modal .cr-confirmacion-mesa__eyebrow,
+html.light .ficha-time-picker>div>span{color:#8b6800!important}
+html.light .ficha-edit-actions button{background:linear-gradient(180deg,#f4f2ed,#ddd8ce)!important;color:#171717!important;border-color:#b89a42!important}
+html.light .ficha-edit-actions button:last-child{background:linear-gradient(180deg,#ffd83a,#edae00)!important;color:#111!important}
+html.light .ficha-pax-control{background:#fff!important;border-color:#b89a42!important}
+html.light .ficha-pax-control button{background:linear-gradient(180deg,#f4f2ed,#ddd8ce)!important;color:#8b6800!important}
+html.light .ficha-pax-control strong{color:#171717!important}
+html.light .ficha-observaciones-input{background:#fff!important;color:#171717!important;border-color:#b89a42!important}
+html.light .ficha-edit-modal .v2-state-current{color:#8b6800;background:#f5f0df}
+@media(max-width:620px){
+  .ficha-edit-modal{width:calc(100vw - 20px);padding:28px 16px}
+  .ficha-edit-modal .cr-confirmacion-mesa__eyebrow{font-size:30px}
+  .ficha-edit-actions button{min-height:62px;font-size:18px}
+  .ficha-pax-control{grid-template-columns:72px minmax(100px,1fr) 72px!important}
+  .ficha-pax-control button{width:72px!important}
+  .ficha-time-picker{gap:10px}
+}
