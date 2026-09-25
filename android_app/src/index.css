@@ -547,6 +547,20 @@ html.light .app-version { color: rgba(0,0,0,.58); }
 .confirm-client strong { font-size:22px; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .confirm-client span { color:#bbb; font-size:16px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .confirm-client b { color:#ffc400; }
+.confirm-code-button {
+  appearance: none;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+  text-align: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+.confirm-code-button b { color: inherit; }
 .confirm-check {
   align-self:center;
   justify-self:center;
