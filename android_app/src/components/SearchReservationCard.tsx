@@ -26,7 +26,7 @@ function FichaWheel({values,value,onChange,kind}:{values:string[];value:string;o
   const snap=()=>{const el=ref.current;if(!el)return;if(timer.current!==null)clearTimeout(timer.current);const i=limit((el.scrollTop+(el.clientHeight/2)-(H/2))/H);timer.current=window.setTimeout(()=>{const el2=ref.current;if(!el2)return;const j=limit((el2.scrollTop+(el2.clientHeight/2)-(H/2))/H);center(j,false);onChange(values[j-1]);timer.current=null},90)};
   return <span ref={ref} className="cr-nueva-reserva__rueda ficha-wheel" role="listbox" aria-label={kind==='hora'?'Hora':'Minutos'} onScroll={snap}>
     <span className="cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--vacio" aria-hidden="true"/>
-    {values.map((item,i)=>{const d=Math.abs(i+1-index);const cls=d===0?'cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--actual':d===1?'cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--cerca':'cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--lejos';return <span key={item} className={cls}>{item}</span>})}
+    {values.map((item)=>{const i=values.indexOf(item);const d=Math.abs(i+1-index);const cls=d===0?'cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--actual':d===1?'cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--cerca':'cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--lejos';return <span key={item} className={cls}>{item}</span>})}
     <span className="cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--vacio" aria-hidden="true"/>
   </span>;
 }
