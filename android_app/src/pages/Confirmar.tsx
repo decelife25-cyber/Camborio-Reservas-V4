@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Check, ArrowLeft } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
@@ -114,7 +115,7 @@ export default function Confirmar() {
               <div className="confirm-pax">{reserva.Personas || 0} PAX</div>
               <div className="confirm-client">
                 <strong>👤 {reserva.Nombre || 'SIN NOMBRE'}</strong>
-                <span>☎ {reserva.Telefono || '—'} · <b>{reserva.CodigoReserva || '—'}</b></span>
+                <span>☎ {reserva.Telefono || '—'} · <button type="button" className="reservation-code reservation-code-button" onClick={() => reserva.CodigoReserva && navigate('/buscar?codigo=' + encodeURIComponent(reserva.CodigoReserva))} disabled={!reserva.CodigoReserva}>{reserva.CodigoReserva || '—'}</button></span>
               </div>
               <button
                 className="confirm-check"
