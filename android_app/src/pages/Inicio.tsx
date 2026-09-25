@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase';
 import ReservationCard from '../components/ReservationCard';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { BadgeNotification } from '../lib/badgeNotification';
 
 type Reserva = {
   ReservaID: string;
@@ -75,6 +76,26 @@ export default function Inicio() {
   const [filtroAbierto, setFiltroAbierto] = useState(false);
   const [filtroEdicion, setFiltroEdicion] = useState<Record<EstadoFiltro, boolean>>(filtroEstados);
 
+  async function actualizarBadgePendientes() {
+    const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
+    const { count, error: badgeError } = await supabase
+      .from('Reservas')
+      .select('ReservaID', { count: 'exact', head: true })
+      .eq('Estado', 'PENDIENTE')
+      .gte('FechaReserva', today);
+
+    if (badgeError) {
+      console.error('Error contando reservas pendientes para badge', badgeError);
+      return;
+    }
+
+    try {
+      await BadgeNotification.updateBadgeCount({ count: count ?? 0 });
+    } catch (badgeError) {
+      console.error('Error actualizando badge de reservas', badgeError);
+    }
+  }
+
   async function fetchReservas() {
     if (!session?.access_token) return;
     setLoading(true);
@@ -96,6 +117,7 @@ export default function Inicio() {
     }
 
     setLoading(false);
+    void actualizarBadgePendientes();
   }
 
   useEffect(() => {
