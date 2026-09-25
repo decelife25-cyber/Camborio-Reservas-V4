@@ -18,7 +18,7 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 
-@CapacitorPlugin(name = "BadgeNotification")
+@CapacitorPlugin(name = "BadgeNotification", permissions = {\n        @com.getcapacitor.annotation.Permission(alias = "notifications", strings = {Manifest.permission.POST_NOTIFICATIONS})\n})
 public class BadgeNotificationPlugin extends Plugin {
     private static final String CHANNEL_ID = "camborio_reservas_pending";
     private static final int NOTIFICATION_ID = 1001;
