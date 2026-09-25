@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import ReservationCard from '../components/ReservationCard';
 import { useNavigate } from 'react-router-dom';
+import { setAppBadge } from '../lib/appBadge';
 
 type Reserva = {
   ReservaID: string;
@@ -91,6 +92,13 @@ export default function Inicio() {
     } else {
       setReservas((data || []) as Reserva[]);
     }
+
+    const { count: pendingCount } = await supabase
+      .from('Reservas')
+      .select('ReservaID', { count: 'exact', head: true })
+      .eq('Estado', 'PENDIENTE')
+      .gte('FechaReserva', today);
+    void setAppBadge(pendingCount || 0);
 
     setLoading(false);
   }
