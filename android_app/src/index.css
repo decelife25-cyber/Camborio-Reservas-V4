@@ -563,6 +563,7 @@ html.light .app-version { color: rgba(0,0,0,.58); }
 .confirm-client strong { font-size:22px; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .confirm-client span { color:#bbb; font-size:16px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .confirm-client b { color:#ffc400; }
+.confirm-code { border:0; background:transparent; padding:0; margin:0; color:#ffc400; font:inherit; font-weight:inherit; text-decoration:underline; cursor:pointer; }
 .confirm-check {
   align-self:center;
   justify-self:center;
