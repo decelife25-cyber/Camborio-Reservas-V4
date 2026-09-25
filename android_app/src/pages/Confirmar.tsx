@@ -34,6 +34,7 @@ function formatTime(value: string) {
 }
 
 export default function Confirmar() {
+  const navigate = useNavigate();
   const [reservas, setReservas] = useState<Reserva[]>([]);
   const [loading, setLoading] = useState(true);
   const [confirming, setConfirming] = useState<string | null>(null);
