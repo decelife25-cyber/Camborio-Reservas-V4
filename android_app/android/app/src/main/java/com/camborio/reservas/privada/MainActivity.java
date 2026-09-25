@@ -10,7 +10,11 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.getcapacitor.BridgeActivity;
 
-public class MainActivity extends BridgeActivity {\n    public MainActivity() {\n        registerPlugin(BadgeNotificationPlugin.class);\n    }
+public class MainActivity extends BridgeActivity {
+    public MainActivity() {
+        registerPlugin(BadgeNotificationPlugin.class);
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
