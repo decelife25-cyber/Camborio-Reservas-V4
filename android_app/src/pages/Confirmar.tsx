@@ -64,6 +64,9 @@ export default function Confirmar() {
 
   useEffect(() => {
     fetchPendientes();
+    const handleReservationChange = () => fetchPendientes();
+    window.addEventListener('camborio-reservation-changed', handleReservationChange);
+    return () => window.removeEventListener('camborio-reservation-changed', handleReservationChange);
   }, []);
 
   async function confirmarReserva(reserva: Reserva) {
@@ -81,6 +84,7 @@ export default function Confirmar() {
     }
 
     setReservas(current => current.filter(item => item.ReservaID !== reserva.ReservaID));
+    window.dispatchEvent(new Event('camborio-reservation-changed'));
     setConfirming(null);
   }
 

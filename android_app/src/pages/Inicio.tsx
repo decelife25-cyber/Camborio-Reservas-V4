@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import ReservationCard from '../components/ReservationCard';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 type Reserva = {
   ReservaID: string;
@@ -65,6 +66,7 @@ function formatDateParts(value: Date) {
 
 export default function Inicio() {
   const navigate = useNavigate();
+  const { session } = useAuth();
   const [reservas, setReservas] = useState<Reserva[]>([]);
   const [turnos, setTurnos] = useState({ COMIDA: true, CENA: true });
   const [loading, setLoading] = useState(true);
@@ -74,6 +76,7 @@ export default function Inicio() {
   const [filtroEdicion, setFiltroEdicion] = useState<Record<EstadoFiltro, boolean>>(filtroEstados);
 
   async function fetchReservas() {
+    if (!session?.access_token) return;
     setLoading(true);
     setError('');
     const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
@@ -96,8 +99,19 @@ export default function Inicio() {
   }
 
   useEffect(() => {
-    fetchReservas();
-  }, []);
+    if (session?.access_token) {
+      fetchReservas();
+    }
+    const handleReservationChange = () => {
+      if (session?.access_token) fetchReservas();
+    };
+    window.addEventListener('camborio-reservation-changed', handleReservationChange);
+    return () => window.removeEventListener('camborio-reservation-changed', handleReservationChange);
+  }, [session?.access_token]);
+
+  const handleUpdate = (updatedReserva: any) => {
+    setReservas(prev => prev.map(r => r.ReservaID === updatedReserva.ReservaID ? { ...r, ...updatedReserva } as Reserva : r));
+  };
 
   const comida = useMemo(() => reservas.filter(r => r.Turno === 'COMIDA'), [reservas]);
   const cena = useMemo(() => reservas.filter(r => r.Turno === 'CENA'), [reservas]);
@@ -195,7 +209,7 @@ export default function Inicio() {
         ) : (
           <div className="calendar-reservations">
             {visibles.map(reserva => (
-              <ReservationCard key={reserva.ReservaID} reserva={reserva} onAssignTable={r => navigate('/mesas?asignar=' + encodeURIComponent(r.ReservaID))} />
+              <ReservationCard key={reserva.ReservaID} reserva={reserva} onAssignTable={r => navigate('/mesas?asignar=' + encodeURIComponent(r.ReservaID))} onUpdate={handleUpdate} />
             ))}
           </div>
         )}

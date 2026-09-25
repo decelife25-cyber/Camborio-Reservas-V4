@@ -43,6 +43,11 @@ export default function Layout() {
     }
 
     if (user) fetchPendingCount();
+    const handleReservationChange = () => {
+      if (user) fetchPendingCount();
+    };
+    window.addEventListener('camborio-reservation-changed', handleReservationChange);
+    return () => window.removeEventListener('camborio-reservation-changed', handleReservationChange);
   }, [user]);
 
   const toggleDarkMode = () => {
@@ -51,6 +56,7 @@ export default function Layout() {
     document.documentElement.classList.toggle('dark', next);
     document.documentElement.classList.toggle('light', !next);
     localStorage.setItem('theme', next ? 'dark' : 'light');
+    window.dispatchEvent(new Event('camborio-theme-change'));
   };
 
   const handleLogout = async () => {
@@ -84,7 +90,7 @@ export default function Layout() {
           </button>
           <button className="logout-button" onClick={() => setShowLogoutConfirm(true)}>CERRAR SESIÓN</button>
         </div>
-        <div className="app-version" aria-label="Versión de la aplicación">V1.0.054</div>
+        <div className="app-version" aria-label="Versión de la aplicación">V1.0.060</div>
       </header>
 
       <nav className="private-menu" aria-label="Menú privado">

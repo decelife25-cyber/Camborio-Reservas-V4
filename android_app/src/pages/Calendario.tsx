@@ -76,6 +76,7 @@ export default function Calendario() {
   const [filtroEstados, setFiltroEstados] = useState<Record<EstadoFiltro, boolean>>(cargarFiltroGuardado);
   const [filtroAbierto, setFiltroAbierto] = useState(false);
   const [filtroEdicion, setFiltroEdicion] = useState<Record<EstadoFiltro, boolean>>(filtroEstados);
+  const [refreshToken, setRefreshToken] = useState(0);
 
   const year = monthDate.getFullYear();
   const month = monthDate.getMonth();
@@ -106,7 +107,14 @@ export default function Calendario() {
     }
 
     fetchMonth();
-  }, [year, month, daysInMonth]);
+    const handleReservationChange = () => setRefreshToken(value => value + 1);
+    window.addEventListener('camborio-reservation-changed', handleReservationChange);
+    return () => window.removeEventListener('camborio-reservation-changed', handleReservationChange);
+  }, [year, month, daysInMonth, refreshToken]);
+
+  const handleUpdate = (updatedReserva: Partial<Reserva> & { ReservaID: string }) => {
+    setReservasMes(current => current.map(r => r.ReservaID === updatedReserva.ReservaID ? { ...r, ...updatedReserva } : r));
+  };
 
   const counts = useMemo(() => {
     const map: Record<string, number> = {};
@@ -218,7 +226,7 @@ export default function Calendario() {
             <div className="calendar-empty-message">No hay reservas para esta fecha.</div>
           ) : (
             reservasSeleccionadas.map(reserva => (
-              <ReservationCard key={reserva.ReservaID} reserva={reserva} onAssignTable={r => navigate('/mesas?asignar=' + encodeURIComponent(r.ReservaID))} />
+              <ReservationCard key={reserva.ReservaID} reserva={reserva} onAssignTable={r => navigate('/mesas?asignar=' + encodeURIComponent(r.ReservaID))} onUpdate={handleUpdate} />
             ))
           )}
         </div>
