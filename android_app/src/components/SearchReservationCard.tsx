@@ -16,14 +16,9 @@ function dateParts(v:string){
   const dt=new Date(y,m-1,d);
   const dias=['DOMINGO','LUNES','MARTES','MIÉRCOLES','JUEVES','VIERNES','SÁBADO'];
   return{fecha:String(d).padStart(2,'0')+'/'+String(m).padStart(2,'0'),anio:String(y),dia:dias[dt.getDay()]};
-}
 function stateLabel(s:string){return s.replaceAll('_',' ');}
-function isPast(r:SearchReservation){
-  return new Date(r.FechaReserva+'T'+String(r.HoraReserva).slice(0,5)+':00').getTime()<Date.now();
-}
 function todayMadrid(){
   return new Date().toLocaleDateString('en-CA',{timeZone:'Europe/Madrid'});
-}
 
 export default function SearchReservationCard({reserva:initial,index,total,onNavigate,onUpdated}:{reserva:SearchReservation;index:number;total:number;onNavigate:(d:number)=>void;onUpdated:(r:SearchReservation)=>void}){
   const navigate=useNavigate();
@@ -153,4 +148,3 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
       </div>
     </div>}
   </div>;
-}
