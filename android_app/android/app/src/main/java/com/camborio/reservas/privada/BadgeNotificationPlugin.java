@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
-import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
@@ -18,7 +17,9 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 
-@CapacitorPlugin(name = "BadgeNotification", permissions = {\n        @com.getcapacitor.annotation.Permission(alias = "notifications", strings = {Manifest.permission.POST_NOTIFICATIONS})\n})
+@CapacitorPlugin(name = "BadgeNotification", permissions = {
+        @com.getcapacitor.annotation.Permission(alias = "notifications", strings = {Manifest.permission.POST_NOTIFICATIONS})
+})
 public class BadgeNotificationPlugin extends Plugin {
     private static final String CHANNEL_ID = "camborio_reservas_pending";
     private static final int NOTIFICATION_ID = 1001;
