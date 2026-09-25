@@ -132,24 +132,24 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
       <button className="cr-busqueda-ficha__guardar" type="button" disabled={!dirty||saving||readOnly} onClick={()=>void save()}>{saving?'GUARDANDO...':'GUARDAR CAMBIOS'}</button>
     </article>
 
-    {editing&&<div className="v2-edit-overlay" onClick={()=>setEditing(null)}>
-      <div className="v2-edit-modal" onClick={e=>e.stopPropagation()}>
-        <h3>{editing==='fecha'?'CAMBIAR FECHA':editing==='hora'?'CAMBIAR HORA':editing==='personas'?'CAMBIAR PAX':'OBSERVACIONES'}</h3>
+    {editing&&<div className="cr-confirmacion-mesa v2-edit-overlay" onClick={()=>setEditing(null)}>
+      <div className="cr-confirmacion-mesa__panel v2-edit-modal" onClick={e=>e.stopPropagation()}>
+        <p className="cr-confirmacion-mesa__eyebrow">{editing==='fecha'?'CAMBIAR FECHA':editing==='hora'?'CAMBIAR HORA':editing==='personas'?'CAMBIAR PAX':'OBSERVACIONES'}</p>
         {editing==='observaciones'
           ? <textarea rows={4} value={value} onChange={e=>setValue(e.target.value)}/>
           : editing==='personas'
             ? <div className="v2-edit-pax"><button type="button" onClick={()=>setValue(String(Math.max(1,Number(value||1)-1)))}>−</button><input type="number" min="1" value={value} onChange={e=>setValue(e.target.value)}/><button type="button" onClick={()=>setValue(String(Number(value||1)+1))}>+</button></div>
             : <input type={editing==='fecha'?'date':'time'} value={value} onChange={e=>setValue(e.target.value)}/>}
-        <div className="v2-edit-actions"><button type="button" onClick={()=>setEditing(null)}>CANCELAR</button><button type="button" onClick={acceptEdit}>ACEPTAR</button></div>
+        <div className="cr-confirmacion-mesa__acciones v2-edit-actions"><button type="button" onClick={()=>setEditing(null)}>CANCELAR</button><button type="button" onClick={acceptEdit}>ACEPTAR</button></div>
       </div>
     </div>}
 
     {stateOpen&&<div className="v2-edit-overlay" onClick={()=>setStateOpen(false)}>
       <div className="v2-edit-modal" onClick={e=>e.stopPropagation()}>
-        <h3>CAMBIAR ESTADO</h3>
-        <div className="v2-state-current">{stateLabel(r.Estado)}</div>
+        <p className="cr-confirmacion-mesa__eyebrow">CAMBIAR ESTADO</p>
+        <div className="cr-confirmacion-mesa__texto v2-state-current">{stateLabel(r.Estado)}</div>
         <div className="v2-edit-actions">{stateActions.map(([s,label])=><button key={s} type="button" disabled={saving} onClick={()=>void changeState(s)}>{label}</button>)}</div>
-        <button className="v2-edit-cancel-full" type="button" onClick={()=>setStateOpen(false)}>CERRAR SIN CAMBIOS</button>
+        <button className="cr-confirmacion-mesa__boton v2-edit-cancel-full" type="button" onClick={()=>setStateOpen(false)}>CERRAR SIN CAMBIOS</button>
       </div>
     </div>}
   </div>;
