@@ -23,7 +23,7 @@ function FichaWheel({values,value,onChange,kind}:{values:string[];value:string;o
   const center=(i:number,smooth:boolean)=>{const el=ref.current;if(!el)return;el.scrollTo({top:Math.max(0,(i*H)-(el.clientHeight/2)+(H/2)),behavior:smooth?'smooth':'auto'});};
   const limit=(i:number)=>Math.min(Math.max(Math.round(i),1),values.length);
   useEffect(()=>{const frame=requestAnimationFrame(()=>center(index,false));return()=>cancelAnimationFrame(frame)},[index,values]);
-  const snap=()=>{const el=ref.current;if(!el)return;if(timer.current!==null)clearTimeout(timer.current);const i=limit((el.scrollTop+(el.clientHeight/2)-(H/2))/H);timer.current=window.setTimeout(()=>{const el2=ref.current;if(!el2)return;const j=limit((el2.scrollTop+(el2.clientHeight/2)-(H/2))/H);center(j,false);onChange(values[j-1]);timer.current=null},90)};
+  const snap=()=>{const el=ref.current;if(!el)return;if(timer.current!==null)clearTimeout(timer.current);timer.current=window.setTimeout(()=>{const el2=ref.current;if(!el2)return;const j=limit((el2.scrollTop+(el2.clientHeight/2)-(H/2))/H);center(j,false);onChange(values[j-1]);timer.current=null},90)};
   return <span ref={ref} className="cr-nueva-reserva__rueda ficha-wheel" role="listbox" aria-label={kind==='hora'?'Hora':'Minutos'} onScroll={snap}>
     <span className="cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--vacio" aria-hidden="true"/>
     {values.map((item)=>{const i=values.indexOf(item);const d=Math.abs(i+1-index);const cls=d===0?'cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--actual':d===1?'cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--cerca':'cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--lejos';return <span key={item} className={cls}>{item}</span>})}
