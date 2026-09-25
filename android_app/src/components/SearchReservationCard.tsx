@@ -36,7 +36,7 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
   const[error,setError]=useState('');
 
   const parts=dateParts(r.FechaReserva);
-  const readOnly=['FINALIZADA','CANCELADA_CLIENTE','CANCELADA_LOCAL','NO_PRESENTADO'].includes(r.Estado)||isPast(r);
+  const readOnly=['FINALIZADA','CANCELADA_CLIENTE','CANCELADA_LOCAL','NO_PRESENTADO'].includes(r.Estado);
   const sentada=r.Estado==='SENTADA';
   const edit=(field:typeof editing)=>{
     if(readOnly||sentada)return;
