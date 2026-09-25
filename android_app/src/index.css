@@ -2985,3 +2985,19 @@ html.light .v2-state-modal .v2-edit-cancel-full {
   background:linear-gradient(180deg,#ffe27a,#d6d0bd) !important;
   color:#161616 !important;
 }
+
+
+/* ESTADOS — paleta única por modo: mismo estado = mismo color en toda la app. */
+.status-pendiente,.status-modal-pendiente{color:#ffc400 !important;border-color:#ffc400 !important}
+.status-confirmada,.status-modal-confirmada{color:#20dc83 !important;border-color:#20dc83 !important}
+.status-sentada,.status-modal-sentada{color:#4da6ff !important;border-color:#4da6ff !important}
+.status-finalizada,.status-modal-finalizada{color:#aaa !important;border-color:#777 !important}
+.status-cancelada,.status-cancelada-cliente,.status-cancelada-local,.status-modal-cancelada-cliente,.status-modal-cancelada-local{color:#ff4d58 !important;border-color:#ff4d58 !important}
+.status-no-presentado,.status-modal-no-presentado{color:#c5162e !important;border-color:#c5162e !important}
+
+html.light .status-pendiente,html.light .status-modal-pendiente{color:#a86b00 !important;border-color:#a86b00 !important}
+html.light .status-confirmada,html.light .status-modal-confirmada{color:#157447 !important;border-color:#157447 !important}
+html.light .status-sentada,html.light .status-modal-sentada{color:#3b82f6 !important;border-color:#3b82f6 !important}
+html.light .status-finalizada,html.light .status-modal-finalizada{color:#777 !important;border-color:#777 !important}
+html.light .status-cancelada,html.light .status-cancelada-cliente,html.light .status-cancelada-local,html.light .status-modal-cancelada-cliente,html.light .status-modal-cancelada-local{color:#ff4d58 !important;border-color:#ff4d58 !important}
+html.light .status-no-presentado,html.light .status-modal-no-presentado{color:#c5162e !important;border-color:#c5162e !important}
