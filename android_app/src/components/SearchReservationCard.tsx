@@ -83,9 +83,16 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
     if(saving||readOnly)return;
     if(nextState==='SENTADA'&&!r.Mesa){setStateOpen(false);navigate('/mesas?asignar='+encodeURIComponent(r.ReservaID)+'&volverCodigo='+encodeURIComponent(r.CodigoReserva||'')+'&accion=sentar');return;}
     setSaving(true);
-    const{data,error:e}=await supabase.from('Reservas').update({Estado:nextState}).eq('ReservaID',r.ReservaID).select('*').single();
+    let data:any=null;
+    if(nextState==='SENTADA' && r.Estado==='PENDIENTE'){
+      const confirmacion=await supabase.from('Reservas').update({Estado:'CONFIRMADA',FechaModificacion:new Date().toISOString()}).eq('ReservaID',r.ReservaID).select('*').single();
+      if(confirmacion.error){setSaving(false);setError(confirmacion.error.message);return;}
+      data=confirmacion.data;
+    }
+    const resultado=await supabase.from('Reservas').update({Estado:nextState,FechaEstado:new Date().toISOString(),FechaModificacion:new Date().toISOString()}).eq('ReservaID',r.ReservaID).select('*').single();
     setSaving(false);
-    if(e){setError(e.message);return;}
+    if(resultado.error){setError(resultado.error.message);return;}
+    data=resultado.data;
     const next={...r,...data,Estado:nextState} as SearchReservation;
     setR(next);onUpdated(next);setStateOpen(false);setDirty(false);setResultado('ESTADO CAMBIADO CORRECTAMENTE');setConfirmAction('resultado');setError('');
   };
