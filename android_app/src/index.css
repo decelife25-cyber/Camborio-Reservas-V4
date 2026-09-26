@@ -3213,3 +3213,98 @@ html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha__c
   background:rgba(184,154,66,.08)!important;
   color:#8b6800!important;
 }
+
+
+/* V2 LITERAL — modales de estado y mesas: botones siempre en columna y claramente visibles. */
+.v2-state-modal .v2-edit-actions.ficha-state-actions,
+.ficha-state-actions{
+  display:flex!important;
+  flex-direction:column!important;
+  width:100%!important;
+  gap:10px!important;
+  margin-top:18px!important;
+}
+.v2-state-modal .ficha-state-button,
+.ficha-state-actions .ficha-state-button{
+  width:100%!important;
+  min-height:62px!important;
+  border:0!important;
+  border-radius:9px!important;
+  color:#fff!important;
+  font:1000 clamp(20px,5vw,27px)/1 var(--cr-font)!important;
+  text-transform:uppercase!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18)!important;
+}
+.v2-state-modal .ficha-state-button--confirmar,
+.ficha-state-button--confirmar{background:linear-gradient(180deg,#1bbf62,#087b35)!important}
+.v2-state-modal .ficha-state-button--sentar,
+.ficha-state-button--sentar{background:linear-gradient(180deg,#2388ff,#0754bd)!important}
+.v2-state-modal .ficha-state-button--finalizar,
+.ficha-state-button--finalizar{background:linear-gradient(180deg,#475569,#1e293b)!important}
+.v2-state-modal .ficha-state-button--cancelar,
+.ficha-state-button--cancelar{background:linear-gradient(180deg,#ef4444,#991b1b)!important}
+.v2-state-modal .ficha-state-button--no-presentado,
+.ficha-state-button--no-presentado{background:linear-gradient(180deg,#f59e0b,#b45309)!important}
+
+/* Estado actual: informativo, no parece un botón. */
+.v2-state-modal .ficha-state-current{
+  display:block!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:auto!important;
+  margin:0 0 8px!important;
+  padding:5px 8px!important;
+  border:0!important;
+  border-radius:6px!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  pointer-events:none!important;
+  font:1000 clamp(17px,4.2vw,23px)/1 var(--cr-font)!important;
+  text-transform:uppercase!important;
+}
+
+/* Modal de mesas asignadas: igual que V2, con botones reales y números completos. */
+.v2-edit-modal .cr-mesas-asignadas-modal__numeros{
+  display:block!important;
+  margin:4px auto 8px!important;
+  color:inherit!important;
+  font:1000 clamp(28px,6.5vw,40px)/1.05 var(--cr-font)!important;
+  letter-spacing:.8px!important;
+  text-align:center!important;
+  text-transform:uppercase!important;
+}
+.v2-edit-modal .ficha-result-actions .cr-confirmacion-mesa__boton{
+  width:100%!important;
+  min-height:62px!important;
+  font-size:clamp(20px,4.8vw,26px)!important;
+  border-radius:9px!important;
+}
+.v2-edit-modal .ficha-result-actions .cr-confirmacion-mesa__boton--cancelar{
+  border:1px solid #3a3a3a!important;
+  background:linear-gradient(180deg,#252525,#111)!important;
+  color:#fff!important;
+}
+.v2-edit-modal .ficha-result-actions .cr-confirmacion-mesa__boton--aceptar{
+  border:1px solid #ffc400!important;
+  background:linear-gradient(180deg,#ffd946 0,#ffc400 58%,#e6a500 100%)!important;
+  color:#070707!important;
+}
+html.light .v2-edit-modal .ficha-result-actions .cr-confirmacion-mesa__boton--cancelar{
+  border-color:#b89a42!important;
+  background:linear-gradient(180deg,#f4f2ed,#ddd8ce)!important;
+  color:#171717!important;
+}
+html.light .v2-edit-modal .ficha-result-actions .cr-confirmacion-mesa__boton--aceptar{
+  border-color:#b89a42!important;
+  background:linear-gradient(180deg,#ffd83a,#edae00)!important;
+  color:#111!important;
+}
+html.light .v2-state-modal .ficha-state-current{
+  background:transparent!important;
+  color:#8b6800!important;
+}
+@media(max-width:620px){
+  .v2-state-modal .ficha-state-button,
+  .ficha-state-actions .ficha-state-button{min-height:60px!important}
+  .v2-edit-modal .ficha-result-actions .cr-confirmacion-mesa__boton{min-height:58px!important}
+}
