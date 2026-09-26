@@ -9,7 +9,8 @@ const defaultParametros={TelefonoReservas:'956254532',TelefonoPrincipal:'9562545
 export default function Configuracion(){
  const navigate=useNavigate();
  const [vista,setVista]=useState<Vista>('menu');
- const [param,setParam]=useState(defaultParametros);\n const [paramInicial,setParamInicial]=useState(defaultParametros);
+ const [param,setParam]=useState(defaultParametros);
+ const [paramInicial,setParamInicial]=useState(defaultParametros);
  const [mensaje,setMensaje]=useState(''); const [error,setError]=useState(false);
  const [cargando,setCargando]=useState(false); const [guardando,setGuardando]=useState(false);
  const [darkMode,setDarkMode]=useState(()=>localStorage.getItem('theme')!=='light');
@@ -27,6 +28,7 @@ export default function Configuracion(){
   catch(e){console.error(e);mostrar('No se pudieron guardar los parámetros.',true)}
   finally{setGuardando(false)}
  };
+ const parametrosDirty=Object.keys(paramInicial).some(k=>(param as any)[k] !== (paramInicial as any)[k]);
  useEffect(()=>{if(vista==='parametros')void cargarParametros()},[vista]);
  useEffect(()=>{
   const syncTheme=()=>setDarkMode(localStorage.getItem('theme')!=='light');
