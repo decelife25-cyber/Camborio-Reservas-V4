@@ -304,7 +304,7 @@ export default function Mesas() {
           <button type="button" className="cr-planos-mesas__cerrar" onClick={() => navigate('/')}>CERRAR</button>
         </header>
 
-        {assignmentMode && assignmentReserva ? <div className="cr-planos-mesas__reserva-info"><div><span>NOMBRE</span><strong>{assignmentReserva.Nombre || 'SIN NOMBRE'}</strong></div><div className="cr-planos-mesas__reserva-fecha">📅 {formatHeaderDate(assignmentReserva.FechaReserva)}</div><div className="cr-planos-mesas__reserva-grid"><div><span>MESAS ASIGNADAS</span><strong>{assignmentTables.length ? assignmentTables.join(', ') : 'SIN ASIGNAR'}</strong></div><div><span>TELÉFONO</span><strong>{assignmentReserva.Telefono || '—'}</strong></div><div><span>HORA</span><strong>{String(assignmentReserva.HoraReserva).slice(0,5)}</strong></div><div><span>PERSONAS</span><strong>{assignmentReserva.Personas || 0} PAX</strong></div></div></div> : <button className="cr-planos-mesas__fecha" type="button" onClick={() => setCalendarOpen(true)} aria-label="Cambiar fecha">📅 {formatHeaderDate(fecha)}</button>}
+        {assignmentMode && assignmentReserva ? <div className="cr-planos-mesas__reserva-info"><div><span>NOMBRE</span><strong>{assignmentReserva.Nombre || 'SIN NOMBRE'}</strong></div><div className="cr-planos-mesas__reserva-fecha">📅 {formatHeaderDate(assignmentReserva.FechaReserva)}</div><div className="cr-planos-mesas__reserva-grid"><div><span>MESAS ASIGNADAS</span><strong data-cr-asignacion-resumen>{assignmentTablesRef.current.length ? assignmentTablesRef.current.join(', ') : 'SIN ASIGNAR'}</strong></div><div><span>TELÉFONO</span><strong>{assignmentReserva.Telefono || '—'}</strong></div><div><span>HORA</span><strong>{String(assignmentReserva.HoraReserva).slice(0,5)}</strong></div><div><span>PERSONAS</span><strong>{assignmentReserva.Personas || 0} PAX</strong></div></div></div> : <button className="cr-planos-mesas__fecha" type="button" onClick={() => setCalendarOpen(true)} aria-label="Cambiar fecha">📅 {formatHeaderDate(fecha)}</button>}
 
         {!assignmentMode && <div className="cr-planos-mesas__turnos" role="tablist" aria-label="Turnos">
           <button type="button" className={turno === 'COMIDA' ? 'activo' : ''} onClick={() => setTurno('COMIDA')}>☀ COMIDA</button>
@@ -328,7 +328,7 @@ export default function Mesas() {
               <button
                 key={mesa.numero}
                 type="button"
-                className={'cr-planos-mesas__mesa cr-planos-mesas__mesa--' + (assignmentMode ? (assignmentSet.has(mesa.numero) ? (assignmentTables[0] === mesa.numero ? 'principal' : 'adicional') : mesa.estado) : mesa.estado)}
+                className={'cr-planos-mesas__mesa cr-planos-mesas__mesa--' + (assignmentMode ? (assignmentSet.has(mesa.numero) ? (assignmentTablesRef.current[0] === mesa.numero ? 'principal' : 'adicional') : mesa.estado) : mesa.estado)}
                 data-mesa-numero={mesa.numero}
                 style={{ '--mesa-x': mesa.x + '%', '--mesa-y': mesa.y + '%' } as CSSProperties}
                 onPointerDown={assignmentMode ? undefined : undefined}
