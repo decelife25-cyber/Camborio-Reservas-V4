@@ -3090,3 +3090,38 @@ html.light .cr-confirmacion-mesa__panel{border-color:#b89a42;background:linear-g
 html.light .cr-confirmacion-mesa__eyebrow{color:#8b6800}
 html.light .cr-confirmacion-mesa__boton--cancelar{background:linear-gradient(180deg,#f4f2ed,#ddd8ce);color:#171717;border-color:#b89a42}
 html.light .cr-confirmacion-mesa__boton--aceptar{background:linear-gradient(180deg,#ffd83a,#edae00);color:#111;border-color:#b89a42}
+
+
+/* ASIGNAR MESA — botón GUARDAR: estados V2 exactos en noche y acento de día. */
+.cr-planos-mesas__assignment-actions button{
+  border:1px solid #ffc400!important;
+  background:linear-gradient(180deg,#ffd946 0,#ffc400 58%,#e6a500 100%)!important;
+  color:#070707!important;
+  box-shadow:0 10px 22px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.35)!important;
+  opacity:1!important;
+  cursor:pointer;
+}
+.cr-planos-mesas__assignment-actions button:disabled{
+  border-color:#4b5563!important;
+  background:linear-gradient(180deg,#5f6670 0,#454c55 58%,#303740 100%)!important;
+  color:#d7dce2!important;
+  box-shadow:none!important;
+  opacity:.9!important;
+  cursor:not-allowed;
+  pointer-events:none;
+}
+html.light .cr-planos-mesas__assignment-actions button{
+  border-color:#a48735!important;
+  background:#b89a42!important;
+  color:#fff!important;
+  box-shadow:none!important;
+}
+html.light .cr-planos-mesas__assignment-actions button:disabled{
+  border-color:#aaa69e!important;
+  background:#c9c6bf!important;
+  color:#77736b!important;
+  box-shadow:none!important;
+  opacity:1!important;
+  cursor:not-allowed;
+  pointer-events:none;
+}
