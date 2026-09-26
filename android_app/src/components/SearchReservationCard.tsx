@@ -34,6 +34,7 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
   const[saving,setSaving]=useState(false);
   const[dirty,setDirty]=useState(false);
   const[error,setError]=useState('');
+  const[confirmAction,setConfirmAction]=useState<null|'guardar'|'salir'>(null);
 
   const parts=dateParts(r.FechaReserva);
   const readOnly=['FINALIZADA','CANCELADA_CLIENTE','CANCELADA_LOCAL','NO_PRESENTADO'].includes(r.Estado);
@@ -96,6 +97,16 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
         ? [['FINALIZADA','FINALIZAR']]
         : [];
 
+  const solicitarGuardar=()=>{
+    if(!dirty||saving||readOnly)return;
+    setConfirmAction('guardar');
+  };
+
+  const volver=()=>{
+    if(dirty){setConfirmAction('salir');return;}
+    window.history.back();
+  };
+
   const openMesa=()=>{
     if(readOnly)return;
     navigate('/mesas?asignar='+encodeURIComponent(r.ReservaID)+'&volverCodigo='+encodeURIComponent(r.CodigoReserva||''));
@@ -103,7 +114,7 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
 
   return <div className="cr-busqueda-ficha-wrap">
     <div className="cr-busqueda-ficha__nav">
-      <button className="cr-busqueda-ficha__volver" type="button" onClick={()=>window.history.back()}>← VOLVER</button>
+      <button className="cr-busqueda-ficha__volver" type="button" onClick={volver}>← VOLVER</button>
       <div className="cr-busqueda-ficha__contador">
         <button type="button" onClick={()=>onNavigate(-1)} disabled={index===0}>‹</button>
         <span>RESERVA {index+1} DE {total}</span>
@@ -129,7 +140,7 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
       <button className="cr-busqueda-ficha__observaciones" type="button" disabled={readOnly||sentada} onClick={()=>edit('observaciones')}><span>OBSERVACIONES</span><p>{r.Observaciones||'Sin observaciones.'}</p></button>
       {r.FechaCreacion&&<span className="cr-busqueda-ficha__creada">📅 Creada: {String(r.FechaCreacion).replace('T',' · ').slice(0,19)}</span>}
       {error&&<div className="cr-nueva-reserva__mensaje" data-tipo="error">{error}</div>}
-      <button className="cr-busqueda-ficha__guardar" type="button" disabled={!dirty||saving||readOnly} onClick={()=>void save()}>{saving?'GUARDANDO...':'GUARDAR CAMBIOS'}</button>
+      <button className="cr-busqueda-ficha__guardar" type="button" disabled={!dirty||saving||readOnly} onClick={solicitarGuardar}>{saving?'GUARDANDO...':'GUARDAR CAMBIOS'}</button>
     </article>
 
     {editing==='fecha'&&<FechaPicker value={value} onChange={v=>{setValue(v);setR(prev=>({...prev,FechaReserva:v}));setDirty(true);setEditing(null)}} onClose={()=>setEditing(null)}/>}
@@ -142,6 +153,17 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
             ? <div className="v2-personas-control ficha-pax-control"><button type="button" onClick={()=>setValue(String(Math.max(1,Number(value||1)-1)))}>−</button><strong>{Number(value||1)} PAX</strong><button type="button" onClick={()=>setValue(String(Number(value||1)+1))}>+</button></div>
             : <textarea className="ficha-observaciones-input" rows={4} value={value} onChange={e=>setValue(e.target.value)}/>}
         <div className="v2-edit-actions ficha-edit-actions"><button type="button" onClick={()=>setEditing(null)}>CANCELAR</button><button type="button" onClick={acceptEdit}>ACEPTAR</button></div>
+      </div>
+    </div>}
+
+    {confirmAction&&<div className="v2-edit-overlay" onClick={()=>!saving&&setConfirmAction(null)}>
+      <div className="v2-edit-modal ficha-edit-modal" onClick={e=>e.stopPropagation()}>
+        <p className="cr-confirmacion-mesa__eyebrow">{confirmAction==='guardar'?'CONFIRMAR CAMBIOS':'CAMBIOS SIN GUARDAR'}</p>
+        <div className="cr-confirmacion-mesa__contenido">{confirmAction==='guardar'?'¿CONFIRMAR LOS CAMBIOS REALIZADOS EN ESTA RESERVA?':'SI SALES AHORA, SE PERDERÁN LOS CAMBIOS REALIZADOS.'}</div>
+        <div className="v2-edit-actions ficha-edit-actions">
+          <button type="button" onClick={()=>setConfirmAction(null)}>{confirmAction==='guardar'?'CANCELAR':'SEGUIR EDITANDO'}</button>
+          <button type="button" onClick={()=>{if(confirmAction==='guardar'){setConfirmAction(null);void save();}else{setConfirmAction(null);setDirty(false);window.history.back();}}}>{confirmAction==='guardar'?'CONFIRMAR':'SALIR SIN GUARDAR'}</button>
+        </div>
       </div>
     </div>}
 
