@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
@@ -173,6 +173,7 @@ export default function Mesas() {
         setFecha(reserva.FechaReserva);
         setTurno(hora >= 18 ? 'CENA' : 'COMIDA');
         setAssignmentTables(parseAssignedTables(reserva));
+        assignmentTablesRef.current = parseAssignedTables(reserva);
         if (reserva.Zona === 'TERRAZA') setZona('terraza');
         else if (reserva.Zona === 'CHILL OUT' || reserva.Zona === 'CHILLOUT') setZona('chillout');
         else setZona('salon');
@@ -254,30 +255,30 @@ export default function Mesas() {
   };
 
   const assignmentSet = new Set(assignmentTables);
+  const assignmentTablesRef = useRef<string[]>(assignmentTables);
   const toggleAssignmentTable = (numero: string) => {
     if (!assignmentMode || mesasConfig[numero]?.Activa === false) return;
-    setAssignmentTables(current => {
-      const next = current.includes(numero) ? current.filter(x => x !== numero) : [...current, numero];
-      requestAnimationFrame(() => {
-        document.querySelectorAll<HTMLElement>('.cr-planos-mesas__mesa').forEach(el => {
-          const mesa = el.getAttribute('aria-label')?.replace(/^Mesa\\s+/i,'').split(' ')[0] || '';
-          if (next.includes(mesa)) {
-            el.classList.add('cr-planos-mesas__mesa--seleccionada');
-            el.classList.remove('cr-planos-mesas__mesa--disponible','cr-planos-mesas__mesa--reservada','cr-planos-mesas__mesa--ocupada');
-          } else if (el.classList.contains('cr-planos-mesas__mesa--seleccionada')) {
-            el.classList.remove('cr-planos-mesas__mesa--seleccionada');
-            el.classList.add('cr-planos-mesas__mesa--disponible');
-          }
-        });
-      });
-      return next;
+    const current = assignmentTablesRef.current;
+    const next = current.includes(numero) ? current.filter(x => x !== numero) : [...current, numero];
+    assignmentTablesRef.current = next;
+    const botones = document.querySelectorAll<HTMLElement>('.cr-planos-mesas__mesa');
+    botones.forEach(el => {
+      const mesa = el.dataset.mesaNumero || '';
+      if (!mesa) return;
+      el.classList.remove('cr-planos-mesas__mesa--principal','cr-planos-mesas__mesa--adicional','cr-planos-mesas__mesa--seleccionada');
+      if (next.includes(mesa)) el.classList.add(next[0] === mesa ? 'cr-planos-mesas__mesa--principal' : 'cr-planos-mesas__mesa--adicional');
     });
+    const resumen = document.querySelector<HTMLElement>('[data-cr-asignacion-resumen]');
+    if (resumen) resumen.textContent = next.length ? next.join(', ') : 'SIN ASIGNAR';
+    const guardar = document.querySelector<HTMLButtonElement>('.cr-planos-mesas__assignment-actions .primario');
+    if (guardar) guardar.disabled = false;
   };
   const guardarAsignacion = async () => {
     if (!assignmentReserva || saving) return;
     setSaving(true); setError('');
-    const principal = assignmentTables[0] || null;
-    const adicionales = assignmentTables.slice(1);
+    const mesasSeleccionadas = assignmentTablesRef.current;
+    const principal = mesasSeleccionadas[0] || null;
+    const adicionales = mesasSeleccionadas.slice(1);
     const principalLayout = Object.values(PLANOS).flatMap(p => p.mesas).find(m => m.numero === principal);
     const zonaAsignada = principalLayout ? principalLayout.zona.toUpperCase().replace('CHILLOUT','CHILL OUT') : null;
     const { error: updateError } = await supabase.from('Reservas').update({ Mesa: principal, MesasAdicionales: adicionales.length ? adicionales.join(', ') : null, Zona: zonaAsignada, Turno: turno, FechaModificacion: new Date().toISOString() }).eq('ReservaID', assignmentReserva.ReservaID);
@@ -328,7 +329,9 @@ export default function Mesas() {
                 key={mesa.numero}
                 type="button"
                 className={'cr-planos-mesas__mesa cr-planos-mesas__mesa--' + (assignmentMode ? (assignmentSet.has(mesa.numero) ? (assignmentTables[0] === mesa.numero ? 'principal' : 'adicional') : mesa.estado) : mesa.estado)}
+                data-mesa-numero={mesa.numero}
                 style={{ '--mesa-x': mesa.x + '%', '--mesa-y': mesa.y + '%' } as CSSProperties}
+                onPointerDown={assignmentMode ? undefined : undefined}
                 onClick={() => assignmentMode ? toggleAssignmentTable(mesa.numero) : setSelectedTable(mesa.numero)}
                 aria-label={'Mesa ' + mesa.numero + ' ' + mesa.estado}
               >
