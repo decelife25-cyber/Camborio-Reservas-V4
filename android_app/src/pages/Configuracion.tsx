@@ -56,7 +56,7 @@ export default function Configuracion(){
     <label><span>TELÉFONO DE RESERVAS</span><input name="TelefonoReservas" type="tel" autoComplete="tel" value={param.TelefonoReservas} onChange={e=>setParam(p=>({...p,TelefonoReservas:e.target.value}))}/></label>
     <label><span>TELÉFONO PRINCIPAL</span><input name="TelefonoPrincipal" type="tel" autoComplete="tel" value={param.TelefonoPrincipal} onChange={e=>setParam(p=>({...p,TelefonoPrincipal:e.target.value}))}/></label>
     <label><span>HORA DE CORTE COMIDA/CENA</span><input name="HORA_CORTE_COMIDA_CENA" type="time" required value={param.HORA_CORTE_COMIDA_CENA} onChange={e=>setParam(p=>({...p,HORA_CORTE_COMIDA_CENA:e.target.value}))}/><small>Define desde qué hora una reserva pertenece al turno de cena.</small></label>
-    <button className="cr-button cr-button--success" type="button" disabled={!parametrosDirty||guardando} onClick={()=>void guardarParametros()>{guardando?'GUARDANDO...':'GUARDAR'}</button></>}
+    <button className="cr-button cr-button--success" type="button" disabled={!parametrosDirty||guardando} onClick={()=>void guardarParametros()}>{guardando?'GUARDANDO...':'GUARDAR'}</button></>}
     {mensaje&&<div className="cr-config-mensaje" data-tipo={error?'error':'ok'}>{mensaje}</div>}<button className="cr-button cr-button--dark" type="button" onClick={()=>setVista('menu')}>← VOLVER</button>
    </section>}
    {vista==='horarios'&&<HorarioConfiguracion onBack={()=>setVista('menu')} darkMode={darkMode} onToggleTheme={toggleDarkMode}/>}
