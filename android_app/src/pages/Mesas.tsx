@@ -143,6 +143,7 @@ export default function Mesas() {
   const [saving, setSaving] = useState(false);
   const assignmentId = searchParams.get('asignar');
   const volverCodigo = searchParams.get('volverCodigo') || '';
+  const accion = searchParams.get('accion') || '';
   const [assignmentReserva, setAssignmentReserva] = useState<Reserva | null>(null);
   const [, setAssignmentTables] = useState<string[]>([]);
   const assignmentTablesRef = useRef<string[]>([]);
@@ -362,7 +363,17 @@ export default function Mesas() {
           Mesa:principal,MesasAdicionales:adicionales.length?adicionales.join(', '):null,Zona:zonaAsignada,Turno:turno,FechaModificacion:new Date().toISOString()
         }).eq('ReservaID',assignmentReserva.ReservaID).select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,Zona,MesasAdicionales,Turno').single();
         if(updateError){savingRef.current=false;setSaving(false);setError(updateError.message);return;}
-        const persistida=(data||{...assignmentReserva,Mesa:principal,MesasAdicionales:adicionales.length?adicionales.join(', '):null,Zona:zonaAsignada,Turno:turno}) as Reserva;
+        let persistida=(data||{...assignmentReserva,Mesa:principal,MesasAdicionales:adicionales.length?adicionales.join(', '):null,Zona:zonaAsignada,Turno:turno}) as Reserva;
+        if(accion==='sentar'){
+          if(persistida.Estado==='PENDIENTE'){
+            const confirmacion=await supabase.from('Reservas').update({Estado:'CONFIRMADA',FechaModificacion:new Date().toISOString()}).eq('ReservaID',persistida.ReservaID).select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,Zona,MesasAdicionales,Turno').single();
+            if(confirmacion.error){savingRef.current=false;setSaving(false);setError(confirmacion.error.message);return;}
+            persistida=(confirmacion.data||persistida) as Reserva;
+          }
+          const sentar=await supabase.from('Reservas').update({Estado:'SENTADA',FechaEstado:new Date().toISOString(),FechaModificacion:new Date().toISOString()}).eq('ReservaID',persistida.ReservaID).select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,Zona,MesasAdicionales,Turno').single();
+          if(sentar.error){savingRef.current=false;setSaving(false);setError(sentar.error.message);return;}
+          persistida=(sentar.data||persistida) as Reserva;
+        }
         assignmentOriginalRef.current=[...mesasSeleccionadas];assignmentTablesRef.current=[...mesasSeleccionadas];
         setAssignmentTables([...mesasSeleccionadas]);setAssignmentReserva(persistida);
         savingRef.current=false;setSaving(false);
