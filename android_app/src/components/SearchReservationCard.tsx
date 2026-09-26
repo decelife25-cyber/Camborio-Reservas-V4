@@ -34,7 +34,8 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
   const[saving,setSaving]=useState(false);
   const[dirty,setDirty]=useState(false);
   const[error,setError]=useState('');
-  const[confirmAction,setConfirmAction]=useState<null|'guardar'|'salir'>(null);
+  const[confirmAction,setConfirmAction]=useState<null|'guardar'|'salir'|'resultado'>(null);
+  const[resultado,setResultado]=useState('');
 
   const parts=dateParts(r.FechaReserva);
   const readOnly=['FINALIZADA','CANCELADA_CLIENTE','CANCELADA_LOCAL','NO_PRESENTADO'].includes(r.Estado);
@@ -75,7 +76,7 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
     setSaving(false);
     if(e){setError(e.message);return;}
     const next={...r,...data,...changes} as SearchReservation;
-    setR(next);onUpdated(next);setDirty(false);setError('');
+    setR(next);onUpdated(next);setDirty(false);setResultado('CAMBIOS GUARDADOS CORRECTAMENTE');setConfirmAction('resultado');setError('');
   };
 
   const changeState=async(nextState:string)=>{
@@ -86,7 +87,7 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
     setSaving(false);
     if(e){setError(e.message);return;}
     const next={...r,...data,Estado:nextState} as SearchReservation;
-    setR(next);onUpdated(next);setStateOpen(false);setDirty(false);setError('');
+    setR(next);onUpdated(next);setStateOpen(false);setDirty(false);setResultado('ESTADO CAMBIADO CORRECTAMENTE');setConfirmAction('resultado');setError('');
   };
 
   const stateActions= r.Estado==='PENDIENTE'
@@ -134,7 +135,7 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
         <button className="cr-busqueda-ficha__bloque cr-busqueda-ficha__bloque--fecha" type="button" disabled={readOnly||sentada} onClick={()=>edit('fecha')}><strong>{parts.fecha}</strong><em>{parts.anio}</em></button>
         <button className="cr-busqueda-ficha__bloque cr-busqueda-ficha__bloque--hora" type="button" disabled={readOnly||sentada} onClick={()=>edit('hora')}><strong>{parts.dia}</strong><em>{String(r.HoraReserva||'').slice(0,5)}</em></button>
         <button className="cr-busqueda-ficha__bloque cr-busqueda-ficha__bloque--pax" type="button" disabled={readOnly||sentada} onClick={()=>edit('personas')}><strong>{r.Personas||0} PAX</strong></button>
-        <button className="cr-busqueda-ficha__bloque cr-busqueda-ficha__bloque--mesa" type="button" disabled={readOnly} onClick={openMesa}><span>MESA</span><strong className={!r.Mesa?'cr-busqueda-ficha__mesa-sin-asignar':''}>{r.Mesa?'MESA '+r.Mesa:'SIN ASIGNAR'}</strong></button>
+        <button className="cr-busqueda-ficha__bloque cr-busqueda-ficha__bloque--mesa" type="button" disabled={readOnly} onClick={openMesa}><span>MESA</span><strong className={!r.Mesa?'cr-busqueda-ficha__mesa-sin-asignar':''}>{r.Mesa ? String(r.Mesa)+(String(r.MesasAdicionales||'').split(',').map(v=>v.trim()).filter(Boolean).length ? ' (+'+String(r.MesasAdicionales||'').split(',').map(v=>v.trim()).filter(Boolean).length+')' : '') : 'SIN ASIGNAR'}</strong></button>
       </div>
 
       <button className="cr-busqueda-ficha__observaciones" type="button" disabled={readOnly||sentada} onClick={()=>edit('observaciones')}><span>OBSERVACIONES</span><p>{r.Observaciones||'Sin observaciones.'}</p></button>
@@ -156,13 +157,13 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
       </div>
     </div>}
 
-    {confirmAction&&<div className="v2-edit-overlay" onClick={()=>!saving&&setConfirmAction(null)}>
+    {confirmAction&&<div className="v2-edit-overlay" onClick={()=>!saving&&confirmAction!=='resultado'&&setConfirmAction(null)}>
       <div className="v2-edit-modal ficha-edit-modal" onClick={e=>e.stopPropagation()}>
-        <p className="cr-confirmacion-mesa__eyebrow">{confirmAction==='guardar'?'CONFIRMAR CAMBIOS':'CAMBIOS SIN GUARDAR'}</p>
-        <div className="cr-confirmacion-mesa__contenido">{confirmAction==='guardar'?'¿CONFIRMAR LOS CAMBIOS REALIZADOS EN ESTA RESERVA?':'SI SALES AHORA, SE PERDERÁN LOS CAMBIOS REALIZADOS.'}</div>
-        <div className="v2-edit-actions ficha-edit-actions">
-          <button type="button" onClick={()=>setConfirmAction(null)}>{confirmAction==='guardar'?'CANCELAR':'SEGUIR EDITANDO'}</button>
-          <button type="button" onClick={()=>{if(confirmAction==='guardar'){setConfirmAction(null);void save();}else{setConfirmAction(null);setDirty(false);window.history.back();}}}>{confirmAction==='guardar'?'CONFIRMAR':'SALIR SIN GUARDAR'}</button>
+        <p className="cr-confirmacion-mesa__eyebrow">{confirmAction==='guardar'?'CONFIRMAR CAMBIOS':confirmAction==='salir'?'CAMBIOS SIN GUARDAR':'OPERACIÓN REALIZADA'}</p>
+        <div className="cr-confirmacion-mesa__contenido">{confirmAction==='guardar'?'¿CONFIRMAR LOS CAMBIOS REALIZADOS EN ESTA RESERVA?':confirmAction==='salir'?'SI SALES AHORA, SE PERDERÁN LOS CAMBIOS REALIZADOS.':resultado}</div>
+        <div className="v2-edit-actions ficha-edit-actions ficha-result-actions">
+          {confirmAction!=='resultado'&&<button type="button" onClick={()=>setConfirmAction(null)}>{confirmAction==='guardar'?'CANCELAR':'SEGUIR EDITANDO'}</button>}
+          <button type="button" onClick={()=>{if(confirmAction==='guardar'){setConfirmAction(null);void save();}else if(confirmAction==='salir'){setConfirmAction(null);setDirty(false);window.history.back();}else{setConfirmAction(null);}}}>{confirmAction==='guardar'?'CONFIRMAR':confirmAction==='salir'?'SALIR SIN GUARDAR':'ACEPTAR'}</button>
         </div>
       </div>
     </div>}
