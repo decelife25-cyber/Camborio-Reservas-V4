@@ -12,7 +12,8 @@ export default function ModificarReservaModal({ reserva, onClose, onUpdated }: P
   const [fecha, setFecha] = useState(reserva.fecha_reserva || '');
   const [hora, setHora] = useState(String(reserva.hora_reserva || '').slice(0, 5));
   const [personas, setPersonas] = useState(reserva.personas || 2);
-  const [loading, setLoading] = useState(false);\n  const [initialValues] = useState({ fecha: reserva.fecha_reserva || '', hora: String(reserva.hora_reserva || '').slice(0, 5), personas: reserva.personas || 2 });\n  const dirty = fecha !== initialValues.fecha || hora !== initialValues.hora || Number(personas) !== Number(initialValues.personas);
+  const [loading, setLoading] = useState(false);
+  const [initialValues] = useState({ fecha: reserva.fecha_reserva || '', hora: String(reserva.hora_reserva || '').slice(0, 5), personas: reserva.personas || 2 });\n  const dirty = fecha !== initialValues.fecha || hora !== initialValues.hora || Number(personas) !== Number(initialValues.personas);
   const [error, setError] = useState('');
 
   const handleUpdate = async (e: React.FormEvent) => {
