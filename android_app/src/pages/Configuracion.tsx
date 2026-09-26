@@ -9,7 +9,7 @@ const defaultParametros={TelefonoReservas:'956254532',TelefonoPrincipal:'9562545
 export default function Configuracion(){
  const navigate=useNavigate();
  const [vista,setVista]=useState<Vista>('menu');
- const [param,setParam]=useState(defaultParametros);
+ const [param,setParam]=useState(defaultParametros);\n const [paramInicial,setParamInicial]=useState(defaultParametros);
  const [mensaje,setMensaje]=useState(''); const [error,setError]=useState(false);
  const [cargando,setCargando]=useState(false); const [guardando,setGuardando]=useState(false);
  const [darkMode,setDarkMode]=useState(()=>localStorage.getItem('theme')!=='light');
@@ -18,12 +18,12 @@ export default function Configuracion(){
   setCargando(true);ocultar();
   const {data,error:e}=await supabase.from('Configuracion').select('Parametro,Valor');
   if(e){setParam(defaultParametros);mostrar('No se pudieron cargar los parámetros.',true)}
-  else{const p={...defaultParametros};(data||[]).forEach((r:any)=>{if(r.Parametro in p&&r.Valor!=null)(p as any)[r.Parametro]=String(r.Valor).slice(0,5)==='00:00'&&String(r.Valor).length>5?String(r.Valor).slice(0,5):String(r.Valor)});setParam(p)}
+  else{const p={...defaultParametros};(data||[]).forEach((r:any)=>{if(r.Parametro in p&&r.Valor!=null)(p as any)[r.Parametro]=String(r.Valor).slice(0,5)==='00:00'&&String(r.Valor).length>5?String(r.Valor).slice(0,5):String(r.Valor)});setParam(p);setParamInicial({...p})}
   setCargando(false);
  };
  const guardarParametros=async()=>{
   setGuardando(true);ocultar();
-  try{for(const [Parametro,Valor] of Object.entries(param)){const q=await supabase.from('Configuracion').select('Parametro').eq('Parametro',Parametro).limit(1);if(q.error)throw q.error;if(q.data?.length){const u=await supabase.from('Configuracion').update({Valor}).eq('Parametro',Parametro);if(u.error)throw u.error}else{const i=await supabase.from('Configuracion').insert({Parametro,Valor});if(i.error)throw i.error}}mostrar('Parámetros guardados correctamente.')}
+  try{for(const [Parametro,Valor] of Object.entries(param)){const q=await supabase.from('Configuracion').select('Parametro').eq('Parametro',Parametro).limit(1);if(q.error)throw q.error;if(q.data?.length){const u=await supabase.from('Configuracion').update({Valor}).eq('Parametro',Parametro);if(u.error)throw u.error}else{const i=await supabase.from('Configuracion').insert({Parametro,Valor});if(i.error)throw i.error}}setParamInicial({...param});mostrar('Parámetros guardados correctamente.')}
   catch(e){console.error(e);mostrar('No se pudieron guardar los parámetros.',true)}
   finally{setGuardando(false)}
  };
@@ -54,7 +54,7 @@ export default function Configuracion(){
     <label><span>TELÉFONO DE RESERVAS</span><input name="TelefonoReservas" type="tel" autoComplete="tel" value={param.TelefonoReservas} onChange={e=>setParam(p=>({...p,TelefonoReservas:e.target.value}))}/></label>
     <label><span>TELÉFONO PRINCIPAL</span><input name="TelefonoPrincipal" type="tel" autoComplete="tel" value={param.TelefonoPrincipal} onChange={e=>setParam(p=>({...p,TelefonoPrincipal:e.target.value}))}/></label>
     <label><span>HORA DE CORTE COMIDA/CENA</span><input name="HORA_CORTE_COMIDA_CENA" type="time" required value={param.HORA_CORTE_COMIDA_CENA} onChange={e=>setParam(p=>({...p,HORA_CORTE_COMIDA_CENA:e.target.value}))}/><small>Define desde qué hora una reserva pertenece al turno de cena.</small></label>
-    <button className="cr-button cr-button--success" type="button" disabled={guardando} onClick={()=>void guardarParametros()}>{guardando?'GUARDANDO...':'GUARDAR'}</button></>}
+    <button className="cr-button cr-button--success" type="button" disabled={!parametrosDirty||guardando} onClick={()=>void guardarParametros()>{guardando?'GUARDANDO...':'GUARDAR'}</button></>}
     {mensaje&&<div className="cr-config-mensaje" data-tipo={error?'error':'ok'}>{mensaje}</div>}<button className="cr-button cr-button--dark" type="button" onClick={()=>setVista('menu')}>← VOLVER</button>
    </section>}
    {vista==='horarios'&&<HorarioConfiguracion onBack={()=>setVista('menu')} darkMode={darkMode} onToggleTheme={toggleDarkMode}/>}
