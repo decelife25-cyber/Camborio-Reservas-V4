@@ -3125,3 +3125,26 @@ html.light .cr-planos-mesas__assignment-actions button:disabled{
   cursor:not-allowed;
   pointer-events:none;
 }
+
+
+/* FICHA RESERVA — GUARDAR: activo solo con cambios, con contraste V2. */
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha__guardar:disabled{
+  background:linear-gradient(180deg,#666,#444)!important;
+  border:1px solid #555!important;
+  color:#bdbdbd!important;
+  opacity:1!important;
+  box-shadow:none!important;
+  cursor:not-allowed!important;
+  pointer-events:none!important;
+}
+html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha__guardar:not(:disabled){
+  background:#b89a42!important;
+  border:1px solid #a48735!important;
+  color:#fff!important;
+  box-shadow:none!important;
+}
+html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha__guardar:disabled{
+  background:#c9c6bf!important;
+  border:1px solid #aaa69e!important;
+  color:#77736b!important;
+}
