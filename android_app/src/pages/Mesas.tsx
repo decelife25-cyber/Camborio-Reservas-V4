@@ -27,6 +27,16 @@ type Reserva = {
   Email?: string | null;
 };
 
+type ConfirmModal = {
+  titulo: string;
+  mensaje: string;
+  aceptar: string;
+  cancelar: string;
+  alAceptar: () => void | Promise<void>;
+  alCancelar?: () => void;
+  soloAviso?: boolean;
+};
+
 const PLANOS: Record<Zona, { nombre: string; mesas: MesaLayout[] }> = {
   terraza: {
     nombre: 'TERRAZA',
@@ -135,6 +145,10 @@ export default function Mesas() {
   const volverCodigo = searchParams.get('volverCodigo') || '';
   const [assignmentReserva, setAssignmentReserva] = useState<Reserva | null>(null);
   const [assignmentTables, setAssignmentTables] = useState<string[]>([]);
+  const assignmentTablesRef = useRef<string[]>([]);
+  const assignmentOriginalRef = useRef<string[]>([]);
+  const savingRef = useRef(false);
+  const [confirmModal, setConfirmModal] = useState<ConfirmModal | null>(null);
   const assignmentMode = Boolean(assignmentId);
 
   const cargar = useCallback(async () => {
@@ -160,7 +174,14 @@ export default function Mesas() {
   useEffect(() => { void cargar(); }, [cargar]);
 
   useEffect(() => {
-    if (!assignmentId) { setAssignmentReserva(null); setAssignmentTables([]); return; }
+    if (!assignmentId) {
+      setAssignmentReserva(null);
+      setAssignmentTables([]);
+      assignmentTablesRef.current = [];
+      assignmentOriginalRef.current = [];
+      setConfirmModal(null);
+      return;
+    }
     let alive = true;
     (async () => {
       const { data, error } = await supabase.from('Reservas').select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,Zona,MesasAdicionales,Turno,Email').eq('ReservaID', assignmentId).maybeSingle();
@@ -172,8 +193,10 @@ export default function Mesas() {
         const hora = Number(String(reserva.HoraReserva || '00').slice(0,2));
         setFecha(reserva.FechaReserva);
         setTurno(hora >= 18 ? 'CENA' : 'COMIDA');
-        setAssignmentTables(parseAssignedTables(reserva));
-        assignmentTablesRef.current = parseAssignedTables(reserva);
+        const mesasAsignadas = parseAssignedTables(reserva);
+        setAssignmentTables(mesasAsignadas);
+        assignmentTablesRef.current = mesasAsignadas;
+        assignmentOriginalRef.current = [...mesasAsignadas];
         if (reserva.Zona === 'TERRAZA') setZona('terraza');
         else if (reserva.Zona === 'CHILL OUT' || reserva.Zona === 'CHILLOUT') setZona('chillout');
         else setZona('salon');
@@ -254,38 +277,98 @@ export default function Mesas() {
     setSaving(false);
   };
 
-  const assignmentTablesRef = useRef<string[]>(assignmentTables);
   const assignmentSet = new Set(assignmentTablesRef.current);
-  const toggleAssignmentTable = (numero: string) => {
-    if (!assignmentMode || mesasConfig[numero]?.Activa === false) return;
-    const current = assignmentTablesRef.current;
-    const next = current.includes(numero) ? current.filter(x => x !== numero) : [...current, numero];
-    assignmentTablesRef.current = next;
-    const botones = document.querySelectorAll<HTMLElement>('.cr-planos-mesas__mesa');
-    botones.forEach(el => {
+  const assignmentOriginalSet = new Set(assignmentOriginalRef.current);
+
+  const pintarSeleccionMesas = (next: string[]) => {
+    const original = new Set(assignmentOriginalRef.current);
+    document.querySelectorAll<HTMLElement>('.cr-planos-mesas__mesa').forEach(el => {
       const mesa = el.dataset.mesaNumero || '';
       if (!mesa) return;
       el.classList.remove('cr-planos-mesas__mesa--principal','cr-planos-mesas__mesa--adicional','cr-planos-mesas__mesa--seleccionada');
-      if (next.includes(mesa)) el.classList.add(next[0] === mesa ? 'cr-planos-mesas__mesa--principal' : 'cr-planos-mesas__mesa--adicional');
+      if (!next.includes(mesa)) el.classList.add('cr-planos-mesas__mesa--disponible');
+      else if (original.has(mesa)) el.classList.add(next[0] === mesa ? 'cr-planos-mesas__mesa--principal' : 'cr-planos-mesas__mesa--adicional');
+      else el.classList.add('cr-planos-mesas__mesa--seleccionada');
     });
-    const resumen = document.querySelector<HTMLElement>('[data-cr-asignacion-resumen]');
-    if (resumen) resumen.textContent = next.length ? next.join(', ') : 'SIN ASIGNAR';
-    const guardar = document.querySelector<HTMLButtonElement>('.cr-planos-mesas__assignment-actions .primario');
-    if (guardar) guardar.disabled = false;
+    const resumen=document.querySelector<HTMLElement>('[data-cr-asignacion-resumen]');
+    if(resumen){
+      resumen.textContent=next.length?next.join(', '):'SIN ASIGNAR';
+      resumen.classList.toggle('cr-planos-mesas__asignacion--asignada',next.join(',')===assignmentOriginalRef.current.join(','));
+      resumen.classList.toggle('cr-planos-mesas__asignacion--pendiente',next.length>0&&next.join(',')!==assignmentOriginalRef.current.join(','));
+    }
+    const etiqueta=document.querySelector<HTMLElement>('[data-cr-asignacion-etiqueta]');
+    if(etiqueta) etiqueta.textContent=next.length===1?'MESA ASIGNADA':'MESAS ASIGNADAS';
+    const guardar=document.querySelector<HTMLButtonElement>('[data-cr-guardar-asignacion]');
+    if(guardar) guardar.disabled=next.join(',')===assignmentOriginalRef.current.join(',');
   };
-  const guardarAsignacion = async () => {
-    if (!assignmentReserva || saving) return;
-    setSaving(true); setError('');
-    const mesasSeleccionadas = assignmentTablesRef.current;
-    const principal = mesasSeleccionadas[0] || null;
-    const adicionales = mesasSeleccionadas.slice(1);
-    const principalLayout = Object.values(PLANOS).flatMap(p => p.mesas).find(m => m.numero === principal);
-    const zonaAsignada = principalLayout ? principalLayout.zona.toUpperCase().replace('CHILLOUT','CHILL OUT') : null;
-    const { error: updateError } = await supabase.from('Reservas').update({ Mesa: principal, MesasAdicionales: adicionales.length ? adicionales.join(', ') : null, Zona: zonaAsignada, Turno: turno, FechaModificacion: new Date().toISOString() }).eq('ReservaID', assignmentReserva.ReservaID);
-    setSaving(false);
-    if (updateError) { setError(updateError.message); return; }
-    if (volverCodigo) navigate('/buscar?codigo=' + encodeURIComponent(volverCodigo));
-    else navigate('/');
+
+  const toggleAssignmentTable = (numero:string) => {
+    if(!assignmentMode || mesasConfig[numero]?.Activa===false)return;
+    const mesaVisible=mesasVisibles.find(m=>m.numero===numero);
+    if(mesaVisible && mesaVisible.estado!=='disponible' && !assignmentTablesRef.current.includes(numero))return;
+    const current=assignmentTablesRef.current;
+    const indice=current.indexOf(numero);
+    const next=indice===0?[]:indice!==-1?current.filter(x=>x!==numero):[...current,numero];
+    assignmentTablesRef.current=next;
+    pintarSeleccionMesas(next);
+  };
+
+  const tieneCambiosAsignacion=()=>assignmentTablesRef.current.join(',')!==assignmentOriginalRef.current.join(',');
+
+  const cerrarAsignacion=()=>{
+    if(!assignmentMode||savingRef.current)return;
+    if(!tieneCambiosAsignacion()){navigate('/');return;}
+    setConfirmModal({
+      titulo:'CAMBIOS SIN GUARDAR',
+      mensaje:'¿CERRAR SIN GUARDAR?',
+      cancelar:'SEGUIR EDITANDO',
+      aceptar:'CERRAR SIN GUARDAR',
+      alAceptar:()=>{
+        const original=[...assignmentOriginalRef.current];
+        assignmentTablesRef.current=original;
+        setAssignmentTables(original);
+        setConfirmModal(null);
+        navigate('/');
+      },
+      alCancelar:()=>setConfirmModal(null)
+    });
+  };
+
+  const guardarAsignacion=()=>{
+    if(!assignmentReserva||savingRef.current||saving)return;
+    const mesasActualesLista=assignmentOriginalRef.current;
+    const mesasSeleccionadas=[...assignmentTablesRef.current];
+    const asignacionNueva=mesasSeleccionadas.join(', ');
+    const quitarAsignacion=mesasSeleccionadas.length===0&&mesasActualesLista.length>0;
+    if(!asignacionNueva&&!quitarAsignacion){setError('Selecciona al menos una mesa antes de guardar.');return;}
+    let mensaje='';
+    if(quitarAsignacion)mensaje='¿Quitar la asignación de '+(mesasActualesLista.length===1?'mesa':'mesas')+' '+mesasActualesLista.join(', ')+' y dejar esta reserva sin mesa asignada?';
+    else if(mesasActualesLista.length)mensaje='¿Cambiar de '+(mesasActualesLista.length===1?'mesa':'mesas')+' '+mesasActualesLista.join(', ')+' a '+(mesasSeleccionadas.length===1?'mesa':'mesas')+' '+asignacionNueva+'?';
+    else mensaje='¿Asignar '+(mesasSeleccionadas.length===1?'mesa':'mesas')+' '+asignacionNueva+' a esta reserva?';
+    setConfirmModal({
+      titulo:'CONFIRMAR MESA',
+      mensaje,
+      cancelar:'CANCELAR',
+      aceptar:'CONFIRMAR',
+      alCancelar:()=>setConfirmModal(null),
+      alAceptar:async()=>{
+        setConfirmModal(null);
+        savingRef.current=true;setSaving(true);setError('');
+        const principal=mesasSeleccionadas[0]||null;
+        const adicionales=mesasSeleccionadas.slice(1);
+        const principalLayout=Object.values(PLANOS).flatMap(p=>p.mesas).find(m=>m.numero===principal);
+        const zonaAsignada=principalLayout?principalLayout.zona.toUpperCase().replace('CHILLOUT','CHILL OUT'):null;
+        const {data,error:updateError}=await supabase.from('Reservas').update({
+          Mesa:principal,MesasAdicionales:adicionales.length?adicionales.join(', '):null,Zona:zonaAsignada,Turno:turno,FechaModificacion:new Date().toISOString()
+        }).eq('ReservaID',assignmentReserva.ReservaID).select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,Zona,MesasAdicionales,Turno').single();
+        if(updateError){savingRef.current=false;setSaving(false);setError(updateError.message);return;}
+        const persistida=(data||{...assignmentReserva,Mesa:principal,MesasAdicionales:adicionales.length?adicionales.join(', '):null,Zona:zonaAsignada,Turno:turno}) as Reserva;
+        assignmentOriginalRef.current=[...mesasSeleccionadas];assignmentTablesRef.current=[...mesasSeleccionadas];
+        setAssignmentTables([...mesasSeleccionadas]);setAssignmentReserva(persistida);
+        savingRef.current=false;setSaving(false);
+        if(volverCodigo)navigate('/buscar?codigo='+encodeURIComponent(volverCodigo));else navigate('/');
+      }
+    });
   };
 
   const estado: 'disponible' | 'reservada' | 'ocupada' | 'desactivada' = selectedTable && mesasConfig[selectedTable]?.Activa === false ? 'desactivada' : (selectedTable ? visualState(reservaSeleccionada) : 'disponible');
@@ -297,14 +380,14 @@ export default function Mesas() {
 
   return (
     <section className="cr-planos-mesas" aria-label="Planos de mesas">
-      <button className="cr-planos-mesas__backdrop" type="button" aria-label="Cerrar" onClick={() => navigate('/')} />
+      <button className="cr-planos-mesas__backdrop" type="button" aria-label="Cerrar" onClick={cerrarAsignacion} />
       <div className={'cr-planos-mesas__panel' + (assignmentMode ? ' cr-planos-mesas__panel--asignacion' : '')}>
         <header className="cr-planos-mesas__header">
           <h2>{assignmentMode ? 'ASIGNAR MESA' : 'PLANOS DE MESAS'}</h2>
-          <button type="button" className="cr-planos-mesas__cerrar" onClick={() => navigate('/')}>CERRAR</button>
+          <button type="button" className="cr-planos-mesas__cerrar" onClick={assignmentMode ? cerrarAsignacion : () => navigate('/')}>CERRAR</button>
         </header>
 
-        {assignmentMode && assignmentReserva ? <div className="cr-planos-mesas__reserva-info"><div><span>NOMBRE</span><strong>{assignmentReserva.Nombre || 'SIN NOMBRE'}</strong></div><div className="cr-planos-mesas__reserva-fecha">📅 {formatHeaderDate(assignmentReserva.FechaReserva)}</div><div className="cr-planos-mesas__reserva-grid"><div><span>MESAS ASIGNADAS</span><strong data-cr-asignacion-resumen>{assignmentTablesRef.current.length ? assignmentTablesRef.current.join(', ') : 'SIN ASIGNAR'}</strong></div><div><span>TELÉFONO</span><strong>{assignmentReserva.Telefono || '—'}</strong></div><div><span>HORA</span><strong>{String(assignmentReserva.HoraReserva).slice(0,5)}</strong></div><div><span>PERSONAS</span><strong>{assignmentReserva.Personas || 0} PAX</strong></div></div></div> : <button className="cr-planos-mesas__fecha" type="button" onClick={() => setCalendarOpen(true)} aria-label="Cambiar fecha">📅 {formatHeaderDate(fecha)}</button>}
+        {assignmentMode && assignmentReserva ? <div className="cr-planos-mesas__reserva-info"><div><span>NOMBRE</span><strong>{assignmentReserva.Nombre || 'SIN NOMBRE'}</strong></div><div className="cr-planos-mesas__reserva-fecha">📅 {formatHeaderDate(assignmentReserva.FechaReserva)}</div><div className="cr-planos-mesas__reserva-grid"><div><span data-cr-asignacion-etiqueta>{assignmentTablesRef.current.length === 1 ? 'MESA ASIGNADA' : 'MESAS ASIGNADAS'}</span><strong data-cr-asignacion-resumen className={assignmentOriginalRef.current.length ? 'cr-planos-mesas__asignacion--asignada' : ''}>{assignmentTablesRef.current.length ? assignmentTablesRef.current.join(', ') : 'SIN ASIGNAR'}</strong></div><div><span>TELÉFONO</span><strong>{assignmentReserva.Telefono || '—'}</strong></div><div><span>HORA</span><strong>{String(assignmentReserva.HoraReserva).slice(0,5)}</strong></div><div><span>PERSONAS</span><strong>{assignmentReserva.Personas || 0} PAX</strong></div></div></div> : <button className="cr-planos-mesas__fecha" type="button" onClick={() => setCalendarOpen(true)} aria-label="Cambiar fecha">📅 {formatHeaderDate(fecha)}</button>}
 
         {!assignmentMode && <div className="cr-planos-mesas__turnos" role="tablist" aria-label="Turnos">
           <button type="button" className={turno === 'COMIDA' ? 'activo' : ''} onClick={() => setTurno('COMIDA')}>☀ COMIDA</button>
@@ -328,11 +411,19 @@ export default function Mesas() {
               <button
                 key={mesa.numero}
                 type="button"
-                className={'cr-planos-mesas__mesa cr-planos-mesas__mesa--' + (assignmentMode ? (assignmentSet.has(mesa.numero) ? (assignmentTablesRef.current[0] === mesa.numero ? 'principal' : 'adicional') : mesa.estado) : mesa.estado)}
+                className={'cr-planos-mesas__mesa cr-planos-mesas__mesa--' + (
+                  assignmentMode
+                    ? assignmentSet.has(mesa.numero)
+                      ? (assignmentOriginalSet.has(mesa.numero)
+                        ? (assignmentTablesRef.current[0] === mesa.numero ? 'principal' : 'adicional')
+                        : 'seleccionada')
+                      : mesa.estado
+                    : mesa.estado
+                )}
                 data-mesa-numero={mesa.numero}
                 style={{ '--mesa-x': mesa.x + '%', '--mesa-y': mesa.y + '%' } as CSSProperties}
-                onPointerDown={assignmentMode ? undefined : undefined}
-                onClick={() => assignmentMode ? toggleAssignmentTable(mesa.numero) : setSelectedTable(mesa.numero)}
+                onPointerDown={assignmentMode ? (event) => { event.preventDefault(); toggleAssignmentTable(mesa.numero); } : undefined}
+                onClick={!assignmentMode ? () => setSelectedTable(mesa.numero) : undefined}
                 aria-label={'Mesa ' + mesa.numero + ' ' + mesa.estado}
               >
                 {mesa.numero}
@@ -351,9 +442,23 @@ export default function Mesas() {
           <span><i className="desactivada" />DESACTIVADA</span>
         </div>
 
-        {assignmentMode && <div className="cr-planos-mesas__assignment-actions"><div>SELECCIONA UNA O VARIAS MESAS Y PULSA GUARDAR ASIGNACIÓN PARA ACTUALIZAR LA RESERVA.</div><button type="button" className="primario" disabled={saving} onClick={() => void guardarAsignacion()}>{saving ? 'GUARDANDO...' : 'GUARDAR ASIGNACIÓN'}</button></div>}
+        {assignmentMode && <div className="cr-planos-mesas__assignment-actions"><div>SELECCIONA UNA O VARIAS MESAS Y PULSA GUARDAR ASIGNACIÓN PARA ACTUALIZAR LA RESERVA.</div><button type="button" className="primario" data-cr-guardar-asignacion disabled={saving || !tieneCambiosAsignacion()} onClick={guardarAsignacion}>{saving ? 'GUARDANDO...' : 'GUARDAR ASIGNACIÓN'}</button></div>}
         {error && <div className="cr-planos-mesas__error">{error}</div>}
       </div>
+
+      {confirmModal && (
+        <div className="cr-confirmacion-mesa" role="dialog" aria-modal="true" aria-labelledby="crConfirmacionMesaTitulo">
+          <button className="cr-confirmacion-mesa__backdrop" type="button" aria-label="Cerrar" onClick={() => { if (!savingRef.current) { confirmModal.alCancelar?.(); setConfirmModal(null); } }} />
+          <section className="cr-confirmacion-mesa__panel">
+            <p className="cr-confirmacion-mesa__eyebrow">{confirmModal.titulo}</p>
+            <div id="crConfirmacionMesaTitulo" className="cr-confirmacion-mesa__contenido">{confirmModal.mensaje}</div>
+            <div className="cr-confirmacion-mesa__acciones">
+              <button className="cr-confirmacion-mesa__boton cr-confirmacion-mesa__boton--cancelar" type="button" onClick={() => { if (!savingRef.current) { confirmModal.alCancelar?.(); setConfirmModal(null); } }}>{confirmModal.cancelar}</button>
+              <button className="cr-confirmacion-mesa__boton cr-confirmacion-mesa__boton--aceptar" type="button" disabled={saving} onClick={() => void confirmModal.alAceptar()}>{confirmModal.aceptar}</button>
+            </div>
+          </section>
+        </div>
+      )}
 
       {selectedTable && (
         <div className="cr-planos-mesas__dialog" role="dialog" aria-modal="true" aria-label={'Mesa ' + selectedTable}>
