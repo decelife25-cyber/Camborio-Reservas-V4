@@ -12,6 +12,7 @@ export type ReservationCardData = {
   Personas: number | null;
   Estado: string;
   Mesa: string | null;
+  MesasAdicionales?: string | null;
   Turno?: string | null;
   Observaciones?: string | null;
 };
@@ -78,7 +79,7 @@ export default function ReservationCard({
     navigate('/mesas?asignar=' + encodeURIComponent(reserva.ReservaID) + '&volverCodigo=' + encodeURIComponent(reserva.CodigoReserva || '') + (autoSeat ? '&accion=sentar' : ''));
   };
   const requestTable = () => {
-    if (!mesaValida(reserva.Mesa)) { goAssignTable(false); return; }
+    if (!mesaValida(reserva.Mesa)) { if (onAssignTable) { onAssignTable(reserva); } else { goAssignTable(false); } return; }
     setTableChangeOpen(true);
   };
   const changeState = async (nextState: string) => {
