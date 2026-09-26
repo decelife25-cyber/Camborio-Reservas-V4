@@ -135,7 +135,7 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
       <div className="cr-busqueda-ficha__cabecera">
         <div className="cr-busqueda-ficha__cliente">
           <strong><span className="cr-busqueda-ficha__cliente-icon">👤</span>{r.Nombre||'Sin nombre'}</strong>
-          <span><span className="cr-busqueda-ficha__telefono-icon">📞</span><span className="cr-busqueda-ficha__telefono">{r.Telefono||'Sin teléfono'}</span><span className="cr-busqueda-ficha__codigo">🏷️ {r.CodigoReserva||'—'}</span></span>
+          <span><span className="cr-busqueda-ficha__telefono-icon">📞</span><span className="cr-busqueda-ficha__telefono">{r.Telefono||'Sin teléfono'}</span>{r.CodigoReserva&&<button type="button" className="cr-busqueda-ficha__codigo" onClick={e=>{e.stopPropagation();navigate('/buscar?codigo='+encodeURIComponent(r.CodigoReserva||''));}}>🏷️ {r.CodigoReserva}</button>}</span>
         </div>
         <button className="cr-busqueda-ficha__estado" type="button" onClick={()=>!readOnly&&setStateOpen(true)} disabled={readOnly}>{stateLabel(r.Estado)}{!readOnly?' ▼':''}</button>
       </div>
