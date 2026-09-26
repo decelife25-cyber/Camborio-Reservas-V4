@@ -147,18 +147,33 @@ export default function ReservationCard({
       }
     }
 
-    const { data, error: e } = await supabase
+    let data:any = null;
+    if (nextState === 'SENTADA' && reserva.Estado === 'PENDIENTE') {
+      const confirmacion = await supabase.from('Reservas')
+        .update({ Estado: 'CONFIRMADA', FechaModificacion: new Date().toISOString() })
+        .eq('ReservaID', reserva.ReservaID)
+        .select('*')
+        .single();
+      if (confirmacion.error) {
+        setError(confirmacion.error.message);
+        setSaving(false);
+        return;
+      }
+      data = confirmacion.data;
+    }
+    const resultado = await supabase
       .from('Reservas')
-      .update({ Estado: nextState })
+      .update({ Estado: nextState, FechaEstado: new Date().toISOString(), FechaModificacion: new Date().toISOString() })
       .eq('ReservaID', reserva.ReservaID)
       .select('*')
       .single();
 
-    if (e) {
-      setError(e.message);
+    if (resultado.error) {
+      setError(resultado.error.message);
       setSaving(false);
       return;
     }
+    data = resultado.data;
 
     const session = await supabase.auth.getSession();
     const userId = session.data.session?.user?.id;
