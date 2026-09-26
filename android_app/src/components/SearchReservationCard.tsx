@@ -98,9 +98,9 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
   };
 
   const stateActions= r.Estado==='PENDIENTE'
-    ? [['CONFIRMADA','CONFIRMAR'],['CANCELADA_LOCAL','CANCELAR']]
+    ? [['SENTADA','SENTAR'],['CONFIRMADA','CONFIRMAR'],['CANCELADA_LOCAL','CANCELAR']]
     : r.Estado==='CONFIRMADA'
-      ? (r.FechaReserva===todayMadrid()&&r.Mesa?[['SENTADA','SENTAR'],['CANCELADA_LOCAL','CANCELAR']]:[['CANCELADA_LOCAL','CANCELAR']])
+      ? (r.FechaReserva===todayMadrid()?[['SENTADA','SENTAR'],['CANCELADA_LOCAL','CANCELAR']]:[['CANCELADA_LOCAL','CANCELAR']])
       : r.Estado==='SENTADA'
         ? [['FINALIZADA','FINALIZAR']]
         : [];
@@ -180,11 +180,10 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
     {confirmAction==='mesas'&&<div className="v2-edit-overlay" onClick={()=>setConfirmAction(null)}>
       <div className="v2-edit-modal ficha-edit-modal" onClick={e=>e.stopPropagation()}>
         <p className="cr-confirmacion-mesa__eyebrow">MESAS ASIGNADAS</p>
-        <div className="v2-state-current">{String(r.Mesa)+(String(r.MesasAdicionales||'').split(',').map(v=>v.trim()).filter(Boolean).length ? ' (+'+String(r.MesasAdicionales||'').split(',').map(v=>v.trim()).filter(Boolean).length+')' : '')}</div>
-        <div className="cr-confirmacion-mesa__contenido">¿QUIERES CAMBIAR LAS MESAS ASIGNADAS?</div>
-        <div className="v2-edit-actions ficha-state-actions">
-          <button type="button" onClick={()=>setConfirmAction(null)}>NO</button>
-          <button type="button" onClick={()=>{setConfirmAction(null);navigate('/mesas?asignar='+encodeURIComponent(r.ReservaID)+'&volverCodigo='+encodeURIComponent(r.CodigoReserva||''));}}>CAMBIAR MESAS</button>
+        <div className="cr-confirmacion-mesa__contenido cr-mesas-asignadas-modal__numeros">{[r.Mesa,...String(r.MesasAdicionales||'').split(',').map(v=>v.trim()).filter(Boolean)].filter(Boolean).join(' · ')}</div>
+        <div className="v2-edit-actions ficha-edit-actions ficha-result-actions">
+          <button className="cr-confirmacion-mesa__boton cr-confirmacion-mesa__boton--cancelar" type="button" onClick={()=>setConfirmAction(null)}>CERRAR</button>
+          <button className="cr-confirmacion-mesa__boton cr-confirmacion-mesa__boton--aceptar" type="button" onClick={()=>{setConfirmAction(null);navigate('/mesas?asignar='+encodeURIComponent(r.ReservaID)+'&volverCodigo='+encodeURIComponent(r.CodigoReserva||''));}}>CAMBIAR MESAS</button>
         </div>
       </div>
     </div>}
