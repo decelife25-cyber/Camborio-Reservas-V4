@@ -265,11 +265,10 @@ export default function ReservationCard({
         <div className="v2-edit-overlay" onClick={() => setTableChangeOpen(false)}>
           <div className={'v2-edit-modal v2-state-modal' + (lightTheme ? ' light-theme' : '')} onClick={e => e.stopPropagation()}>
             <h3>MESA ASIGNADA</h3>
-            <div className="v2-state-current">{mesaLabel}</div>
-            <div className="cr-confirmacion-mesa__contenido">¿QUIERES CAMBIAR LAS MESAS ASIGNADAS?</div>
-            <div className="v2-edit-actions ficha-state-actions">
-              <button type="button" onClick={() => setTableChangeOpen(false)}>NO</button>
-              <button type="button" onClick={() => { setTableChangeOpen(false); goAssignTable(false); }}>CAMBIAR MESAS</button>
+            <div className="cr-confirmacion-mesa__contenido cr-mesas-asignadas-modal__numeros">{assignedTables.join(' · ')}</div>
+            <div className="v2-edit-actions ficha-edit-actions ficha-result-actions">
+              <button className="cr-confirmacion-mesa__boton cr-confirmacion-mesa__boton--cancelar" type="button" onClick={() => setTableChangeOpen(false)}>CERRAR</button>
+              <button className="cr-confirmacion-mesa__boton cr-confirmacion-mesa__boton--aceptar" type="button" onClick={() => { setTableChangeOpen(false); goAssignTable(false); }}>CAMBIAR MESAS</button>
             </div>
           </div>
         </div>
@@ -283,12 +282,12 @@ export default function ReservationCard({
               {statusLabel(reserva.Estado)}
             </div>
             {error && <div className="cr-nueva-reserva__mensaje" data-tipo="error">{error}</div>}
-            <div className="v2-edit-actions">
+            <div className="v2-edit-actions ficha-state-actions">
               {stateActions.map(([s, label, kind]) => (
                 <button
                   key={s}
                   type="button"
-                  className={'v2-state-action v2-state-action--' + kind}
+                  className={'ficha-state-button ficha-state-button--' + kind}
                   onClick={() => changeState(s)}
                   disabled={saving}
                 >
