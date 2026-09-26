@@ -3191,3 +3191,25 @@ html.light .ficha-edit-modal{
 html.light .ficha-edit-modal .cr-confirmacion-mesa__eyebrow{color:#8b6800!important}
 html.light .ficha-edit-modal .cr-confirmacion-mesa__contenido{color:#171717!important}
 html.light .ficha-edit-modal .ficha-state-current{background:#eeeae1!important;color:#6f5500!important}
+
+/* FICHA BUSCAR — código como botón V2. */
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha__codigo{
+  appearance:none!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:5px!important;
+  padding:4px 9px!important;
+  border:1px solid #8c7100!important;
+  border-radius:5px!important;
+  background:rgba(255,196,0,.05)!important;
+  color:#ffc400!important;
+  font:inherit!important;
+  font-weight:1000!important;
+  cursor:pointer!important;
+  white-space:nowrap!important;
+}
+html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha__codigo{
+  border-color:#b89a42!important;
+  background:rgba(184,154,66,.08)!important;
+  color:#8b6800!important;
+}
