@@ -13,7 +13,8 @@ export default function AsignarMesaModal({ reserva, mesasDisponibles, onClose, o
   const [mesasAdicionales, setMesasAdicionales] = useState<string[]>(
     reserva.mesas_adicionales ? JSON.parse(JSON.stringify(reserva.mesas_adicionales)) : []
   );
-  const [loading, setLoading] = useState(false);\n  const initialPrincipal = reserva.mesa || '';\n  const initialAdicionales = reserva.mesas_adicionales ? JSON.stringify(reserva.mesas_adicionales) : '[]';\n  const dirty = mesaPrincipal !== initialPrincipal || JSON.stringify(mesasAdicionales) !== initialAdicionales;
+  const [loading, setLoading] = useState(false);
+  const initialPrincipal = reserva.mesa || '';\n  const initialAdicionales = reserva.mesas_adicionales ? JSON.stringify(reserva.mesas_adicionales) : '[]';\n  const dirty = mesaPrincipal !== initialPrincipal || JSON.stringify(mesasAdicionales) !== initialAdicionales;
 
   const toggleAdicional = (mesaId: string) => {
     if (mesaId === mesaPrincipal) return; // Cant add main as additional
