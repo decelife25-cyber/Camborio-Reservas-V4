@@ -547,6 +547,20 @@ html.light .app-version { color: rgba(0,0,0,.58); }
 .confirm-client strong { font-size:22px; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .confirm-client span { color:#bbb; font-size:16px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .confirm-client b { color:#ffc400; }
+.confirm-code-button {
+  appearance: none;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+  text-align: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+.confirm-code-button b { color: inherit; }
 .confirm-check {
   align-self:center;
   justify-self:center;
@@ -2457,7 +2471,7 @@ html.light .cr-planos-mesas__dialog-state{color:#111;background:#f3f3f3}
 html.light .cr-planos-mesas__dialog-actions button{background:#fff;border-color:#bbb;color:#111}
 html.light .cr-planos-mesas__dialog-actions button.primario{background:#b89a42;border-color:#a48735;color:#fff}
 
-.cr-planos-mesas__reserva-info{margin:8px 0 10px}.cr-planos-mesas__reserva-info>div:first-child span,.cr-planos-mesas__reserva-grid span{display:block;color:#ddd;font:900 15px/1.05 Arial,sans-serif;text-transform:uppercase}.cr-planos-mesas__reserva-info>div:first-child strong{display:block;color:#ffc400;font:1000 clamp(28px,6vw,40px)/1 var(--cr-font);text-transform:uppercase}.cr-planos-mesas__reserva-fecha{text-align:center;color:#fff;font:1000 clamp(20px,4.5vw,28px)/1.1 var(--cr-font);text-transform:uppercase;margin:8px 0}.cr-planos-mesas__reserva-grid{display:grid;grid-template-columns:1.45fr 1fr .7fr .85fr;gap:7px}.cr-planos-mesas__reserva-grid>div{border:1px solid #333;border-radius:8px;padding:10px 8px;background:#090909}.cr-planos-mesas__reserva-grid strong{display:block;color:#ffc400;font:1000 clamp(24px,5vw,30px)/1.05 var(--cr-font);margin-top:5px;overflow-wrap:anywhere}.cr-planos-mesas__assignment-actions{text-align:center;margin-top:8px;color:#ddd;font:800 12px/1.25 Arial,sans-serif;text-transform:uppercase}.cr-planos-mesas__assignment-actions button{width:100%;min-height:52px;margin-top:10px;border:1px solid #ffc400;border-radius:9px;background:linear-gradient(180deg,#4d5b6a,#29333d);color:#fff;font:1000 18px/1 var(--cr-font);text-transform:uppercase}.cr-planos-mesas__assignment-actions button:disabled{opacity:.6}.cr-planos-mesas__mesa--principal,.cr-planos-mesas__mesa--adicional{cursor:pointer}.cr-planos-mesas__mesa--principal:after,.cr-planos-mesas__mesa--adicional:after{content:"";position:absolute;inset:-5px;border:3px solid #ffc400;border-radius:15px;pointer-events:none}.cr-planos-mesas__mesa--principal:after{border-color:#1688ff}.cr-planos-mesas__mesa--adicional:after{border-color:#66b9f4}
+.cr-planos-mesas__reserva-info{margin:8px 0 10px}.cr-planos-mesas__reserva-info>div:first-child span,.cr-planos-mesas__reserva-grid span{display:block;color:#ddd;font:900 15px/1.05 Arial,sans-serif;text-transform:uppercase}.cr-planos-mesas__reserva-info>div:first-child strong{display:block;color:#ffc400;font:1000 clamp(28px,6vw,40px)/1 var(--cr-font);text-transform:uppercase}.cr-planos-mesas__reserva-fecha{text-align:center;color:#fff;font:1000 clamp(20px,4.5vw,28px)/1.1 var(--cr-font);text-transform:uppercase;margin:8px 0}.cr-planos-mesas__reserva-grid{display:grid;grid-template-columns:1.45fr 1fr .7fr .85fr;gap:7px}.cr-planos-mesas__reserva-grid>div{border:1px solid #333;border-radius:8px;padding:10px 8px;background:#090909}.cr-planos-mesas__reserva-grid strong{display:block;color:#ffc400;font:1000 clamp(24px,5vw,30px)/1.05 var(--cr-font);margin-top:5px;overflow-wrap:anywhere}.cr-planos-mesas__assignment-actions{text-align:center;margin-top:8px;color:#ddd;font:800 12px/1.25 Arial,sans-serif;text-transform:uppercase}.cr-planos-mesas__assignment-actions button{width:100%;min-height:52px;margin-top:10px;border:1px solid #ffc400;border-radius:9px;background:linear-gradient(180deg,#4d5b6a,#29333d);color:#fff;font:1000 18px/1 var(--cr-font);text-transform:uppercase}.cr-planos-mesas__assignment-actions button:disabled{border-color:#555;background:linear-gradient(180deg,#666,#444);color:#bdbdbd;opacity:1;cursor:not-allowed;box-shadow:none}.cr-planos-mesas__mesa--principal,.cr-planos-mesas__mesa--adicional{cursor:pointer}.cr-planos-mesas__mesa--principal:after,.cr-planos-mesas__mesa--adicional:after{content:"";position:absolute;inset:-5px;border:3px solid #ffc400;border-radius:15px;pointer-events:none}.cr-planos-mesas__mesa--principal:after{border-color:#1688ff}.cr-planos-mesas__mesa--adicional:after{border-color:#66b9f4}
 html.light .cr-planos-mesas__leyenda{color:#222!important}
 html.light .cr-planos-mesas__leyenda span{color:#222!important}
 html.light .cr-planos-mesas__leyenda .principal{background:#1688ff!important}
@@ -2534,7 +2548,7 @@ html.light .cr-config-v4__matrix .hora-col{background:#f5f3ef}
 
 
 /* CONFIGURACIÓN V4 — CSS trasladado literalmente de V2. */
-button{font:inherit;text-transform:uppercase;color:inherit;border:0;cursor:pointer;touch-action:manipulation}button:active{transform:scale(.97);filter:brightness(1.18)}.cr-button{min-height:78px;border-radius:8px;border:1px solid var(--cr-line);display:flex;align-items:center;justify-content:center;gap:10px;font-size:var(--cr-text-button);font-weight:1000;box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}.cr-button span{font-size:36px}.cr-button--primary{background:linear-gradient(135deg,#ffd32a,#f1ad00);color:#050505}.cr-button--dark{background:linear-gradient(180deg,#171717,#060606);color:#fff}.cr-button--success{background:linear-gradient(135deg,#05b966,#007c42)}
+button{font:inherit;text-transform:uppercase;color:inherit;border:0;cursor:pointer;touch-action:manipulation}button:active{transform:scale(.97);filter:brightness(1.18)}.cr-button{min-height:78px;border-radius:8px;border:1px solid var(--cr-line);display:flex;align-items:center;justify-content:center;gap:10px;font-size:var(--cr-text-button);font-weight:1000;box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}.cr-button span{font-size:36px}.cr-button--primary{background:linear-gradient(135deg,#ffd32a,#f1ad00);color:#050505}.cr-button--dark{background:linear-gradient(180deg,#171717,#060606);color:#fff}.cr-button--success{background:linear-gradient(135deg,#05b966,#007c42)}.cr-button--success:disabled{border-color:#555;background:linear-gradient(180deg,#666,#444);color:#bdbdbd;opacity:1;cursor:not-allowed;box-shadow:none}
 .cr-config-modal{position:fixed;inset:0;z-index:109;display:flex;align-items:center;justify-content:center;padding:14px;background:#000;overflow-x:hidden;overscroll-behavior:contain;touch-action:none}.cr-config-modal__box{box-sizing:border-box;width:min(760px,100%);max-height:calc(100dvh - 28px);overflow:auto;overflow-x:hidden;border:1px solid var(--cr-line);border-radius:8px;background:#050505;padding:18px;box-shadow:0 20px 50px rgba(0,0,0,.55);touch-action:auto}.cr-config-modal__header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.cr-config-modal__header h2,.cr-config-parametros h3,.cr-config-proximamente h3{margin:0;font-size:var(--cr-text-panel-title)}.cr-config-modal__header h2{color:#fff}.cr-config-parametros h3,.cr-config-proximamente h3{color:var(--cr-gold)}.cr-config-modal__close{width:48px;min-height:48px;border:1px solid var(--cr-line);border-radius:8px;background:#141414;color:#fff;font-size:32px;font-weight:900}.cr-config-menu,.cr-config-parametros,.cr-config-proximamente{display:grid;gap:12px}.cr-config-menu .cr-button{width:100%;min-height:76px;font-size:var(--cr-text-button)}.cr-config-button--horarios{background:linear-gradient(135deg,#238cff,#0755a8);color:#fff}.cr-config-parametros label{display:grid;gap:6px;color:var(--cr-muted);font-size:18px}.cr-config-parametros small{color:var(--cr-muted);font:400 15px/1.3 Arial,sans-serif;text-transform:none}.cr-config-parametros input{width:100%;min-height:56px;border:2px solid var(--cr-line);border-radius:8px;background:#090909;color:var(--cr-text);padding:8px 12px;font:900 22px Arial,sans-serif}.cr-config-parametros input:focus{outline:0;border-color:var(--cr-gold);box-shadow:0 0 0 3px rgba(255,196,0,.18)}.cr-config-proximamente p{margin:18px 0;color:var(--cr-muted);font:900 24px Arial,sans-serif;text-align:center}.cr-config-mensaje{margin-top:12px;color:#35d06f;font:900 18px Arial,sans-serif;text-transform:none}.cr-config-mensaje[data-tipo=error]{color:#ffb3b8}@media(max-width:620px){.cr-config-modal{align-items:flex-start;padding:72px 6px 6px}.cr-config-modal__box{width:calc(100vw - 12px);max-height:calc(100dvh - 78px);padding:10px}}
 .cr-config-horarios,.cr-horario-form{display:grid;gap:12px}.cr-config-horarios h3,.cr-horario-form h3{margin:0;color:var(--cr-gold);font-size:var(--cr-text-panel-title)}.cr-horarios-inconsistencia{margin:0;padding:9px;border-radius:7px;background:#35171a;color:#ffb3b8;font:700 14px/1.3 Arial,sans-serif;text-transform:none}.cr-horario-bloque{margin:4px 0;padding:8px;border:1px solid #292929;border-radius:8px;background:#0b0b0b}.cr-horario-bloque__cabecera{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:8px;margin-bottom:8px}.cr-horario-bloque__acciones{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;min-width:0}.cr-horario-bloque h4{margin:0;white-space:nowrap;font:900 20px Arial,sans-serif}.cr-horario-bloque[data-servicio=COMIDA] h4{color:#ffbf3f}.cr-horario-bloque[data-servicio=CENA] h4{color:#7db7ff}.cr-horario-margen-servicio{display:flex;align-items:center;justify-content:center;gap:5px;min-width:0;color:#ddd;font:700 14px Arial,sans-serif;text-transform:none;white-space:nowrap}.cr-horario-margen-servicio input{box-sizing:border-box;width:64px;height:46px;border:1px solid #555;border-radius:6px;background:#080808;color:#fff;padding:4px;text-align:center;font:900 16px Arial,sans-serif}.cr-horario-anadir{flex:0 0 auto;min-height:44px;border:1px solid #2777c7;border-radius:7px;background:#123b64;color:#fff;padding:7px 9px;font:900 13px Arial,sans-serif;white-space:nowrap}.cr-horario-anadir:disabled,.cr-horario-margen-servicio input:disabled,.cr-horario-eliminar-fila:disabled{opacity:.45}.cr-horario-matriz-wrap{max-width:100%;overflow-x:auto;overscroll-behavior-inline:contain}.cr-horario-matriz{width:100%;min-width:320px;table-layout:fixed;border-collapse:separate;border-spacing:0;color:#fff;font-family:Arial,sans-serif}.cr-horario-matriz th,.cr-horario-matriz td{box-sizing:border-box;width:calc((100% - 96px)/7);height:43px;border-bottom:1px solid #292929;padding:2px;text-align:center}.cr-horario-matriz th{position:sticky;top:0;z-index:1;background:#111;color:#bbb;font-size:10px}.cr-horario-matriz .cr-horario-col-hora{position:sticky;left:0;z-index:2;width:50px;background:#0b0b0b;text-align:left}.cr-horario-matriz thead .cr-horario-col-hora{z-index:3;background:#111}.cr-horario-matriz th:last-child,.cr-horario-matriz td:last-child{width:46px;padding-left:10px}.cr-horario-hora{display:block;font-size:15px;font-weight:900}.cr-horario-check{width:28px;height:28px;margin:0;accent-color:#29b765}.cr-horario-check:disabled{opacity:.3}.cr-horario-col-lunes{background:#101010;color:#666}.cr-horario-eliminar-fila{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border:1px solid #a52b33;border-radius:7px;background:#3b1115;color:#ff9aa0;font:900 25px/1 Arial,sans-serif}.cr-horario-vacio{padding:12px;color:#888;text-align:center;text-transform:none}.cr-horario-form label{display:grid;gap:6px;color:var(--cr-muted);font-size:17px}.cr-horario-form small{font:400 14px/1.3 Arial,sans-serif;text-transform:none}.cr-horario-form input[type=time]{min-height:54px;border:2px solid var(--cr-line);border-radius:8px;background:#090909;color:#fff;padding:8px 12px;font:900 21px Arial,sans-serif}.cr-horario-fijos{color:#aaa;font:700 15px Arial,sans-serif}.cr-horario-fijos strong{color:#fff}.cr-horario-dias-form{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin:0;border:1px solid #333;padding:9px}.cr-horario-dias-form legend{color:#aaa;font:900 13px Arial,sans-serif}.cr-horario-dias-form label{display:flex;align-items:center;gap:3px;font-size:11px}.cr-horario-dias-form input{width:25px;height:25px;margin:0;accent-color:#29b765}.cr-horario-confirmar{position:absolute;inset:50% auto auto 50%;z-index:4;width:min(440px,calc(100% - 28px));transform:translate(-50%,-50%);border:1px solid #555;border-radius:9px;background:#111;padding:18px;box-shadow:0 0 0 100vmax rgba(0,0,0,.8)}.cr-horario-confirmar p{margin:0 0 18px;color:#fff;font:900 20px/1.35 Arial,sans-serif;text-align:center;text-transform:none}.cr-horario-confirmar div{display:grid;grid-template-columns:1fr 1fr;gap:8px}.cr-horario-confirmar .cr-button{min-width:0;padding:10px}.cr-horario-confirmar [data-cr-horario-eliminar-cancelar]{background:#171717;color:#fff}.cr-horario-confirmar [data-cr-horario-eliminar-confirmar]{background:#b51f2d;color:#fff}@media(max-width:390px){.cr-horario-bloque__acciones{gap:5px}.cr-horario-margen-servicio{font-size:11px}.cr-horario-anadir{padding-inline:7px;font-size:12px}.cr-horario-dias-form{grid-template-columns:repeat(4,1fr)}}
 @media(max-width:620px){.cr-button{min-height:74px;padding:8px 2px;flex-direction:column;gap:5px;font-size:var(--cr-text-button);line-height:1.05}.cr-button span{font-size:30px}}
@@ -2984,4 +2998,218 @@ html.light .v2-state-modal .v2-edit-cancel-full {
 .v2-state-modal.light-theme .v2-edit-cancel-full {
   background:linear-gradient(180deg,#ffe27a,#d6d0bd) !important;
   color:#161616 !important;
+}
+
+/* Ficha de reserva — modales replicados de V2 */
+.cr-confirmacion-mesa{position:fixed;inset:0;z-index:10010;display:grid;place-items:center;padding:18px;background:rgba(0,0,0,.68)}
+.cr-confirmacion-mesa__backdrop{position:absolute;inset:0}
+.cr-confirmacion-mesa__panel{position:relative;width:min(520px,100%);box-sizing:border-box;border:1px solid #ffc400;border-radius:16px;background:linear-gradient(180deg,#111 0,#050505 100%);box-shadow:0 20px 60px rgba(0,0,0,.72),inset 0 1px 0 rgba(255,255,255,.08);padding:24px;color:#fff;text-align:center}
+.cr-confirmacion-mesa__eyebrow{margin:0 0 10px;color:#ffc400;font:1000 27px/1.05 Arial,sans-serif;letter-spacing:.55px;text-transform:uppercase}
+.cr-confirmacion-mesa__texto{margin:0;color:#fff;font:900 20px/1.2 Arial,sans-serif}
+.cr-confirmacion-mesa__acciones{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:22px}
+.cr-confirmacion-mesa__boton{min-height:52px;border-radius:9px;border:1px solid #3a3a3a;background:linear-gradient(180deg,#252525,#111);color:#fff;font:1000 18px/1 Arial,sans-serif;cursor:pointer}
+.cr-busqueda-edicion-modal .cr-confirmacion-mesa__eyebrow{font-size:27px}
+.cr-busqueda-edicion-modal .cr-formulario__campo{display:grid;gap:12px;text-align:left;color:#fff;font:1000 20px/1 Arial,sans-serif;text-transform:uppercase}
+.cr-busqueda-edicion-modal [data-cr-busqueda-edicion-input]{width:100%;box-sizing:border-box;min-height:64px;border:2px solid #ffc400;border-radius:10px;background:#070707;color:#fff;font:1000 30px/1 Arial,sans-serif;padding:12px 14px;outline:none;text-align:center}
+.cr-busqueda-edicion-modal textarea[data-cr-busqueda-edicion-input]{min-height:140px;text-align:left;text-transform:none;line-height:1.15}
+.cr-busqueda-edicion__pax-control{display:grid;grid-template-columns:72px minmax(0,1fr) 72px;gap:10px;align-items:center}
+.cr-busqueda-edicion__pax-control button{min-height:64px;border:2px solid #ffc400;border-radius:10px;background:linear-gradient(180deg,#ffd946 0,#ffc400 58%,#e6a500 100%);color:#070707;font:1000 38px/1 Arial,sans-serif}
+.cr-busqueda-edicion-modal .cr-confirmacion-mesa__boton{min-height:64px;font-size:20px}
+.cr-busqueda-estado-modal .cr-confirmacion-mesa__acciones{grid-template-columns:1fr;margin-top:22px}
+.cr-busqueda-estado__boton--confirmar{background:linear-gradient(180deg,#1bbf62,#087b35)}
+.cr-busqueda-estado__boton--sentar{background:linear-gradient(180deg,#2388ff,#0754bd)}
+.cr-busqueda-estado__boton--finalizar{background:linear-gradient(180deg,#475569,#1e293b)}
+.cr-busqueda-estado__boton--cancelar{background:linear-gradient(180deg,#ef4444,#991b1b)}
+.cr-busqueda-estado__boton--no-presentado{background:linear-gradient(180deg,#f59e0b,#b45309)}
+.cr-busqueda-estado__cerrar{width:100%;margin-top:4px;border:1px solid #ffc400;background:linear-gradient(180deg,#ffe27a 0,#d6d0bd 100%);color:#161616}
+
+
+/* Ficha de reserva: modales grandes y legibles en móvil, usando los mismos controles de V2. */
+.ficha-edit-modal{width:min(620px,calc(100vw - 24px));padding:32px 24px;border-radius:18px}
+.ficha-edit-modal .cr-confirmacion-mesa__eyebrow{margin:0 0 24px;color:#ffc400;font:1000 clamp(28px,7vw,40px)/1 Arial,sans-serif;text-align:center}
+.ficha-edit-actions{gap:14px;margin-top:26px}
+.ficha-edit-actions button{min-height:64px;border:1px solid #ffc400;border-radius:10px;background:linear-gradient(180deg,#262626,#111);color:#fff;font:1000 clamp(18px,4.5vw,23px)/1 Arial,sans-serif;text-transform:uppercase;padding:10px 14px}
+.ficha-edit-actions button:last-child{background:linear-gradient(180deg,#ffd83a,#edae00);color:#111}
+.ficha-pax-control{grid-template-columns:82px minmax(130px,1fr) 82px!important;min-height:96px!important;padding:8px!important}
+.ficha-pax-control button{width:82px!important;height:76px!important;font-size:38px!important}
+.ficha-pax-control strong{font-size:clamp(30px,7vw,42px)!important}
+.ficha-time-picker{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+.ficha-time-picker>div>span{display:block;margin-bottom:8px;color:#ffc400;font:1000 17px/1 Arial,sans-serif;text-align:center}
+
+.ficha-observaciones-input{width:100%;min-height:130px;box-sizing:border-box;padding:14px;border:1px solid #ffc400;border-radius:10px;background:#0b0b0b;color:#fff;font:700 20px/1.25 Arial,sans-serif;resize:vertical}
+html.light .ficha-edit-modal{background:linear-gradient(180deg,#fff,#f1efea)!important;color:#171717!important;border-color:#b89a42!important}
+html.light .ficha-edit-modal .cr-confirmacion-mesa__eyebrow,
+html.light .ficha-time-picker>div>span{color:#8b6800!important}
+html.light .ficha-edit-actions button{background:linear-gradient(180deg,#f4f2ed,#ddd8ce)!important;color:#171717!important;border-color:#b89a42!important}
+html.light .ficha-edit-actions button:last-child{background:linear-gradient(180deg,#ffd83a,#edae00)!important;color:#111!important}
+html.light .ficha-pax-control{background:#fff!important;border-color:#b89a42!important}
+html.light .ficha-pax-control button{background:linear-gradient(180deg,#f4f2ed,#ddd8ce)!important;color:#8b6800!important}
+html.light .ficha-pax-control strong{color:#171717!important}
+html.light .ficha-observaciones-input{background:#fff!important;color:#171717!important;border-color:#b89a42!important}
+html.light .ficha-edit-modal .v2-state-current{color:#8b6800;background:#f5f0df}
+@media(max-width:620px){
+  .ficha-edit-modal{width:calc(100vw - 20px);padding:28px 16px}
+  .ficha-edit-modal .cr-confirmacion-mesa__eyebrow{font-size:30px}
+  .ficha-edit-actions button{min-height:62px;font-size:18px}
+  .ficha-pax-control{grid-template-columns:72px minmax(100px,1fr) 72px!important}
+  .ficha-pax-control button{width:72px!important}
+  .ficha-time-picker{gap:10px}
+}
+
+/* Corrección integral modales ficha: mismo control Wheel que NuevaReserva y modales legibles en día/noche. */
+.ficha-time-picker{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}.ficha-time-picker label{display:grid;gap:8px;color:#ffc400;font:1000 18px/1 var(--cr-font);text-transform:uppercase}.ficha-time-picker .cr-nueva-reserva__rueda{width:100%}
+.ficha-edit-modal{width:min(640px,94vw)!important;max-height:calc(100svh - 36px);overflow:auto;padding:28px!important;border-radius:18px!important}.ficha-edit-modal .cr-confirmacion-mesa__eyebrow{font-size:clamp(28px,7vw,38px)!important;margin:0 0 22px!important}.ficha-edit-actions button{min-height:64px!important;font-size:clamp(20px,5vw,28px)!important;padding:12px 14px!important}.ficha-state-actions{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.ficha-state-button{min-height:64px!important;border:0!important;border-radius:10px!important;color:#fff!important;font:1000 clamp(20px,5vw,28px)/1 var(--cr-font)!important;text-transform:uppercase}.ficha-state-button--confirmada{background:linear-gradient(180deg,#1bbf62,#087b35)!important}.ficha-state-button--sentada{background:linear-gradient(180deg,#2388ff,#0754bd)!important}.ficha-state-button--finalizada{background:linear-gradient(180deg,#475569,#1e293b)!important}.ficha-state-button--cancelada-local,.ficha-state-button--cancelada-cliente{background:linear-gradient(180deg,#ef4444,#991b1b)!important}.ficha-state-current{min-height:64px!important;min-width:min(360px,100%)!important;font-size:clamp(28px,7vw,42px)!important}
+html.light .ficha-edit-modal{background:linear-gradient(180deg,#fff,#f2f0eb)!important;color:#171717!important;border-color:#b89a42!important}.ficha-edit-modal .cr-confirmacion-mesa__eyebrow{color:#ffc400!important}html.light .ficha-edit-modal .cr-confirmacion-mesa__eyebrow,html.light .ficha-time-picker label{color:#8b6800!important}html.light .ficha-state-current{color:#8b6800!important;background:#f5f0df!important}html.light .ficha-state-button{color:#fff!important}html.light .ficha-edit-actions button:first-child{background:#f4f2ed!important;color:#171717!important;border-color:#b89a42!important}html.light .ficha-edit-actions button:last-child{background:linear-gradient(180deg,#ffd83a,#edae00)!important;color:#111!important}.ficha-observaciones-input{font-size:22px!important}
+@media(max-width:620px){.ficha-edit-modal{width:calc(100vw - 20px)!important;padding:22px 14px!important}.ficha-time-picker{gap:10px}.ficha-state-actions{grid-template-columns:1fr}.ficha-state-button{min-height:62px!important}.ficha-edit-actions button{min-height:60px!important}}
+
+
+/* ASIGNACIÓN DE MESAS — adaptación directa de V2 (modo noche). */
+.cr-planos-mesas__mesa--seleccionada{background:linear-gradient(145deg,#ffe66b 0,#ffc400 100%);border-color:#7a5900;color:#090909}
+.cr-planos-mesas__asignacion--asignada{color:#2388ff}
+.cr-planos-mesas__asignacion--pendiente{color:#ffc400}
+.cr-confirmacion-mesa{position:fixed;inset:0;z-index:10010;display:grid;place-items:center;padding:18px;background:rgba(0,0,0,.68)}
+.cr-confirmacion-mesa__backdrop{position:absolute;inset:0;border:0;background:transparent}
+.cr-confirmacion-mesa__panel{position:relative;width:min(520px,100%);border:1px solid #ffc400;border-radius:16px;background:linear-gradient(180deg,#111 0,#050505 100%);box-shadow:0 20px 60px rgba(0,0,0,.72),inset 0 1px 0 rgba(255,255,255,.08);padding:24px;color:#fff;text-align:center}
+.cr-confirmacion-mesa__eyebrow{margin:0 0 10px;color:#ffc400;font:1000 15px/1 var(--cr-font);letter-spacing:.55px;text-transform:uppercase}
+.cr-confirmacion-mesa__contenido{font:1000 27px/1.12 var(--cr-font);text-transform:none}
+.cr-confirmacion-mesa__acciones{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:22px}
+.cr-confirmacion-mesa__boton{min-height:56px;border-radius:10px;padding:0 12px;font:1000 clamp(18px,4.6vw,24px)/1 var(--cr-font);text-transform:uppercase;cursor:pointer}
+.cr-confirmacion-mesa__boton--cancelar{border:1px solid #3a3a3a;background:linear-gradient(180deg,#252525,#111);color:#fff}
+.cr-confirmacion-mesa__boton--aceptar{border:1px solid #ffc400;background:linear-gradient(180deg,#ffd946 0,#ffc400 58%,#e6a500 100%);color:#070707}
+.cr-confirmacion-mesa__boton:hover,.cr-confirmacion-mesa__boton:focus{outline:3px solid rgba(255,196,0,.45);outline-offset:2px}
+.cr-confirmacion-mesa__boton:disabled{opacity:.6;cursor:not-allowed}
+@media(max-width:620px){
+  .cr-confirmacion-mesa{padding:12px}
+  .cr-confirmacion-mesa__panel{width:92vw;padding:24px 18px}
+  .cr-confirmacion-mesa__eyebrow{font-size:clamp(24px,6.8vw,36px);line-height:1.02}
+  .cr-confirmacion-mesa__contenido{font:1000 clamp(24px,5.8vw,34px)/1.08 var(--cr-font);text-transform:uppercase}
+  .cr-confirmacion-mesa__boton{min-height:60px;font-size:clamp(20px,4.8vw,26px)}
+  .cr-confirmacion-mesa__acciones{grid-template-columns:1fr}
+}
+html.light .cr-confirmacion-mesa__panel{border-color:#b89a42;background:linear-gradient(180deg,#fff,#f1efea);color:#171717}
+html.light .cr-confirmacion-mesa__eyebrow{color:#8b6800}
+html.light .cr-confirmacion-mesa__boton--cancelar{background:linear-gradient(180deg,#f4f2ed,#ddd8ce);color:#171717;border-color:#b89a42}
+html.light .cr-confirmacion-mesa__boton--aceptar{background:linear-gradient(180deg,#ffd83a,#edae00);color:#111;border-color:#b89a42}
+
+
+/* ASIGNAR MESA — botón GUARDAR: estados V2 exactos en noche y acento de día. */
+.cr-planos-mesas__assignment-actions button{
+  border:1px solid #ffc400!important;
+  background:linear-gradient(180deg,#ffd946 0,#ffc400 58%,#e6a500 100%)!important;
+  color:#070707!important;
+  box-shadow:0 10px 22px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.35)!important;
+  opacity:1!important;
+  cursor:pointer;
+}
+.cr-planos-mesas__assignment-actions button:disabled{
+  border-color:#4b5563!important;
+  background:linear-gradient(180deg,#5f6670 0,#454c55 58%,#303740 100%)!important;
+  color:#d7dce2!important;
+  box-shadow:none!important;
+  opacity:.9!important;
+  cursor:not-allowed;
+  pointer-events:none;
+}
+html.light .cr-planos-mesas__assignment-actions button{
+  border-color:#a48735!important;
+  background:#b89a42!important;
+  color:#fff!important;
+  box-shadow:none!important;
+}
+html.light .cr-planos-mesas__assignment-actions button:disabled{
+  border-color:#aaa69e!important;
+  background:#c9c6bf!important;
+  color:#77736b!important;
+  box-shadow:none!important;
+  opacity:1!important;
+  cursor:not-allowed;
+  pointer-events:none;
+}
+
+
+/* FICHA RESERVA — GUARDAR: activo solo con cambios, con contraste V2. */
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha__guardar:disabled{
+  background:linear-gradient(180deg,#666,#444)!important;
+  border:1px solid #555!important;
+  color:#bdbdbd!important;
+  opacity:1!important;
+  box-shadow:none!important;
+  cursor:not-allowed!important;
+  pointer-events:none!important;
+}
+html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha__guardar:not(:disabled){
+  background:#b89a42!important;
+  border:1px solid #a48735!important;
+  color:#fff!important;
+  box-shadow:none!important;
+}
+html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha__guardar:disabled{
+  background:#c9c6bf!important;
+  border:1px solid #aaa69e!important;
+  color:#77736b!important;
+}
+
+/* FICHA RESERVA — réplica V2: estado actual informativo y acciones a ancho completo. */
+.ficha-state-current{
+  display:block!important;
+  width:100%!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  box-shadow:none!important;
+  pointer-events:none!important;
+  margin:0 0 14px!important;
+  padding:10px 12px!important;
+  text-align:center!important;
+  font-weight:900!important;
+  font-size:clamp(18px,4.8vw,25px)!important;
+  text-transform:uppercase!important;
+}
+.ficha-state-actions{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:10px!important;
+  width:100%!important;
+}
+.ficha-state-actions .ficha-state-button{
+  width:100%!important;
+  min-height:62px!important;
+  flex:0 0 auto!important;
+}
+.ficha-result-actions{
+  display:flex!important;
+  flex-direction:column!important;
+}
+.ficha-result-actions button{
+  width:100%!important;
+}
+html.light .ficha-edit-modal{
+  background:linear-gradient(180deg,#fff,#f1efea)!important;
+  color:#171717!important;
+  border-color:#b89a42!important;
+  box-shadow:0 20px 60px rgba(0,0,0,.35)!important;
+}
+html.light .ficha-edit-modal .cr-confirmacion-mesa__eyebrow{color:#8b6800!important}
+html.light .ficha-edit-modal .cr-confirmacion-mesa__contenido{color:#171717!important}
+html.light .ficha-edit-modal .ficha-state-current{background:#eeeae1!important;color:#6f5500!important}
+
+/* FICHA BUSCAR — código como botón V2. */
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha__codigo{
+  appearance:none!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:5px!important;
+  padding:4px 9px!important;
+  border:1px solid #8c7100!important;
+  border-radius:5px!important;
+  background:rgba(255,196,0,.05)!important;
+  color:#ffc400!important;
+  font:inherit!important;
+  font-weight:1000!important;
+  cursor:pointer!important;
+  white-space:nowrap!important;
+}
+html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha__codigo{
+  border-color:#b89a42!important;
+  background:rgba(184,154,66,.08)!important;
+  color:#8b6800!important;
 }

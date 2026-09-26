@@ -13,6 +13,8 @@ export default function ModificarReservaModal({ reserva, onClose, onUpdated }: P
   const [hora, setHora] = useState(String(reserva.hora_reserva || '').slice(0, 5));
   const [personas, setPersonas] = useState(reserva.personas || 2);
   const [loading, setLoading] = useState(false);
+  const [initialValues] = useState({ fecha: reserva.fecha_reserva || '', hora: String(reserva.hora_reserva || '').slice(0, 5), personas: reserva.personas || 2 });
+  const dirty = fecha !== initialValues.fecha || hora !== initialValues.hora || Number(personas) !== Number(initialValues.personas);
   const [error, setError] = useState('');
 
   const handleUpdate = async (e: React.FormEvent) => {
@@ -107,7 +109,7 @@ export default function ModificarReservaModal({ reserva, onClose, onUpdated }: P
             <button type="button" onClick={onClose} className="flex-1 p-2 bg-gray-200 dark:bg-gray-700 rounded-lg text-gray-900 dark:text-white">
               Cancelar
             </button>
-            <button type="submit" disabled={loading} className="flex-1 p-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg font-bold">
+            <button type="submit" disabled={!dirty || loading} className="flex-1 p-2 bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-500 disabled:hover:bg-gray-500 disabled:text-gray-300 disabled:cursor-not-allowed text-white rounded-lg font-bold">
               {loading ? 'Guardando...' : 'Guardar'}
             </button>
           </div>

@@ -12,6 +12,7 @@ export type ReservationCardData = {
   Personas: number | null;
   Estado: string;
   Mesa: string | null;
+  MesasAdicionales?: string | null;
   Turno?: string | null;
   Observaciones?: string | null;
 };
@@ -61,6 +62,7 @@ export default function ReservationCard({
   const [stateOpen, setStateOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [tableChangeOpen, setTableChangeOpen] = useState(false);
   const [lightTheme, setLightTheme] = useState(() => document.documentElement.classList.contains('light'));
   const hasObservations = Boolean(reserva.Observaciones?.trim());
 
@@ -73,6 +75,13 @@ export default function ReservationCard({
 
   const readOnly = ['FINALIZADA', 'CANCELADA_CLIENTE', 'CANCELADA_LOCAL', 'NO_PRESENTADO'].includes(reserva.Estado);
 
+  const goAssignTable = (autoSeat = false) => {
+    navigate('/mesas?asignar=' + encodeURIComponent(reserva.ReservaID) + '&volverCodigo=' + encodeURIComponent(reserva.CodigoReserva || '') + (autoSeat ? '&accion=sentar' : ''));
+  };
+  const requestTable = () => {
+    if (!mesaValida(reserva.Mesa)) { if (onAssignTable) { onAssignTable(reserva); } else { goAssignTable(false); } return; }
+    setTableChangeOpen(true);
+  };
   const changeState = async (nextState: string) => {
     setSaving(true);
     setError('');
@@ -84,7 +93,7 @@ export default function ReservationCard({
     }
 
     if (nextState === 'SENTADA') {
-      if (reserva.Estado !== 'CONFIRMADA') {
+      if (!['PENDIENTE','CONFIRMADA'].includes(reserva.Estado)) {
         setError('La reserva debe estar CONFIRMADA para sentarla.');
         setSaving(false);
         return;
@@ -100,8 +109,8 @@ export default function ReservationCard({
         return;
       }
       if (!mesaValida(reserva.Mesa)) {
-        setError('Debes asignar una mesa antes de sentar la reserva.');
         setSaving(false);
+        goAssignTable(true);
         return;
       }
     }
@@ -139,18 +148,33 @@ export default function ReservationCard({
       }
     }
 
-    const { data, error: e } = await supabase
+    let data:any = null;
+    if (nextState === 'SENTADA' && reserva.Estado === 'PENDIENTE') {
+      const confirmacion = await supabase.from('Reservas')
+        .update({ Estado: 'CONFIRMADA', FechaModificacion: new Date().toISOString() })
+        .eq('ReservaID', reserva.ReservaID)
+        .select('*')
+        .single();
+      if (confirmacion.error) {
+        setError(confirmacion.error.message);
+        setSaving(false);
+        return;
+      }
+      data = confirmacion.data;
+    }
+    const resultado = await supabase
       .from('Reservas')
-      .update({ Estado: nextState })
+      .update({ Estado: nextState, FechaEstado: new Date().toISOString(), FechaModificacion: new Date().toISOString() })
       .eq('ReservaID', reserva.ReservaID)
       .select('*')
       .single();
 
-    if (e) {
-      setError(e.message);
+    if (resultado.error) {
+      setError(resultado.error.message);
       setSaving(false);
       return;
     }
+    data = resultado.data;
 
     const session = await supabase.auth.getSession();
     const userId = session.data.session?.user?.id;
@@ -173,12 +197,15 @@ export default function ReservationCard({
 
   const stateActions =
     reserva.Estado === 'PENDIENTE'
-      ? [['CONFIRMADA', 'CONFIRMAR', 'confirmar'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar']]
+      ? [['SENTADA', 'SENTAR', 'sentar'], ['CONFIRMADA', 'CONFIRMAR', 'confirmar'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar']]
       : reserva.Estado === 'CONFIRMADA'
         ? [['SENTADA', 'SENTAR', 'sentar'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar']]
         : reserva.Estado === 'SENTADA'
           ? [['FINALIZADA', 'FINALIZAR', 'finalizar'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']]
           : [];
+
+  const assignedTables = [reserva.Mesa, ...(String(reserva.MesasAdicionales || '').split(',').map(v => v.trim()).filter(Boolean))].filter(Boolean) as string[];
+  const mesaLabel = assignedTables.length ? 'MESA ' + assignedTables[0] + (assignedTables.length > 1 ? ' (+' + (assignedTables.length - 1) + ')' : '') : 'SIN ASIGNAR';
 
   return (
     <>
@@ -216,8 +243,8 @@ export default function ReservationCard({
         </div>
         <div className="reservation-party">
           <div className="pax"><span>👥</span> {reserva.Personas || 0} PAX</div>
-          <button className="table-button" type="button" onClick={() => { if (!reserva.Mesa && onAssignTable) onAssignTable(reserva); }}>
-            {reserva.Mesa ? 'MESA ' + reserva.Mesa : 'SIN ASIGNAR'}
+          <button className="table-button" type="button" onClick={requestTable}>
+            {mesaLabel}
           </button>
         </div>
       </article>
@@ -230,6 +257,20 @@ export default function ReservationCard({
             <button type="button" className="observation-close" onClick={() => setShowObservations(false)}>
               CERRAR
             </button>
+          </div>
+        </div>
+      )}
+
+      {tableChangeOpen && (
+        <div className="v2-edit-overlay" onClick={() => setTableChangeOpen(false)}>
+          <div className={'v2-edit-modal v2-state-modal' + (lightTheme ? ' light-theme' : '')} onClick={e => e.stopPropagation()}>
+            <h3>MESA ASIGNADA</h3>
+            <div className="v2-state-current">{mesaLabel}</div>
+            <div className="cr-confirmacion-mesa__contenido">¿QUIERES CAMBIAR LAS MESAS ASIGNADAS?</div>
+            <div className="v2-edit-actions ficha-state-actions">
+              <button type="button" onClick={() => setTableChangeOpen(false)}>NO</button>
+              <button type="button" onClick={() => { setTableChangeOpen(false); goAssignTable(false); }}>CAMBIAR MESAS</button>
+            </div>
           </div>
         </div>
       )}
