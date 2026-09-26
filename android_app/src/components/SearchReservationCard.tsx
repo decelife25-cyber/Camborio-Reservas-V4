@@ -34,7 +34,7 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
   const[saving,setSaving]=useState(false);
   const[dirty,setDirty]=useState(false);
   const[error,setError]=useState('');
-  const[confirmAction,setConfirmAction]=useState<null|'guardar'|'salir'|'resultado'>(null);
+  const[confirmAction,setConfirmAction]=useState<null|'guardar'|'salir'|'resultado'|'mesas'>(null);
   const[resultado,setResultado]=useState('');
 
   const parts=dateParts(r.FechaReserva);
@@ -81,7 +81,7 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
 
   const changeState=async(nextState:string)=>{
     if(saving||readOnly)return;
-    if(nextState==='SENTADA'&&!r.Mesa){setError('No se puede sentar la reserva sin mesa asignada.');setStateOpen(false);return;}
+    if(nextState==='SENTADA'&&!r.Mesa){setStateOpen(false);navigate('/mesas?asignar='+encodeURIComponent(r.ReservaID)+'&volverCodigo='+encodeURIComponent(r.CodigoReserva||'')+'&accion=sentar');return;}
     setSaving(true);
     const{data,error:e}=await supabase.from('Reservas').update({Estado:nextState}).eq('ReservaID',r.ReservaID).select('*').single();
     setSaving(false);
@@ -110,7 +110,9 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
 
   const openMesa=()=>{
     if(readOnly)return;
-    navigate('/mesas?asignar='+encodeURIComponent(r.ReservaID)+'&volverCodigo='+encodeURIComponent(r.CodigoReserva||''));
+    const mesas=[r.Mesa,...String(r.MesasAdicionales||'').split(',').map(v=>v.trim()).filter(Boolean)].filter(Boolean);
+    if(!mesas.length){navigate('/mesas?asignar='+encodeURIComponent(r.ReservaID)+'&volverCodigo='+encodeURIComponent(r.CodigoReserva||''));return;}
+    setConfirmAction('mesas');
   };
 
   return <div className="cr-busqueda-ficha-wrap">
@@ -168,6 +170,17 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
       </div>
     </div>}
 
+    {confirmAction==='mesas'&&<div className="v2-edit-overlay" onClick={()=>setConfirmAction(null)}>
+      <div className="v2-edit-modal ficha-edit-modal" onClick={e=>e.stopPropagation()}>
+        <p className="cr-confirmacion-mesa__eyebrow">MESAS ASIGNADAS</p>
+        <div className="v2-state-current">{String(r.Mesa)+(String(r.MesasAdicionales||'').split(',').map(v=>v.trim()).filter(Boolean).length ? ' (+'+String(r.MesasAdicionales||'').split(',').map(v=>v.trim()).filter(Boolean).length+')' : '')}</div>
+        <div className="cr-confirmacion-mesa__contenido">¿QUIERES CAMBIAR LAS MESAS ASIGNADAS?</div>
+        <div className="v2-edit-actions ficha-state-actions">
+          <button type="button" onClick={()=>setConfirmAction(null)}>NO</button>
+          <button type="button" onClick={()=>{setConfirmAction(null);navigate('/mesas?asignar='+encodeURIComponent(r.ReservaID)+'&volverCodigo='+encodeURIComponent(r.CodigoReserva||''));}}>CAMBIAR MESAS</button>
+        </div>
+      </div>
+    </div>}
     {stateOpen&&<div className="v2-edit-overlay" onClick={()=>setStateOpen(false)}>
       <div className="v2-edit-modal ficha-edit-modal ficha-state-modal" onClick={e=>e.stopPropagation()}>
         <p className="cr-confirmacion-mesa__eyebrow">CAMBIAR ESTADO</p>
