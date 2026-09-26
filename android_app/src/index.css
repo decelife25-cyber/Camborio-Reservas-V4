@@ -3061,3 +3061,32 @@ html.light .ficha-edit-modal .v2-state-current{color:#8b6800;background:#f5f0df}
 .ficha-edit-modal{width:min(640px,94vw)!important;max-height:calc(100svh - 36px);overflow:auto;padding:28px!important;border-radius:18px!important}.ficha-edit-modal .cr-confirmacion-mesa__eyebrow{font-size:clamp(28px,7vw,38px)!important;margin:0 0 22px!important}.ficha-edit-actions button{min-height:64px!important;font-size:clamp(20px,5vw,28px)!important;padding:12px 14px!important}.ficha-state-actions{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.ficha-state-button{min-height:64px!important;border:0!important;border-radius:10px!important;color:#fff!important;font:1000 clamp(20px,5vw,28px)/1 var(--cr-font)!important;text-transform:uppercase}.ficha-state-button--confirmada{background:linear-gradient(180deg,#1bbf62,#087b35)!important}.ficha-state-button--sentada{background:linear-gradient(180deg,#2388ff,#0754bd)!important}.ficha-state-button--finalizada{background:linear-gradient(180deg,#475569,#1e293b)!important}.ficha-state-button--cancelada-local,.ficha-state-button--cancelada-cliente{background:linear-gradient(180deg,#ef4444,#991b1b)!important}.ficha-state-current{min-height:64px!important;min-width:min(360px,100%)!important;font-size:clamp(28px,7vw,42px)!important}
 html.light .ficha-edit-modal{background:linear-gradient(180deg,#fff,#f2f0eb)!important;color:#171717!important;border-color:#b89a42!important}.ficha-edit-modal .cr-confirmacion-mesa__eyebrow{color:#ffc400!important}html.light .ficha-edit-modal .cr-confirmacion-mesa__eyebrow,html.light .ficha-time-picker label{color:#8b6800!important}html.light .ficha-state-current{color:#8b6800!important;background:#f5f0df!important}html.light .ficha-state-button{color:#fff!important}html.light .ficha-edit-actions button:first-child{background:#f4f2ed!important;color:#171717!important;border-color:#b89a42!important}html.light .ficha-edit-actions button:last-child{background:linear-gradient(180deg,#ffd83a,#edae00)!important;color:#111!important}.ficha-observaciones-input{font-size:22px!important}
 @media(max-width:620px){.ficha-edit-modal{width:calc(100vw - 20px)!important;padding:22px 14px!important}.ficha-time-picker{gap:10px}.ficha-state-actions{grid-template-columns:1fr}.ficha-state-button{min-height:62px!important}.ficha-edit-actions button{min-height:60px!important}}
+
+
+/* ASIGNACIÓN DE MESAS — adaptación directa de V2 (modo noche). */
+.cr-planos-mesas__mesa--seleccionada{background:linear-gradient(145deg,#ffe66b 0,#ffc400 100%);border-color:#7a5900;color:#090909}
+.cr-planos-mesas__asignacion--asignada{color:#2388ff}
+.cr-planos-mesas__asignacion--pendiente{color:#ffc400}
+.cr-confirmacion-mesa{position:fixed;inset:0;z-index:10010;display:grid;place-items:center;padding:18px;background:rgba(0,0,0,.68)}
+.cr-confirmacion-mesa__backdrop{position:absolute;inset:0;border:0;background:transparent}
+.cr-confirmacion-mesa__panel{position:relative;width:min(520px,100%);border:1px solid #ffc400;border-radius:16px;background:linear-gradient(180deg,#111 0,#050505 100%);box-shadow:0 20px 60px rgba(0,0,0,.72),inset 0 1px 0 rgba(255,255,255,.08);padding:24px;color:#fff;text-align:center}
+.cr-confirmacion-mesa__eyebrow{margin:0 0 10px;color:#ffc400;font:1000 15px/1 var(--cr-font);letter-spacing:.55px;text-transform:uppercase}
+.cr-confirmacion-mesa__contenido{font:1000 27px/1.12 var(--cr-font);text-transform:none}
+.cr-confirmacion-mesa__acciones{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:22px}
+.cr-confirmacion-mesa__boton{min-height:56px;border-radius:10px;padding:0 12px;font:1000 clamp(18px,4.6vw,24px)/1 var(--cr-font);text-transform:uppercase;cursor:pointer}
+.cr-confirmacion-mesa__boton--cancelar{border:1px solid #3a3a3a;background:linear-gradient(180deg,#252525,#111);color:#fff}
+.cr-confirmacion-mesa__boton--aceptar{border:1px solid #ffc400;background:linear-gradient(180deg,#ffd946 0,#ffc400 58%,#e6a500 100%);color:#070707}
+.cr-confirmacion-mesa__boton:hover,.cr-confirmacion-mesa__boton:focus{outline:3px solid rgba(255,196,0,.45);outline-offset:2px}
+.cr-confirmacion-mesa__boton:disabled{opacity:.6;cursor:not-allowed}
+@media(max-width:620px){
+  .cr-confirmacion-mesa{padding:12px}
+  .cr-confirmacion-mesa__panel{width:92vw;padding:24px 18px}
+  .cr-confirmacion-mesa__eyebrow{font-size:clamp(24px,6.8vw,36px);line-height:1.02}
+  .cr-confirmacion-mesa__contenido{font:1000 clamp(24px,5.8vw,34px)/1.08 var(--cr-font);text-transform:uppercase}
+  .cr-confirmacion-mesa__boton{min-height:60px;font-size:clamp(20px,4.8vw,26px)}
+  .cr-confirmacion-mesa__acciones{grid-template-columns:1fr}
+}
+html.light .cr-confirmacion-mesa__panel{border-color:#b89a42;background:linear-gradient(180deg,#fff,#f1efea);color:#171717}
+html.light .cr-confirmacion-mesa__eyebrow{color:#8b6800}
+html.light .cr-confirmacion-mesa__boton--cancelar{background:linear-gradient(180deg,#f4f2ed,#ddd8ce);color:#171717;border-color:#b89a42}
+html.light .cr-confirmacion-mesa__boton--aceptar{background:linear-gradient(180deg,#ffd83a,#edae00);color:#111;border-color:#b89a42}
