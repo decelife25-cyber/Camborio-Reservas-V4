@@ -256,7 +256,22 @@ export default function Mesas() {
   const assignmentSet = new Set(assignmentTables);
   const toggleAssignmentTable = (numero: string) => {
     if (!assignmentMode || mesasConfig[numero]?.Activa === false) return;
-    setAssignmentTables(current => current.includes(numero) ? current.filter(x => x !== numero) : [...current, numero]);
+    setAssignmentTables(current => {
+      const next = current.includes(numero) ? current.filter(x => x !== numero) : [...current, numero];
+      requestAnimationFrame(() => {
+        document.querySelectorAll<HTMLElement>('.cr-planos-mesas__mesa').forEach(el => {
+          const mesa = el.getAttribute('aria-label')?.replace(/^Mesa\\s+/i,'').split(' ')[0] || '';
+          if (next.includes(mesa)) {
+            el.classList.add('cr-planos-mesas__mesa--seleccionada');
+            el.classList.remove('cr-planos-mesas__mesa--disponible','cr-planos-mesas__mesa--reservada','cr-planos-mesas__mesa--ocupada');
+          } else if (el.classList.contains('cr-planos-mesas__mesa--seleccionada')) {
+            el.classList.remove('cr-planos-mesas__mesa--seleccionada');
+            el.classList.add('cr-planos-mesas__mesa--disponible');
+          }
+        });
+      });
+      return next;
+    });
   };
   const guardarAsignacion = async () => {
     if (!assignmentReserva || saving) return;
