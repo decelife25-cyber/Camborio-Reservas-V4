@@ -254,8 +254,8 @@ export default function Mesas() {
     setSaving(false);
   };
 
-  const assignmentSet = new Set(assignmentTables);
   const assignmentTablesRef = useRef<string[]>(assignmentTables);
+  const assignmentSet = new Set(assignmentTablesRef.current);
   const toggleAssignmentTable = (numero: string) => {
     if (!assignmentMode || mesasConfig[numero]?.Activa === false) return;
     const current = assignmentTablesRef.current;
