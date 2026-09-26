@@ -3148,3 +3148,46 @@ html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha__g
   border:1px solid #aaa69e!important;
   color:#77736b!important;
 }
+
+/* FICHA RESERVA — réplica V2: estado actual informativo y acciones a ancho completo. */
+.ficha-state-current{
+  display:block!important;
+  width:100%!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  box-shadow:none!important;
+  pointer-events:none!important;
+  margin:0 0 14px!important;
+  padding:10px 12px!important;
+  text-align:center!important;
+  font-weight:900!important;
+  font-size:clamp(18px,4.8vw,25px)!important;
+  text-transform:uppercase!important;
+}
+.ficha-state-actions{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:10px!important;
+  width:100%!important;
+}
+.ficha-state-actions .ficha-state-button{
+  width:100%!important;
+  min-height:62px!important;
+  flex:0 0 auto!important;
+}
+.ficha-result-actions{
+  display:flex!important;
+  flex-direction:column!important;
+}
+.ficha-result-actions button{
+  width:100%!important;
+}
+html.light .ficha-edit-modal{
+  background:linear-gradient(180deg,#fff,#f1efea)!important;
+  color:#171717!important;
+  border-color:#b89a42!important;
+  box-shadow:0 20px 60px rgba(0,0,0,.35)!important;
+}
+html.light .ficha-edit-modal .cr-confirmacion-mesa__eyebrow{color:#8b6800!important}
+html.light .ficha-edit-modal .cr-confirmacion-mesa__contenido{color:#171717!important}
+html.light .ficha-edit-modal .ficha-state-current{background:#eeeae1!important;color:#6f5500!important}
