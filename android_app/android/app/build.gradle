@@ -1,5 +1,13 @@
 apply plugin: 'com.android.application'
 
+// Single source of truth for Android versioning: android_app/package.json.
+// versionCode is derived automatically from versionName so it can never
+// go backwards just because the GitHub Actions run number changed.
+def packageJson = file("../../package.json")
+def packageVersion = new groovy.json.JsonSlurper().parseText(packageJson.text).version as String
+def versionParts = packageVersion.tokenize('.').collect { it as Integer }
+def generatedVersionCode = versionParts[0] * 1000000 + versionParts[1] * 1000 + versionParts[2]
+
 android {
     namespace = "com.camborio.reservas.privada"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -7,8 +15,8 @@ android {
         applicationId "com.camborio.reservas.privada"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode = 100 + Integer.parseInt(System.getenv("GITHUB_RUN_NUMBER") ?: "1")
-        versionName "1.0.067"
+        versionCode = generatedVersionCode
+        versionName packageVersion
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
