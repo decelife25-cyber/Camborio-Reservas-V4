@@ -63,7 +63,17 @@ export default function Confirmar() {
   }
 
   useEffect(() => {
-    fetchPendientes();
+    void fetchPendientes();
+    const refresh = () => { void fetchPendientes(); };
+    window.addEventListener('camborio-reservas-change', refresh);
+    const channel = supabase
+      .channel('reservas-pendientes-live')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'Reservas' }, refresh)
+      .subscribe();
+    return () => {
+      window.removeEventListener('camborio-reservas-change', refresh);
+      void supabase.removeChannel(channel);
+    };
   }, []);
 
   async function confirmarReserva(reserva: Reserva) {
@@ -81,6 +91,7 @@ export default function Confirmar() {
     }
 
     setReservas(current => current.filter(item => item.ReservaID !== reserva.ReservaID));
+    window.dispatchEvent(new Event('camborio-reservas-change'));
     setConfirming(null);
   }
 
