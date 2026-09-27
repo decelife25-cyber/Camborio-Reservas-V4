@@ -3036,3 +3036,13 @@ html.light .cr-mesas-asignadas-modal .cr-confirmacion-mesa__boton--cancelar{back
   .cr-planos-mesas__panel--asignacion{max-height:calc(100vh - 8px);padding:10px 10px 16px}
   .cr-planos-mesas__panel--asignacion .cr-planos-mesas__canvas{height:285px;min-height:285px}
 }
+
+/* Ficha Buscar Reserva: mismos controles de edición que NUEVA RESERVA. */
+.cr-ficha-edicion-hora{width:min(560px,94vw)!important}
+.cr-ficha-edicion__ruedas{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:8px 0 4px}
+.cr-ficha-edicion__ruedas label{display:grid;gap:7px;color:#ffc400;font:1000 17px/1 var(--cr-font);text-transform:uppercase}
+.cr-ficha-edicion__rueda{height:132px!important}
+.cr-ficha-edicion__contador{width:100%;margin:8px 0 4px}
+.cr-ficha-edicion-pax{width:min(520px,94vw)!important}
+html.light .cr-ficha-edicion__ruedas label{color:#8b6800}
+@media(max-width:620px){.cr-ficha-edicion__ruedas{gap:8px}.cr-ficha-edicion__ruedas label{font-size:15px}.cr-ficha-edicion__rueda{height:120px!important}.cr-ficha-edicion__contador{grid-template-columns:60px minmax(80px,1fr) 60px!important;min-height:86px}.cr-ficha-edicion__contador button{width:60px!important;height:58px!important}}
