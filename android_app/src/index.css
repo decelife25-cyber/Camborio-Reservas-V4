@@ -3013,3 +3013,26 @@ html.light .cr-mesas-asignadas-modal .cr-confirmacion-mesa__panel{background:lin
 html.light .cr-mesas-asignadas-modal .cr-confirmacion-mesa__eyebrow{color:#8b6800}
 html.light .cr-mesas-asignadas-modal__numeros{color:#222;text-shadow:none}
 html.light .cr-mesas-asignadas-modal .cr-confirmacion-mesa__boton--cancelar{background:#f2f0eb;color:#222;border-color:#c9c5bd}
+
+/* V2: selección de unión sin halos amarillos extra y guardado solo cuando hay cambios. */
+.cr-planos-mesas__mesa--principal:after,
+.cr-planos-mesas__mesa--adicional:after{display:none!important}
+.cr-planos-mesas__assignment-actions button:not(.primario){
+  border-color:#4b5563;
+  background:linear-gradient(180deg,#5f6670 0,#454c55 58%,#303740 100%);
+  color:#d7dce2;
+  box-shadow:none;
+}
+.cr-planos-mesas__assignment-actions button:not(.primario):disabled{opacity:.9;cursor:not-allowed}
+.cr-planos-mesas__panel--asignacion{
+  max-height:calc(100vh - 10px);
+  padding-bottom:18px;
+}
+.cr-planos-mesas__panel--asignacion .cr-planos-mesas__canvas{
+  height:300px;
+  min-height:300px;
+}
+@media(max-width:620px){
+  .cr-planos-mesas__panel--asignacion{max-height:calc(100vh - 8px);padding:10px 10px 16px}
+  .cr-planos-mesas__panel--asignacion .cr-planos-mesas__canvas{height:285px;min-height:285px}
+}
