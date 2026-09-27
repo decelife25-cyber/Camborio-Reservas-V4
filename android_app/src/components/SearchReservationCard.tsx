@@ -24,6 +24,15 @@ function stateLabel(s:string){return s.replaceAll('_',' ');}
 function todayMadrid(){
   return new Date().toLocaleDateString('en-CA',{timeZone:'Europe/Madrid'});
 }
+function mesaValida(mesa:string|null){
+  const v=String(mesa||'').trim().toUpperCase();
+  return Boolean(v && !['SIN ASIGNAR','NULL','UNDEFINED'].includes(v));
+}
+function turnoActivo(){
+  const hour=Number(new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Madrid',hour:'2-digit',hour12:false}).format(new Date()));
+  return hour>=18?'CENA':'COMIDA';
+}
+function esFechaPasada(fecha:string){return fecha<todayMadrid();}
 
 export default function SearchReservationCard({reserva:initial,index,total,onNavigate,onUpdated}:{reserva:SearchReservation;index:number;total:number;onNavigate:(d:number)=>void;onUpdated:(r:SearchReservation)=>void}){
   const navigate=useNavigate();
@@ -81,29 +90,61 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
 
   const changeState=async(nextState:string)=>{
     if(saving||readOnly)return;
-    if(nextState==='SENTADA'&&!r.Mesa){setStateOpen(false);navigate('/mesas?asignar='+encodeURIComponent(r.ReservaID)+'&volverCodigo='+encodeURIComponent(r.CodigoReserva||'')+'&accion=sentar');return;}
-    setSaving(true);
-    let data:any=null;
-    if(nextState==='SENTADA' && r.Estado==='PENDIENTE'){
-      const confirmacion=await supabase.from('Reservas').update({Estado:'CONFIRMADA',FechaModificacion:new Date().toISOString()}).eq('ReservaID',r.ReservaID).select('*').single();
-      if(confirmacion.error){setSaving(false);setError(confirmacion.error.message);return;}
-      data=confirmacion.data;
+    setError('');
+
+    if(nextState==='CONFIRMADA' && r.Estado!=='PENDIENTE'){
+      setError('Solo se pueden confirmar reservas pendientes.');
+      return;
     }
-    const resultado=await supabase.from('Reservas').update({Estado:nextState,FechaEstado:new Date().toISOString(),FechaModificacion:new Date().toISOString()}).eq('ReservaID',r.ReservaID).select('*').single();
+    if(nextState==='SENTADA'){
+      if(r.Estado!=='CONFIRMADA'){setError('Solo se pueden sentar reservas confirmadas.');return;}
+      if(r.FechaReserva!==todayMadrid()){setError('Solo se puede sentar una reserva de HOY.');return;}
+      if(r.Turno!==turnoActivo()){setError('La reserva pertenece a otro turno. Cambia al turno correspondiente para sentarla.');return;}
+      if(!mesaValida(r.Mesa)){setStateOpen(false);navigate('/mesas?asignar='+encodeURIComponent(r.ReservaID)+'&volverCodigo='+encodeURIComponent(r.CodigoReserva||'')+'&accion=sentar');return;}
+    }
+    if(nextState==='CANCELADA_LOCAL' && !['PENDIENTE','CONFIRMADA'].includes(r.Estado)){
+      setError('Esta reserva no se puede cancelar desde esta ficha.');return;
+    }
+    if(nextState==='FINALIZADA'){
+      if(r.Estado==='SENTADA'){
+        // Permitido según V2.
+      }else if(['PENDIENTE','CONFIRMADA'].includes(r.Estado) && esFechaPasada(r.FechaReserva)){
+        // V2 permite finalizar reservas activas que ya quedaron atrás.
+      }else{
+        setError('Solo se pueden finalizar reservas sentadas o reservas activas ya pasadas.');return;
+      }
+    }
+    if(nextState==='NO_PRESENTADO'){
+      if(!['PENDIENTE','CONFIRMADA','SENTADA'].includes(r.Estado) || !esFechaPasada(r.FechaReserva)){
+        setError('Solo se puede marcar NO ASISTIÓ en una reserva activa ya pasada.');return;
+      }
+    }
+
+    setSaving(true);
+    const ahora=new Date().toISOString();
+    const resultado=await supabase.from('Reservas').update({Estado:nextState,FechaEstado:ahora,FechaModificacion:ahora}).eq('ReservaID',r.ReservaID).select('*').single();
     setSaving(false);
     if(resultado.error){setError(resultado.error.message);return;}
-    data=resultado.data;
-    const next={...r,...data,Estado:nextState} as SearchReservation;
+    const next={...r,...resultado.data,Estado:nextState} as SearchReservation;
     setR(next);onUpdated(next);setStateOpen(false);setDirty(false);setResultado('ESTADO CAMBIADO CORRECTAMENTE');setConfirmAction('resultado');setError('');
   };
 
-  const stateActions= r.Estado==='PENDIENTE'
-    ? [['SENTADA','SENTAR'],['CONFIRMADA','CONFIRMAR'],['CANCELADA_LOCAL','CANCELAR']]
-    : r.Estado==='CONFIRMADA'
-      ? (r.FechaReserva===todayMadrid()?[['SENTADA','SENTAR'],['CANCELADA_LOCAL','CANCELAR']]:[['CANCELADA_LOCAL','CANCELAR']])
-      : r.Estado==='SENTADA'
-        ? [['FINALIZADA','FINALIZAR']]
-        : [];
+  const stateActions = (() => {
+    if(r.Estado==='PENDIENTE'){
+      return esFechaPasada(r.FechaReserva)
+        ? [['FINALIZADA','FINALIZAR'],['NO_PRESENTADO','NO ASISTIÓ']]
+        : [['CONFIRMADA','CONFIRMAR'],['CANCELADA_LOCAL','CANCELAR']];
+    }
+    if(r.Estado==='CONFIRMADA'){
+      if(esFechaPasada(r.FechaReserva)) return [['FINALIZADA','FINALIZAR'],['NO_PRESENTADO','NO ASISTIÓ']];
+      if(r.FechaReserva===todayMadrid() && r.Turno===turnoActivo() && mesaValida(r.Mesa)) return [['SENTADA','SENTAR'],['CANCELADA_LOCAL','CANCELAR']];
+      return [['CANCELADA_LOCAL','CANCELAR']];
+    }
+    if(r.Estado==='SENTADA'){
+      return esFechaPasada(r.FechaReserva) ? [['FINALIZADA','FINALIZAR'],['NO_PRESENTADO','NO ASISTIÓ']] : [['FINALIZADA','FINALIZAR']];
+    }
+    return [];
+  })();
 
   const solicitarGuardar=()=>{
     if(!dirty||saving||readOnly)return;
