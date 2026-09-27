@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { getTurnoFromHora } from '../utils/shifts';
 import FechaPicker from './FechaPicker';
@@ -14,31 +14,18 @@ function isPast(r:SearchReservation){return new Date(r.FechaReserva+'T'+String(r
 function isToday(v:string){return v===new Date().toLocaleDateString('en-CA',{timeZone:'Europe/Madrid'})}
 
 function Wheel({values,value,onChange,kind}:{values:string[];value:string;onChange:(v:string)=>void;kind:'hora'|'minutos'}){
- const controlRef=useState<HTMLDivElement|null>(null)[0];
- const [indiceVisual,setIndiceVisual]=useState(Math.max(1,values.indexOf(value)+1));
- const limitar=(i:number)=>Math.min(Math.max(Math.round(i),1),values.length);
- const centrar=(i:number,suave:boolean)=>{
-   const control=controlRef;if(!control)return;
-   const item=control.querySelector<HTMLElement>('[data-wheel-item]');const h=item?.getBoundingClientRect().height||32;
-   control.scrollTo({top:(i*h)-(control.clientHeight/2)+(h/2),behavior:suave?'smooth':'auto'});
- };
- const indice=(control:HTMLDivElement)=>{const item=control.querySelector<HTMLElement>('[data-wheel-item]');const h=item?.getBoundingClientRect().height||32;return limitar(Math.round((control.scrollTop+(control.clientHeight/2)-(h/2))/h))};
- return <WheelInner values={values} value={value} onChange={onChange} kind={kind}/>;
-}
-function WheelInner({values,value,onChange,kind}:{values:string[];value:string;onChange:(v:string)=>void;kind:'hora'|'minutos'}){
+ const controlRef=useRef<HTMLDivElement|null>(null);
  const [indiceVisual,setIndiceVisual]=useState(Math.max(1,values.indexOf(value)+1));
  const [timer,setTimer]=useState<number|null>(null);
- const controlRef={current:null as HTMLDivElement|null};
- const limitar=(i:number)=>Math.min(Math.max(Math.round(i),1),values.length);
  const itemHeight=32;
+ const limitar=(i:number)=>Math.min(Math.max(Math.round(i),1),values.length);
  const centrar=(i:number,suave:boolean)=>{const c=controlRef.current;if(!c)return;c.scrollTo({top:(i*itemHeight)-(c.clientHeight/2)+(itemHeight/2),behavior:suave?'smooth':'auto'});};
- const aplicar=(i:number)=>{const n=limitar(i);setIndiceVisual(n);return n;};
  const indiceDesdeScroll=(c:HTMLDivElement)=>limitar(Math.round((c.scrollTop+(c.clientHeight/2)-(itemHeight/2))/itemHeight));
- const encajar=()=>{const c=controlRef.current;if(!c)return;if(timer!==null)window.clearTimeout(timer);aplicar(indiceDesdeScroll(c));const t=window.setTimeout(()=>{const cc=controlRef.current;if(!cc)return;const n=aplicar(indiceDesdeScroll(cc));centrar(n,false);onChange(values[n-1]);},90);setTimer(t);};
- return <div ref={controlRef} className="cr-nueva-reserva__rueda cr-ficha-edicion__rueda" data-wheel-kind={kind} role="listbox" tabIndex={0} onScroll={encajar} onKeyDown={e=>{if(e.key!=='ArrowDown'&&e.key!=='ArrowUp')return;e.preventDefault();const n=limitar(indiceDesdeScroll(controlRef.current!)+(e.key==='ArrowDown'?1:-1));centrar(n,true);window.setTimeout(()=>onChange(values[n-1]),90)}}>
-   <span className="cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--vacio" data-wheel-item aria-hidden="true"/>
-   {values.map((item,i)=>{const n=i+1,d=Math.abs(n-indiceVisual);return <span key={item} data-wheel-item className={'cr-nueva-reserva__rueda-item '+(d===0?'cr-nueva-reserva__rueda-item--actual':d===1?'cr-nueva-reserva__rueda-item--cerca':'cr-nueva-reserva__rueda-item--lejos')} role="option" aria-selected={d===0?'true':'false'}>{item}</span>})}
-   <span className="cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--vacio" data-wheel-item aria-hidden="true"/>
+ const encajar=()=>{const c=controlRef.current;if(!c)return;if(timer!==null)window.clearTimeout(timer);setIndiceVisual(indiceDesdeScroll(c));const t=window.setTimeout(()=>{const cc=controlRef.current;if(!cc)return;const n=limitar(indiceDesdeScroll(cc));setIndiceVisual(n);centrar(n,false);onChange(values[n-1]);},90);setTimer(t);};
+ return <div ref={controlRef} className="cr-nueva-reserva__rueda cr-ficha-edicion__rueda" data-wheel-kind={kind} role="listbox" tabIndex={0} onScroll={encajar} onKeyDown={e=>{if(e.key!=='ArrowDown'&&e.key!=='ArrowUp')return;e.preventDefault();const c=controlRef.current;if(!c)return;const n=limitar(indiceDesdeScroll(c)+(e.key==='ArrowDown'?1:-1));centrar(n,true);window.setTimeout(()=>onChange(values[n-1]),90)}}>
+   <span className="cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--vacio" aria-hidden="true"/>
+   {values.map((item,i)=>{const n=i+1,d=Math.abs(n-indiceVisual);return <span key={item} className={'cr-nueva-reserva__rueda-item '+(d===0?'cr-nueva-reserva__rueda-item--actual':d===1?'cr-nueva-reserva__rueda-item--cerca':'cr-nueva-reserva__rueda-item--lejos')} role="option" aria-selected={d===0?'true':'false'}>{item}</span>})}
+   <span className="cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--vacio" aria-hidden="true"/>
  </div>;
 }
 
