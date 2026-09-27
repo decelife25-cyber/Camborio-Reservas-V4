@@ -179,18 +179,18 @@ export default function ReservationCard({
     setStateOpen(false);
   };
 
+  // El modal CAMBIAR ESTADO solo contiene acciones de estado, igual en
+  // RESERVAS HOY y en la ficha. MODIFICAR y ASIGNAR/CAMBIAR MESA son
+  // acciones independientes de la ficha/tarjeta y no aparecen aquí.
   const stateActions = (() => {
     if (reserva.Estado === 'PENDIENTE') {
       return esReservaPasada
         ? [['FINALIZADA', 'FINALIZAR', 'finalizada'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']]
-        : [['CONFIRMADA', 'CONFIRMAR', 'confirmada'], ['MODIFICAR', 'MODIFICAR', 'modificar'], ['ASIGNAR_MESA', 'ASIGNAR MESA', 'asignar-mesa'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelada-local']];
+        : [['CONFIRMADA', 'CONFIRMAR', 'confirmada'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelada-local']];
     }
     if (reserva.Estado === 'CONFIRMADA') {
       if (esReservaPasada) return [['FINALIZADA', 'FINALIZAR', 'finalizada'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']];
-      const acciones = [
-        ['MODIFICAR', 'MODIFICAR', 'modificar'],
-        [mesaValida(reserva.Mesa) ? 'CAMBIAR_MESA' : 'ASIGNAR_MESA', mesaValida(reserva.Mesa) ? 'CAMBIAR MESA' : 'ASIGNAR MESA', mesaValida(reserva.Mesa) ? 'cambiar-mesa' : 'asignar-mesa'],
-      ];
+      const acciones: string[][] = [];
       if (esReservaHoy && turnoActivo && mesaValida(reserva.Mesa)) acciones.push(['SENTADA', 'SENTAR', 'sentar']);
       acciones.push(['CANCELADA_LOCAL', 'CANCELAR', 'cancelada-local']);
       return acciones;
@@ -198,7 +198,7 @@ export default function ReservationCard({
     if (reserva.Estado === 'SENTADA') {
       return esReservaPasada
         ? [['FINALIZADA', 'FINALIZAR', 'finalizada'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']]
-        : [['CAMBIAR_MESA', 'CAMBIAR MESA', 'cambiar-mesa'], ['FINALIZADA', 'FINALIZAR', 'finalizada']];
+        : [['FINALIZADA', 'FINALIZAR', 'finalizada']];
     }
     return [];
   })();
