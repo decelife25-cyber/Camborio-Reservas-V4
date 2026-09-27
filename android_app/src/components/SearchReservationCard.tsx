@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { getTurnoFromHora } from '../utils/shifts';
 import FechaPicker from './FechaPicker';
@@ -21,6 +21,7 @@ function Wheel({values,value,onChange,kind}:{values:string[];value:string;onChan
  const limitar=(i:number)=>Math.min(Math.max(Math.round(i),1),values.length);
  const centrar=(i:number,suave:boolean)=>{const c=controlRef.current;if(!c)return;c.scrollTo({top:(i*itemHeight)-(c.clientHeight/2)+(itemHeight/2),behavior:suave?'smooth':'auto'});};
  const indiceDesdeScroll=(c:HTMLDivElement)=>limitar(Math.round((c.scrollTop+(c.clientHeight/2)-(itemHeight/2))/itemHeight));
+ useEffect(()=>{const n=limitar(values.indexOf(value)+1);setIndiceVisual(n);const f=window.requestAnimationFrame(()=>centrar(n,false));return()=>window.cancelAnimationFrame(f)},[value,values]);
  const encajar=()=>{const c=controlRef.current;if(!c)return;if(timer!==null)window.clearTimeout(timer);setIndiceVisual(indiceDesdeScroll(c));const t=window.setTimeout(()=>{const cc=controlRef.current;if(!cc)return;const n=limitar(indiceDesdeScroll(cc));setIndiceVisual(n);centrar(n,false);onChange(values[n-1]);},90);setTimer(t);};
  return <div ref={controlRef} className="cr-nueva-reserva__rueda cr-ficha-edicion__rueda" data-wheel-kind={kind} role="listbox" tabIndex={0} onScroll={encajar} onKeyDown={e=>{if(e.key!=='ArrowDown'&&e.key!=='ArrowUp')return;e.preventDefault();const c=controlRef.current;if(!c)return;const n=limitar(indiceDesdeScroll(c)+(e.key==='ArrowDown'?1:-1));centrar(n,true);window.setTimeout(()=>onChange(values[n-1]),90)}}>
    <span className="cr-nueva-reserva__rueda-item cr-nueva-reserva__rueda-item--vacio" aria-hidden="true"/>
