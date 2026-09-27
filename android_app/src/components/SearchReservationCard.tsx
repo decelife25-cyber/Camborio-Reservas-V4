@@ -7,6 +7,7 @@ export type SearchReservation={ReservaID:string;CodigoReserva:string|null;FechaR
 function dateParts(v:string){const [y,m,d]=String(v||'').split('-').map(Number);if(!y||!m||!d)return{fecha:'--/--',anio:'',dia:'--'};const dt=new Date(y,m-1,d);const dias=['DOMINGO','LUNES','MARTES','MIÉRCOLES','JUEVES','VIERNES','SÁBADO'];return{fecha:String(d).padStart(2,'0')+'/'+String(m).padStart(2,'0'),anio:String(y),dia:dias[dt.getDay()]}}
 function stateLabel(s:string){return s.replaceAll('_',' ')}
 function isPast(r:SearchReservation){return new Date(r.FechaReserva+'T'+String(r.HoraReserva).slice(0,5)+':00').getTime()<Date.now()}
+function isToday(v:string){return v===new Date().toLocaleDateString('en-CA',{timeZone:'Europe/Madrid'})}
 
 export default function SearchReservationCard({reserva:initial,index,total,onNavigate,onUpdated}:{reserva:SearchReservation;index:number;total:number;onNavigate:(d:number)=>void;onUpdated:(r:SearchReservation)=>void}){
  const[r,setR]=useState(initial),[editing,setEditing]=useState<null|'fecha'|'hora'|'personas'|'mesa'|'observaciones'>(null),[value,setValue]=useState(''),[stateOpen,setStateOpen]=useState(false),[saving,setSaving]=useState(false),[dirty,setDirty]=useState(false),[error,setError]=useState('');
