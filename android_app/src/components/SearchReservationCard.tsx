@@ -10,11 +10,23 @@ function isPast(r:SearchReservation){return new Date(r.FechaReserva+'T'+String(r
 
 export default function SearchReservationCard({reserva:initial,index,total,onNavigate,onUpdated}:{reserva:SearchReservation;index:number;total:number;onNavigate:(d:number)=>void;onUpdated:(r:SearchReservation)=>void}){
  const[r,setR]=useState(initial),[editing,setEditing]=useState<null|'fecha'|'hora'|'personas'|'mesa'|'observaciones'>(null),[value,setValue]=useState(''),[stateOpen,setStateOpen]=useState(false),[saving,setSaving]=useState(false),[dirty,setDirty]=useState(false),[error,setError]=useState('');
- const parts=dateParts(r.FechaReserva),readOnly=['FINALIZADA','CANCELADA_CLIENTE','CANCELADA_LOCAL','NO_PRESENTADO'].includes(r.Estado)||isPast(r);
+ const parts=dateParts(r.FechaReserva),readOnly=['FINALIZADA','CANCELADA_CLIENTE','CANCELADA_LOCAL','NO_PRESENTADO'].includes(r.Estado);
  const edit=(f:typeof editing)=>{if(readOnly)return;setError('');setEditing(f);setValue(f==='fecha'?r.FechaReserva:f==='hora'?String(r.HoraReserva).slice(0,5):f==='personas'?String(r.Personas||1):f==='mesa'?r.Mesa||'':r.Observaciones||'')};
- const save=async()=>{if(!editing)return;let changes:any={};if(editing==='fecha')changes.FechaReserva=value;if(editing==='hora')changes.HoraReserva=value;if(editing==='personas')changes.Personas=Math.max(1,Number(value)||1);if(editing==='mesa')changes.Mesa=value.trim()||null;if(editing==='observaciones')changes.Observaciones=value.trim()||null;const nd=changes.FechaReserva||r.FechaReserva,nt=changes.HoraReserva||String(r.HoraReserva).slice(0,5);if(new Date(nd+'T'+nt+':00').getTime()<Date.now()-60000){setError('No puedes usar una fecha u hora pasada.');return}if(changes.FechaReserva||changes.HoraReserva){changes.Turno=getTurnoFromHora(nt);if(changes.Turno!==r.Turno){changes.Mesa=null;changes.MesasAdicionales=null}}setSaving(true);const{data,error:e}=await supabase.from('Reservas').update(changes).eq('ReservaID',r.ReservaID).select('*').single();setSaving(false);if(e){setError(e.message);return}const next={...r,...data,...changes} as SearchReservation;setR(next);onUpdated(next);setEditing(null);setDirty(true)};
- const changeState=async(nextState:string)=>{setSaving(true);const{data,error:e}=await supabase.from('Reservas').update({Estado:nextState}).eq('ReservaID',r.ReservaID).select('*').single();setSaving(false);if(e){setError(e.message);return}const next={...r,...data,Estado:nextState} as SearchReservation;setR(next);onUpdated(next);setStateOpen(false);setDirty(true)};
- const stateActions=r.Estado==='PENDIENTE'?[['CONFIRMADA','CONFIRMAR'],['CANCELADA_LOCAL','CANCELAR']]:r.Estado==='CONFIRMADA'?[['SENTADA','SENTAR'],['CANCELADA_LOCAL','CANCELAR']]:r.Estado==='SENTADA'?[['FINALIZADA','FINALIZAR']]:[];
+ const save=async()=>{if(!editing)return;let changes:any={};if(editing==='fecha')changes.FechaReserva=value;if(editing==='hora')changes.HoraReserva=value;if(editing==='personas')changes.Personas=Math.max(1,Number(value)||1);if(editing==='mesa')changes.Mesa=value.trim()||null;if(editing==='observaciones')changes.Observaciones=value.trim()||null;const nd=changes.FechaReserva||r.FechaReserva,nt=changes.HoraReserva||String(r.HoraReserva).slice(0,5);if((editing==='fecha'||editing==='hora')&&new Date(nd+'T'+nt+':00').getTime()<Date.now()-60000){setError('No puedes usar una fecha u hora pasada.');return}if(changes.FechaReserva||changes.HoraReserva){changes.Turno=getTurnoFromHora(nt);if(changes.Turno!==r.Turno){changes.Mesa=null;changes.MesasAdicionales=null}}setSaving(true);const{data,error:e}=await supabase.from('Reservas').update(changes).eq('ReservaID',r.ReservaID).select('*').single();setSaving(false);if(e){setError(e.message);return}const next={...r,...data,...changes} as SearchReservation;setR(next);onUpdated(next);setEditing(null);setDirty(true)};
+ const changeState=async(nextState:string)=>{
+  setError('');
+  if(nextState==='SENTADA'){
+   if(r.Estado!=='CONFIRMADA'){setError('La reserva debe estar CONFIRMADA para sentarla.');return}
+   if(!isToday(r.FechaReserva)){setError('Solo se puede sentar una reserva de HOY.');return}
+   if(r.Turno!==getTurnoFromHora(String(r.HoraReserva).slice(0,5))){setError('La reserva pertenece a otro turno.');return}
+   if(!r.Mesa&&!r.MesasAdicionales){setError('Debes asignar una mesa antes de sentar la reserva.');return}
+  }
+  setSaving(true);const{data,error:e}=await supabase.from('Reservas').update({Estado:nextState}).eq('ReservaID',r.ReservaID).select('*').single();setSaving(false);if(e){setError(e.message);return}const next={...r,...data,Estado:nextState} as SearchReservation;setR(next);onUpdated(next);setStateOpen(false);setDirty(true);
+ };
+ const today=isToday(r.FechaReserva), past=isPast(r);
+ const stateActions=r.Estado==='PENDIENTE'?[['CONFIRMADA','CONFIRMAR'],['CANCELADA_LOCAL','CANCELAR']]:
+  r.Estado==='CONFIRMADA'?(today&&r.Mesa?[['SENTADA','SENTAR'],['CANCELADA_LOCAL','CANCELAR']]:[['CANCELADA_LOCAL','CANCELAR']]):
+  r.Estado==='SENTADA'?(past?[['FINALIZADA','FINALIZAR'],['NO_PRESENTADO','NO ASISTIÓ']]:[['FINALIZADA','FINALIZAR']]):[];
  return <div className="cr-busqueda-ficha-wrap">
   <div className="cr-busqueda-ficha__nav">
    <button className="cr-busqueda-ficha__volver" type="button" onClick={()=>window.history.back()}>← VOLVER</button>
