@@ -3029,12 +3029,12 @@ html.light .cr-mesas-asignadas-modal .cr-confirmacion-mesa__boton--cancelar{back
   padding-bottom:18px;
 }
 .cr-planos-mesas__panel--asignacion .cr-planos-mesas__canvas{
-  height:300px;
-  min-height:300px;
+  height:405px;
+  min-height:405px;
 }
 @media(max-width:620px){
-  .cr-planos-mesas__panel--asignacion{max-height:calc(100vh - 8px);padding:10px 10px 16px}
-  .cr-planos-mesas__panel--asignacion .cr-planos-mesas__canvas{height:285px;min-height:285px}
+  .cr-planos-mesas__panel--asignacion{max-height:calc(100vh - 12px);padding:12px}
+  .cr-planos-mesas__panel--asignacion .cr-planos-mesas__canvas{height:405px;min-height:405px}
 }
 
 /* Ficha Buscar Reserva: mismos controles de edición que NUEVA RESERVA. */
