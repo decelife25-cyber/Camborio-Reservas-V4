@@ -134,6 +134,8 @@ export default function Mesas() {
   const assignmentId = searchParams.get('asignar');
   const [assignmentReserva, setAssignmentReserva] = useState<Reserva | null>(null);
   const [assignmentTables, setAssignmentTables] = useState<string[]>([]);
+  const [assignmentOriginalTables, setAssignmentOriginalTables] = useState<string[]>([]);
+  const [showAssignmentExitConfirm, setShowAssignmentExitConfirm] = useState(false);
   const assignmentMode = Boolean(assignmentId);
 
   const cargar = useCallback(async () => {
@@ -159,7 +161,7 @@ export default function Mesas() {
   useEffect(() => { void cargar(); }, [cargar]);
 
   useEffect(() => {
-    if (!assignmentId) { setAssignmentReserva(null); setAssignmentTables([]); return; }
+    if (!assignmentId) { setAssignmentReserva(null); setAssignmentTables([]); setAssignmentOriginalTables([]); setShowAssignmentExitConfirm(false); return; }
     let alive = true;
     (async () => {
       const { data, error } = await supabase.from('Reservas').select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,Zona,MesasAdicionales,Turno,Email').eq('ReservaID', assignmentId).maybeSingle();
@@ -172,6 +174,7 @@ export default function Mesas() {
         setFecha(reserva.FechaReserva);
         setTurno(hora >= 18 ? 'CENA' : 'COMIDA');
         setAssignmentTables(parseAssignedTables(reserva));
+        setAssignmentOriginalTables(parseAssignedTables(reserva));
         if (reserva.Zona === 'TERRAZA') setZona('terraza');
         else if (reserva.Zona === 'CHILL OUT' || reserva.Zona === 'CHILLOUT') setZona('chillout');
         else setZona('salon');
@@ -255,6 +258,8 @@ export default function Mesas() {
   };
 
   const assignmentSet = new Set(assignmentTables);
+  const assignmentDirty = assignmentTables.join(',') !== assignmentOriginalTables.join(',');
+  const closeAssignment = () => { if (assignmentDirty && !saving) setShowAssignmentExitConfirm(true); else navigate('/'); };
   const toggleAssignmentTable = (numero: string) => {
     if (!assignmentMode || mesasConfig[numero]?.Activa === false) return;
     setAssignmentTables(current => current.includes(numero) ? current.filter(x => x !== numero) : [...current, numero]);
@@ -295,7 +300,7 @@ export default function Mesas() {
       <div className={'cr-planos-mesas__panel' + (assignmentMode ? ' cr-planos-mesas__panel--asignacion' : '')}>
         <header className="cr-planos-mesas__header">
           <h2>{assignmentMode ? 'ASIGNAR MESA' : 'PLANOS DE MESAS'}</h2>
-          <button type="button" className="cr-planos-mesas__cerrar" onClick={() => navigate('/')}>CERRAR</button>
+          <button type="button" className="cr-planos-mesas__cerrar" onClick={closeAssignment}>CERRAR</button>
         </header>
 
         {assignmentMode && assignmentReserva ? <div className="cr-planos-mesas__reserva-info"><div><span>NOMBRE</span><strong>{assignmentReserva.Nombre || 'SIN NOMBRE'}</strong></div><div className="cr-planos-mesas__reserva-fecha">📅 {formatHeaderDate(assignmentReserva.FechaReserva)}</div><div className="cr-planos-mesas__reserva-grid"><div><span>MESAS ASIGNADAS</span><strong>{assignmentTables.length ? assignmentTables.join(', ') : 'SIN ASIGNAR'}</strong></div><div><span>TELÉFONO</span><strong>{assignmentReserva.Telefono || '—'}</strong></div><div><span>HORA</span><strong>{String(assignmentReserva.HoraReserva).slice(0,5)}</strong></div><div><span>PERSONAS</span><strong>{assignmentReserva.Personas || 0} PAX</strong></div></div></div> : <button className="cr-planos-mesas__fecha" type="button" onClick={() => setCalendarOpen(true)} aria-label="Cambiar fecha">📅 {formatHeaderDate(fecha)}</button>}
@@ -343,9 +348,24 @@ export default function Mesas() {
           <span><i className="desactivada" />DESACTIVADA</span>
         </div>
 
-        {assignmentMode && <div className="cr-planos-mesas__assignment-actions"><div>SELECCIONA UNA O VARIAS MESAS Y PULSA GUARDAR ASIGNACIÓN PARA ACTUALIZAR LA RESERVA.</div><button type="button" className="primario" disabled={saving} onClick={() => void guardarAsignacion()}>{saving ? 'GUARDANDO...' : 'GUARDAR ASIGNACIÓN'}</button></div>}
+        {assignmentMode && <div className="cr-planos-mesas__assignment-actions"><div>SELECCIONA UNA O VARIAS MESAS Y PULSA GUARDAR ASIGNACIÓN PARA ACTUALIZAR LA RESERVA.</div><button type="button" className={assignmentDirty ? 'primario' : ''} disabled={!assignmentDirty || saving} onClick={() => void guardarAsignacion()}>{saving ? 'GUARDANDO...' : 'GUARDAR ASIGNACIÓN'}</button></div>}
         {error && <div className="cr-planos-mesas__error">{error}</div>}
       </div>
+
+
+      {showAssignmentExitConfirm && (
+        <div className="cr-confirmacion-mesa cr-confirmacion-mesa--salida-selector" role="dialog" aria-modal="true">
+          <button className="cr-confirmacion-mesa__backdrop" type="button" aria-label="Cerrar" onClick={() => setShowAssignmentExitConfirm(false)} />
+          <section className="cr-confirmacion-mesa__panel">
+            <p className="cr-confirmacion-mesa__eyebrow">CAMBIOS SIN GUARDAR</p>
+            <div className="cr-confirmacion-mesa__contenido">Si sales ahora, se perderán los cambios realizados.</div>
+            <div className="cr-confirmacion-mesa__acciones">
+              <button type="button" className="cr-confirmacion-mesa__boton cr-confirmacion-mesa__boton--cancelar" onClick={() => setShowAssignmentExitConfirm(false)}>PERMANECER</button>
+              <button type="button" className="cr-confirmacion-mesa__boton cr-confirmacion-mesa__boton--aceptar" onClick={() => navigate('/')}>SALIR Y BORRAR</button>
+            </div>
+          </section>
+        </div>
+      )}
 
       {selectedTable && (
         <div className="cr-planos-mesas__dialog" role="dialog" aria-modal="true" aria-label={'Mesa ' + selectedTable}>
