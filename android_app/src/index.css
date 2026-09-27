@@ -2985,3 +2985,28 @@ html.light .v2-state-modal .v2-edit-cancel-full {
   background:linear-gradient(180deg,#ffe27a,#d6d0bd) !important;
   color:#161616 !important;
 }
+
+
+/* V4.067 — V2: consulta de mesas asignadas + modo DÍA. */
+.cr-mesas-asignadas-modal .cr-confirmacion-mesa__panel{
+  width:min(560px,94vw); padding:28px 22px;
+  box-sizing:border-box; border:1px solid #ffc400; border-radius:12px;
+  background:linear-gradient(180deg,#111,#050505); color:#fff;
+  box-shadow:0 20px 60px rgba(0,0,0,.75); text-align:center;
+}
+.cr-mesas-asignadas-modal .cr-confirmacion-mesa__eyebrow{
+  margin:0 0 18px; color:#ffc400; font:1000 clamp(28px,6.5vw,40px)/1.05 Arial,sans-serif;
+}
+.cr-mesas-asignadas-modal__numeros{
+  display:block; margin:4px auto 20px; color:#fff;
+  font:1000 clamp(28px,6.5vw,40px)/1.05 Arial,sans-serif;
+  letter-spacing:.8px; text-align:center;
+}
+.cr-mesas-asignadas-modal .cr-confirmacion-mesa__acciones{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cr-mesas-asignadas-modal .cr-confirmacion-mesa__boton{min-height:52px;border-radius:8px;font:1000 16px Arial,sans-serif;padding:8px 10px}
+.cr-mesas-asignadas-modal .cr-confirmacion-mesa__boton--cancelar{background:#171717;color:#fff;border:1px solid #444}
+.cr-mesas-asignadas-modal .cr-confirmacion-mesa__boton--confirmar{background:linear-gradient(180deg,#ffd32a,#f1ad00);color:#111;border:1px solid #ffc400}
+html.light .cr-mesas-asignadas-modal .cr-confirmacion-mesa__panel{background:linear-gradient(180deg,#fff,#f1efea);color:#222;border-color:#b89a42;box-shadow:0 20px 60px rgba(0,0,0,.28)}
+html.light .cr-mesas-asignadas-modal .cr-confirmacion-mesa__eyebrow{color:#8b6800}
+html.light .cr-mesas-asignadas-modal__numeros{color:#222;text-shadow:none}
+html.light .cr-mesas-asignadas-modal .cr-confirmacion-mesa__boton--cancelar{background:#f2f0eb;color:#222;border-color:#c9c5bd}
