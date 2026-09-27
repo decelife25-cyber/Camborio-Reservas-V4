@@ -10,7 +10,7 @@ const parseISODate = (iso:string) => { const [y,m,d]=iso.split('-').map(Number);
 const formatDateES = (iso:string) => { const [y,m,d]=iso.split('-'); return d+'/'+m+'/'+y; };
 const isoDate = (d:Date) => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 
-function Wheel({ values, value, onChange, kind }: { values:string[]; value:string; onChange:(v:string)=>void; kind:'hora'|'minutos' }) {
+export function Wheel({ values, value, onChange, kind }: { values:string[]; value:string; onChange:(v:string)=>void; kind:'hora'|'minutos' }) {
   const controlRef=useRef<HTMLSpanElement|null>(null);
   const encajeRef=useRef<number|null>(null);
   const ITEM_HEIGHT=32;

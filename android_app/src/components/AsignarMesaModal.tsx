@@ -14,6 +14,9 @@ export default function AsignarMesaModal({ reserva, mesasDisponibles, onClose, o
     reserva.mesas_adicionales ? JSON.parse(JSON.stringify(reserva.mesas_adicionales)) : []
   );
   const [loading, setLoading] = useState(false);
+  const initialPrincipal = reserva.mesa || '';
+  const initialAdicionales = reserva.mesas_adicionales ? JSON.stringify(reserva.mesas_adicionales) : '[]';
+  const dirty = mesaPrincipal !== initialPrincipal || JSON.stringify(mesasAdicionales) !== initialAdicionales;
 
   const toggleAdicional = (mesaId: string) => {
     if (mesaId === mesaPrincipal) return; // Cant add main as additional
@@ -105,7 +108,7 @@ export default function AsignarMesaModal({ reserva, mesasDisponibles, onClose, o
           <button type="button" onClick={onClose} className="flex-1 p-2 bg-gray-200 dark:bg-gray-700 rounded-lg text-gray-900 dark:text-white">
             Cancelar
           </button>
-          <button type="button" onClick={handleUpdate} disabled={loading} className="flex-1 p-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold">
+          <button type="button" onClick={handleUpdate} disabled={!dirty || loading} className="flex-1 p-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-500 disabled:hover:bg-gray-500 disabled:text-gray-300 disabled:cursor-not-allowed text-white rounded-lg font-bold">
             {loading ? 'Guardando...' : 'Guardar Asignación'}
           </button>
         </div>
