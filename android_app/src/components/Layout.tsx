@@ -32,17 +32,33 @@ export default function Layout() {
   }, []);
 
   useEffect(() => {
-    async function fetchPendingCount() {
+    if (!user) return;
+    let alive = true;
+
+    const fetchPendingCount = async () => {
       const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
       const { count, error } = await supabase
         .from('Reservas')
         .select('ReservaID', { count: 'exact', head: true })
         .eq('Estado', 'PENDIENTE')
         .gte('FechaReserva', today);
-      if (!error) setPendingCount(count || 0);
-    }
+      if (alive && !error) setPendingCount(count || 0);
+    };
 
-    if (user) fetchPendingCount();
+    void fetchPendingCount();
+    const refresh = () => { void fetchPendingCount(); };
+    window.addEventListener('camborio-reservas-change', refresh);
+
+    const channel = supabase
+      .channel('reservas-pending-count-live')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'Reservas' }, refresh)
+      .subscribe();
+
+    return () => {
+      alive = false;
+      window.removeEventListener('camborio-reservas-change', refresh);
+      void supabase.removeChannel(channel);
+    };
   }, [user]);
 
   const toggleDarkMode = () => {
