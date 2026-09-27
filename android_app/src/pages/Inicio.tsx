@@ -14,6 +14,7 @@ type Reserva = {
   Personas: number | null;
   Estado: string;
   Mesa: string | null;
+  MesasAdicionales: string | null;
   Turno: 'COMIDA' | 'CENA' | string | null;
   Observaciones: string | null;
 };
@@ -83,7 +84,7 @@ export default function Inicio() {
 
     const { data, error: queryError } = await supabase
       .from('Reservas')
-      .select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,Turno,Observaciones')
+      .select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,MesasAdicionales,Turno,Observaciones')
       .eq('FechaReserva', today)
       .order('HoraReserva', { ascending: true });
 
@@ -99,9 +100,21 @@ export default function Inicio() {
   }
 
   useEffect(() => {
-    if (session?.access_token) {
-      fetchReservas();
-    }
+    if (!session?.access_token) return;
+    void fetchReservas();
+
+    const refresh = () => { void fetchReservas(); };
+    window.addEventListener('camborio-reservas-change', refresh);
+
+    const channel = supabase
+      .channel('reservas-hoy-live')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'Reservas' }, refresh)
+      .subscribe();
+
+    return () => {
+      window.removeEventListener('camborio-reservas-change', refresh);
+      void supabase.removeChannel(channel);
+    };
   }, [session?.access_token]);
 
   const handleUpdate = (updatedReserva: any) => {
