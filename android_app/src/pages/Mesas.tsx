@@ -296,7 +296,7 @@ export default function Mesas() {
 
   return (
     <section className="cr-planos-mesas" aria-label="Planos de mesas">
-      <button className="cr-planos-mesas__backdrop" type="button" aria-label="Cerrar" onClick={() => navigate('/')} />
+      <button className="cr-planos-mesas__backdrop" type="button" aria-label="Cerrar" onClick={closeAssignment} />
       <div className={'cr-planos-mesas__panel' + (assignmentMode ? ' cr-planos-mesas__panel--asignacion' : '')}>
         <header className="cr-planos-mesas__header">
           <h2>{assignmentMode ? 'ASIGNAR MESA' : 'PLANOS DE MESAS'}</h2>
