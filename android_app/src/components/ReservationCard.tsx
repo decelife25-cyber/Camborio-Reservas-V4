@@ -51,10 +51,12 @@ function mesaValida(mesa: string | null) {
 export default function ReservationCard({
   reserva,
   onAssignTable,
+  onModify,
   onUpdate,
 }: {
   reserva: ReservationCardData;
   onAssignTable?: (reserva: ReservationCardData) => void;
+  onModify?: (reserva: ReservationCardData) => void;
   onUpdate?: (reserva: ReservationCardData) => void;
 }) {
   const navigate = useNavigate();
@@ -82,7 +84,12 @@ export default function ReservationCard({
     if (!mesaValida(reserva.Mesa)) { if (onAssignTable) { onAssignTable(reserva); } else { goAssignTable(false); } return; }
     setTableChangeOpen(true);
   };
+  const esReservaPasada = reserva.FechaReserva < new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
+  const esReservaHoy = isToday(reserva.FechaReserva);
+  const turnoActivo = reserva.Turno === getActiveTurno();
+
   const changeState = async (nextState: string) => {
+    if (saving || readOnly) return;
     setSaving(true);
     setError('');
 
@@ -93,18 +100,18 @@ export default function ReservationCard({
     }
 
     if (nextState === 'SENTADA') {
-      if (!['PENDIENTE','CONFIRMADA'].includes(reserva.Estado)) {
-        setError('La reserva debe estar CONFIRMADA para sentarla.');
+      if (reserva.Estado !== 'CONFIRMADA') {
+        setError('Solo se pueden sentar reservas confirmadas.');
         setSaving(false);
         return;
       }
-      if (!isToday(reserva.FechaReserva)) {
+      if (!esReservaHoy) {
         setError('Solo se puede sentar una reserva de HOY.');
         setSaving(false);
         return;
       }
-      if (reserva.Turno !== getActiveTurno()) {
-        setError('La reserva pertenece a otro turno. Cambia al turno activo para sentarla.');
+      if (!turnoActivo) {
+        setError('La reserva pertenece a otro turno. Cambia al turno correspondiente para sentarla.');
         setSaving(false);
         return;
       }
@@ -115,56 +122,37 @@ export default function ReservationCard({
       }
     }
 
-    if (nextState === 'CANCELADA_LOCAL') {
-      if (!['PENDIENTE', 'CONFIRMADA', 'SENTADA'].includes(reserva.Estado)) {
-        setError('No se puede cancelar la reserva en este estado.');
+    if (nextState === 'CANCELADA_LOCAL' && !['PENDIENTE', 'CONFIRMADA', 'SENTADA'].includes(reserva.Estado)) {
+      setError('No se puede cancelar la reserva en este estado.');
+      setSaving(false);
+      return;
+    }
+
+    if (nextState === 'FINALIZADA') {
+      if (reserva.Estado === 'SENTADA') {
+        // Permitido: una reserva sentada puede finalizarse en el turno actual.
+      } else if (['PENDIENTE', 'CONFIRMADA'].includes(reserva.Estado) && esReservaPasada) {
+        // V2 permite cerrar una reserva activa que ya quedó atrás.
+      } else {
+        setError('Solo se pueden finalizar reservas sentadas o reservas activas ya pasadas.');
         setSaving(false);
         return;
       }
     }
 
     if (nextState === 'NO_PRESENTADO') {
-      if (!['PENDIENTE', 'CONFIRMADA', 'SENTADA'].includes(reserva.Estado)) {
-        setError('No se puede marcar NO ASISTIÓ desde este estado.');
+      const permitido = ['PENDIENTE', 'CONFIRMADA', 'SENTADA'].includes(reserva.Estado) && esReservaPasada;
+      if (!permitido) {
+        setError('Solo se puede marcar NO ASISTIÓ en una reserva activa ya pasada.');
         setSaving(false);
         return;
       }
     }
 
-    if (nextState === 'FINALIZADA' && !['SENTADA', 'PENDIENTE', 'CONFIRMADA'].includes(reserva.Estado)) {
-      setError('No se puede finalizar la reserva en este estado.');
-      setSaving(false);
-      return;
-    }
-
-    if (nextState === 'FINALIZADA' && ['PENDIENTE', 'CONFIRMADA'].includes(reserva.Estado)) {
-      const fechaHora = new Date(
-        reserva.FechaReserva + 'T' + formatTime(reserva.HoraReserva) + ':00'
-      ).getTime();
-      if (!Number.isNaN(fechaHora) && fechaHora > Date.now()) {
-        setError('Solo se puede finalizar una reserva pendiente o confirmada cuando ya ha pasado su hora.');
-        setSaving(false);
-        return;
-      }
-    }
-
-    let data:any = null;
-    if (nextState === 'SENTADA' && reserva.Estado === 'PENDIENTE') {
-      const confirmacion = await supabase.from('Reservas')
-        .update({ Estado: 'CONFIRMADA', FechaModificacion: new Date().toISOString() })
-        .eq('ReservaID', reserva.ReservaID)
-        .select('*')
-        .single();
-      if (confirmacion.error) {
-        setError(confirmacion.error.message);
-        setSaving(false);
-        return;
-      }
-      data = confirmacion.data;
-    }
+    const ahora = new Date().toISOString();
     const resultado = await supabase
       .from('Reservas')
-      .update({ Estado: nextState, FechaEstado: new Date().toISOString(), FechaModificacion: new Date().toISOString() })
+      .update({ Estado: nextState, FechaEstado: ahora, FechaModificacion: ahora })
       .eq('ReservaID', reserva.ReservaID)
       .select('*')
       .single();
@@ -174,7 +162,6 @@ export default function ReservationCard({
       setSaving(false);
       return;
     }
-    data = resultado.data;
 
     const session = await supabase.auth.getSession();
     const userId = session.data.session?.user?.id;
@@ -184,25 +171,37 @@ export default function ReservationCard({
       Accion: 'ESTADO_MODIFICADO',
       Detalle: 'Cambio de estado: ' + reserva.Estado + ' → ' + nextState,
     });
-
-    if (logError) {
-      console.warn('No se pudo registrar el log de estado', logError);
-    }
+    if (logError) console.warn('No se pudo registrar el log de estado', logError);
 
     setSaving(false);
-    const next = { ...reserva, ...data, Estado: nextState } as ReservationCardData;
+    const next = { ...reserva, ...resultado.data, Estado: nextState } as ReservationCardData;
     onUpdate?.(next);
     setStateOpen(false);
   };
 
-  const stateActions =
-    reserva.Estado === 'PENDIENTE'
-      ? [['SENTADA', 'SENTAR', 'sentar'], ['CONFIRMADA', 'CONFIRMAR', 'confirmar'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar']]
-      : reserva.Estado === 'CONFIRMADA'
-        ? [['SENTADA', 'SENTAR', 'sentar'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar']]
-        : reserva.Estado === 'SENTADA'
-          ? [['FINALIZADA', 'FINALIZAR', 'finalizar'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']]
-          : [];
+  const stateActions = (() => {
+    if (reserva.Estado === 'PENDIENTE') {
+      return esReservaPasada
+        ? [['FINALIZADA', 'FINALIZAR', 'finalizada'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']]
+        : [['CONFIRMADA', 'CONFIRMAR', 'confirmada'], ['MODIFICAR', 'MODIFICAR', 'modificar'], ['ASIGNAR_MESA', 'ASIGNAR MESA', 'asignar-mesa'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelada-local']];
+    }
+    if (reserva.Estado === 'CONFIRMADA') {
+      if (esReservaPasada) return [['FINALIZADA', 'FINALIZAR', 'finalizada'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']];
+      const acciones = [
+        ['MODIFICAR', 'MODIFICAR', 'modificar'],
+        [mesaValida(reserva.Mesa) ? 'CAMBIAR_MESA' : 'ASIGNAR_MESA', mesaValida(reserva.Mesa) ? 'CAMBIAR MESA' : 'ASIGNAR MESA', mesaValida(reserva.Mesa) ? 'cambiar-mesa' : 'asignar-mesa'],
+      ];
+      if (esReservaHoy && turnoActivo && mesaValida(reserva.Mesa)) acciones.push(['SENTADA', 'SENTAR', 'sentar']);
+      acciones.push(['CANCELADA_LOCAL', 'CANCELAR', 'cancelada-local']);
+      return acciones;
+    }
+    if (reserva.Estado === 'SENTADA') {
+      return esReservaPasada
+        ? [['FINALIZADA', 'FINALIZAR', 'finalizada'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']]
+        : [['CAMBIAR_MESA', 'CAMBIAR MESA', 'cambiar-mesa'], ['FINALIZADA', 'FINALIZAR', 'finalizada']];
+    }
+    return [];
+  })();
 
   const assignedTables = [reserva.Mesa, ...(String(reserva.MesasAdicionales || '').split(',').map(v => v.trim()).filter(Boolean))].filter(Boolean) as string[];
   const mesaLabel = assignedTables.length ? 'MESA ' + assignedTables[0] + (assignedTables.length > 1 ? ' (+' + (assignedTables.length - 1) + ')' : '') : 'SIN ASIGNAR';
@@ -288,7 +287,20 @@ export default function ReservationCard({
                   key={s}
                   type="button"
                   className={'ficha-state-button ficha-state-button--' + kind}
-                  onClick={() => changeState(s)}
+                  onClick={() => {
+                    if (s === 'MODIFICAR') {
+                      if (onModify) onModify(reserva);
+                      else navigate('/buscar?codigo=' + encodeURIComponent(reserva.CodigoReserva || ''));
+                      setStateOpen(false);
+                      return;
+                    }
+                    if (s === 'ASIGNAR_MESA' || s === 'CAMBIAR_MESA') {
+                      setStateOpen(false);
+                      goAssignTable(false);
+                      return;
+                    }
+                    void changeState(s);
+                  }}
                   disabled={saving}
                 >
                   {saving ? '...' : label}
