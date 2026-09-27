@@ -12,6 +12,7 @@ export type ReservationCardData = {
   Personas: number | null;
   Estado: string;
   Mesa: string | null;
+  MesasAdicionales?: string | null;
   Turno?: string | null;
   Observaciones?: string | null;
 };
@@ -42,6 +43,26 @@ function getActiveTurno(): 'COMIDA' | 'CENA' {
   return hour >= 18 ? 'CENA' : 'COMIDA';
 }
 
+function parseMesas(reserva: Pick<ReservationCardData, 'Mesa' | 'MesasAdicionales'>) {
+  const result: string[] = [];
+  const add = (value: unknown) => {
+    if (Array.isArray(value)) value.forEach(add);
+    else if (value !== null && value !== undefined) String(value).split(',').forEach(part => {
+      const n = part.replace(/[^0-9]/g, '').trim();
+      if (n && !result.includes(n)) result.push(n);
+    });
+  };
+  add(reserva.Mesa);
+  add(reserva.MesasAdicionales);
+  return result;
+}
+
+function mesaLabel(reserva: Pick<ReservationCardData, 'Mesa' | 'MesasAdicionales'>) {
+  const mesas = parseMesas(reserva);
+  if (!mesas.length) return 'SIN ASIGNAR';
+  return mesas.length === 1 ? 'MESA ' + mesas[0] : 'MESA ' + mesas[0] + ' (+' + (mesas.length - 1) + ')';
+}
+
 function mesaValida(mesa: string | null) {
   const value = String(mesa || '').trim().toUpperCase();
   return Boolean(value && !['SIN ASIGNAR', 'NULL', 'UNDEFINED'].includes(value));
@@ -58,6 +79,7 @@ export default function ReservationCard({
 }) {
   const navigate = useNavigate();
   const [showObservations, setShowObservations] = useState(false);
+  const [showAssignedTables, setShowAssignedTables] = useState(false);
   const [stateOpen, setStateOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -169,6 +191,7 @@ export default function ReservationCard({
     const next = { ...reserva, ...data, Estado: nextState } as ReservationCardData;
     onUpdate?.(next);
     setStateOpen(false);
+    window.dispatchEvent(new Event('camborio-reservas-change'));
   };
 
   const stateActions =
@@ -216,11 +239,27 @@ export default function ReservationCard({
         </div>
         <div className="reservation-party">
           <div className="pax"><span>👥</span> {reserva.Personas || 0} PAX</div>
-          <button className="table-button" type="button" onClick={() => { if (!reserva.Mesa && onAssignTable) onAssignTable(reserva); }}>
-            {reserva.Mesa ? 'MESA ' + reserva.Mesa : 'SIN ASIGNAR'}
+          <button className="table-button" type="button" onClick={() => {
+              if (parseMesas(reserva).length) setShowAssignedTables(true);
+              else if (onAssignTable) onAssignTable(reserva);
+            }}>
+            {mesaLabel(reserva)}
           </button>
         </div>
       </article>
+
+      {showAssignedTables && (
+        <div className="v2-edit-overlay cr-mesas-asignadas-modal" role="dialog" aria-modal="true" aria-labelledby="mesasAsignadasTitulo" onClick={() => setShowAssignedTables(false)}>
+          <div className="cr-confirmacion-mesa__panel" onClick={e => e.stopPropagation()}>
+            <p className="cr-confirmacion-mesa__eyebrow" id="mesasAsignadasTitulo">MESAS ASIGNADAS</p>
+            <div className="cr-mesas-asignadas-modal__numeros">{parseMesas(reserva).join(' · ')}</div>
+            <div className="cr-confirmacion-mesa__acciones">
+              <button type="button" className="cr-confirmacion-mesa__boton cr-confirmacion-mesa__boton--cancelar" onClick={() => setShowAssignedTables(false)}>CERRAR</button>
+              <button type="button" className="cr-confirmacion-mesa__boton cr-confirmacion-mesa__boton--confirmar" onClick={() => { setShowAssignedTables(false); onAssignTable?.(reserva); }}>CAMBIAR MESAS</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showObservations && (
         <div className="observation-overlay" role="dialog" aria-modal="true" aria-label="Observaciones">
