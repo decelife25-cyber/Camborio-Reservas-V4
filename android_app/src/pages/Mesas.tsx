@@ -275,10 +275,19 @@ export default function Mesas() {
 
   const estado: 'disponible' | 'reservada' | 'ocupada' | 'desactivada' = selectedTable && mesasConfig[selectedTable]?.Activa === false ? 'desactivada' : (selectedTable ? visualState(reservaSeleccionada) : 'disponible');
 
-  const mesasVisibles = useMemo(() => layout.mesas.map(m => ({
-    ...m,
-    estado: mesasConfig[m.numero]?.Activa === false ? 'desactivada' : visualState(reservationForTable(reservas, m.numero)),
-  })), [layout.mesas, mesasConfig, reservas]);
+  const mesasVisibles = useMemo(() => layout.mesas.map(m => {
+    const reserva = reservationForTable(reservas, m.numero);
+    const mesasAsignadas = reserva ? parseAssignedTables(reserva) : [];
+    return {
+      ...m,
+      reserva,
+      // Igual que V2: en PLANOS DE MESAS una reserva con varias mesas
+      // se representa visualmente con el número de su mesa principal
+      // repetido en todas las mesas físicas de la unión.
+      numeroVisual: !assignmentMode && mesasAsignadas.length ? mesasAsignadas[0] : m.numero,
+      estado: mesasConfig[m.numero]?.Activa === false ? 'desactivada' : visualState(reserva),
+    };
+  }), [layout.mesas, mesasConfig, reservas, assignmentMode]);
 
   return (
     <section className="cr-planos-mesas" aria-label="Planos de mesas">
@@ -318,7 +327,7 @@ export default function Mesas() {
                 onClick={() => assignmentMode ? toggleAssignmentTable(mesa.numero) : setSelectedTable(mesa.numero)}
                 aria-label={'Mesa ' + mesa.numero + ' ' + mesa.estado}
               >
-                {mesa.numero}
+                {mesa.numeroVisual}
               </button>
             ))}
           </div>
