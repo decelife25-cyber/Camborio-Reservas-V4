@@ -203,6 +203,7 @@ export default function Mesas() {
       return;
     }
     setSelectedTable(null);
+    window.dispatchEvent(new Event('camborio-reservas-change'));
     await cargar();
     setSaving(false);
   };
@@ -248,6 +249,7 @@ export default function Mesas() {
       return;
     }
     setSelectedTable(null);
+    window.dispatchEvent(new Event('camborio-reservas-change'));
     await cargar();
     setSaving(false);
   };
@@ -267,6 +269,7 @@ export default function Mesas() {
     const { error: updateError } = await supabase.from('Reservas').update({ Mesa: principal, MesasAdicionales: adicionales.length ? adicionales.join(', ') : null, Zona: zonaAsignada, Turno: turno, FechaModificacion: new Date().toISOString() }).eq('ReservaID', assignmentReserva.ReservaID);
     setSaving(false);
     if (updateError) { setError(updateError.message); return; }
+    window.dispatchEvent(new Event('camborio-reservas-change'));
     navigate('/');
   };
 
