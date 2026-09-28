@@ -3346,3 +3346,79 @@ html.light .status-modal-confirmada{background:rgba(21,116,71,.12)}
 /* El botón de estado de la ficha debe usar exactamente el mismo verde que CONFIRMADA en el modal y en la tarjeta. */
 .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha--confirmada .cr-busqueda-ficha__estado{border-color:var(--estado-confirmada)!important;color:var(--estado-confirmada)!important}
 html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha--confirmada .cr-busqueda-ficha__estado{border-color:var(--estado-confirmada)!important;color:var(--estado-confirmada)!important}
+
+
+/* ===== 1.0.074: código de reserva y mesas ===== */
+.cr-nueva-reserva__mensaje[data-tipo=info]{
+  border-style:solid;
+  border-color:rgba(255,196,0,.42);
+  background:rgba(255,196,0,.06);
+  color:#f2f2f2;
+}
+.cr-nueva-reserva__codigo-destacado{
+  display:inline-block;
+  margin-left:5px;
+  padding:5px 10px;
+  border:1px solid #ffc400;
+  border-radius:6px;
+  background:rgba(255,196,0,.16);
+  color:#ffc400;
+  font:1000 1.08em/1 Arial,sans-serif;
+  letter-spacing:1px;
+}
+.reservation-code{
+  display:inline-flex;
+  align-items:center;
+  border:1px solid #8c7100;
+  border-radius:5px;
+  padding:3px 8px;
+  background:rgba(255,196,0,.05);
+}
+.cr-reserva-card__codigo,
+.cr-reserva-confirmar__codigo,
+.cr-busqueda-ficha__codigo{
+  display:inline-flex!important;
+  align-items:center;
+  border:1px solid rgba(255,196,0,.55)!important;
+  border-radius:6px!important;
+  padding:4px 8px!important;
+  background:rgba(255,196,0,.07)!important;
+  box-sizing:border-box;
+}
+.observation-button{
+  margin-left:8px!important;
+}
+.cr-reserva-card__codigo-icon,
+.cr-reserva-confirmar__codigo-icon,
+.cr-busqueda-ficha__codigo-icon{
+  margin-left:2px;
+}
+
+/* Mesa asignada: amarillo sólido con texto negro, igual en noche y día. */
+.table-button--asignada,
+.cr-busqueda-ficha__bloque--mesa-asignada,
+.cr-nueva-reserva__mesa--asignada{
+  background:linear-gradient(180deg,#ffd83a 0,#ffc400 58%,#edae00 100%)!important;
+  color:#050505!important;
+  border-color:#ffc400!important;
+}
+.table-button--asignada{font-weight:1000!important;}
+.cr-busqueda-ficha__bloque--mesa-asignada span,
+.cr-busqueda-ficha__bloque--mesa-asignada strong,
+.cr-nueva-reserva__mesa--asignada span,
+.cr-nueva-reserva__mesa--asignada strong{
+  color:#050505!important;
+}
+html.light .table-button--asignada,
+html.light .cr-busqueda-ficha__bloque--mesa-asignada,
+html.light .cr-nueva-reserva__mesa--asignada{
+  background:linear-gradient(180deg,#ffd83a 0,#ffc400 58%,#edae00 100%)!important;
+  color:#050505!important;
+  border-color:#c89d00!important;
+}
+html.light .cr-busqueda-ficha__bloque--mesa-asignada span,
+html.light .cr-busqueda-ficha__bloque--mesa-asignada strong,
+html.light .cr-nueva-reserva__mesa--asignada span,
+html.light .cr-nueva-reserva__mesa--asignada strong{
+  color:#050505!important;
+}
