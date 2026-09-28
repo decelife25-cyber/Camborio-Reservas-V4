@@ -3317,3 +3317,28 @@ html.light .v2-state-modal .ficha-state-current{
 .state-change-modal .ficha-state-button--cancelada-local,.state-change-modal .ficha-state-button--cancelada-cliente{border-color:#ff4d58!important;background:linear-gradient(180deg,#ff4d58,#b3131d)!important;color:#fff!important}
 .state-change-modal .ficha-state-button--no-presentado{border-color:#ff8a00!important;background:linear-gradient(180deg,#f59e0b,#b45309)!important;color:#1b1000!important}
 .state-change-modal .v2-edit-cancel-full{min-height:56px!important;margin-top:10px!important}
+
+/* COLOR ÚNICO DEL ESTADO CONFIRMADA: el indicador de la tarjeta, fecha,
+   ficha/modal y calendario deben usar exactamente el mismo verde. */
+:root{--estado-confirmada:#05d677}
+.status-confirmada,
+.status-modal-confirmada,
+.v2-search-card--confirmada .v2-search-state,
+.cr-reserva-card--confirmada .cr-reserva-estado,
+.cr-reserva-card--confirmada .cr-reserva-confirmar__estado,
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-card--confirmada .cr-reserva-estado,
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha--confirmada .cr-busqueda-ficha__estado,
+.cr-reserva-acciones__boton--confirmar,
+.cr-reserva-acciones__boton--finalizar{border-color:var(--estado-confirmada);color:var(--estado-confirmada)}
+.status-modal-confirmada{background:rgba(5,214,119,.12)}
+html.light{
+  --estado-confirmada:#157447;
+}
+html.light .status-confirmada,
+html.light .status-modal-confirmada,
+html.light .v2-search-card--confirmada .v2-search-state,
+html.light .cr-reserva-card--confirmada .cr-reserva-estado,
+html.light .cr-reserva-card--confirmada .cr-reserva-confirmar__estado,
+html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-card--confirmada .cr-reserva-estado,
+html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha--confirmada .cr-busqueda-ficha__estado{border-color:var(--estado-confirmada);color:var(--estado-confirmada)}
+html.light .status-modal-confirmada{background:rgba(21,116,71,.12)}
