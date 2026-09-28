@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { getTurnoFromHora } from '../utils/shifts';
 
@@ -109,6 +110,7 @@ export function Wheel({ values, value, onChange, kind }: { values:string[]; valu
 }
 
 export default function NuevaReserva(){
+  const navigate=useNavigate();
   const[nombre,setNombre]=useState(''),[telefono,setTelefono]=useState(''),[personas,setPersonas]=useState(2);
   const[fecha,setFecha]=useState(todayMadrid()),[hora,setHora]=useState('13'),[minutos,setMinutos]=useState('15');
   const[mesa,setMesa]=useState(''),[observaciones,setObservaciones]=useState('');
