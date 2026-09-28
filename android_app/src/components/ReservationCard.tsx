@@ -91,9 +91,6 @@ export default function ReservationCard({
   const hoyMadrid = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
   const horaMadrid = madridNowTime();
   const esReservaPasada = reserva.FechaReserva < hoyMadrid || (reserva.FechaReserva === hoyMadrid && formatTime(reserva.HoraReserva) < horaMadrid);
-  const esReservaHoy = isToday(reserva.FechaReserva);
-  const turnoActivo = reserva.Turno === getActiveTurno();
-
   const changeState = async (nextState: string) => {
     if (saving || readOnly) return;
     setSaving(true);
@@ -108,16 +105,6 @@ export default function ReservationCard({
     if (nextState === 'SENTADA') {
       if (reserva.Estado !== 'CONFIRMADA') {
         setError('Solo se pueden sentar reservas confirmadas.');
-        setSaving(false);
-        return;
-      }
-      if (!esReservaHoy) {
-        setError('Solo se puede sentar una reserva de HOY.');
-        setSaving(false);
-        return;
-      }
-      if (!turnoActivo) {
-        setError('La reserva pertenece a otro turno. Cambia al turno correspondiente para sentarla.');
         setSaving(false);
         return;
       }
@@ -193,8 +180,8 @@ export default function ReservationCard({
     }
     if (reserva.Estado === 'CONFIRMADA') {
       return esReservaPasada
-        ? [['FINALIZADA', 'FINALIZAR', 'finalizada'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']]
-        : [['CANCELADA_LOCAL', 'CANCELAR', 'cancelar']];
+        ? [['SENTADA', 'SENTAR', 'sentar'], ['FINALIZADA', 'FINALIZAR', 'finalizada'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']]
+        : [['SENTADA', 'SENTAR', 'sentar'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar']];
     }
     if (reserva.Estado === 'SENTADA') {
       return esReservaPasada
