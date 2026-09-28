@@ -479,7 +479,7 @@ export default function Mesas() {
           <span><i className="desactivada" />DESACTIVADA</span>
         </div>
 
-        {assignmentMode && <div className="cr-planos-mesas__assignment-actions"><div>SELECCIONA UNA O VARIAS MESAS Y PULSA GUARDAR ASIGNACIÓN PARA ACTUALIZAR LA RESERVA.</div><button type="button" className="primario" data-cr-guardar-asignacion disabled={saving || (Boolean(nuevaBorrador) && assignmentTables.length === 0)} onPointerDown={(event) => { event.preventDefault(); void guardarAsignacion(); }}>{saving ? 'GUARDANDO...' : 'GUARDAR ASIGNACIÓN'}</button></div>}
+        {assignmentMode && <div className="cr-planos-mesas__assignment-actions"><div>SELECCIONA UNA O VARIAS MESAS Y PULSA GUARDAR ASIGNACIÓN PARA ACTUALIZAR LA RESERVA.</div><button type="button" className="primario" data-cr-guardar-asignacion disabled={saving || (Boolean(nuevaBorrador) && assignmentTables.length === 0)} onClick={() => void guardarAsignacion()}>{saving ? 'GUARDANDO...' : 'GUARDAR ASIGNACIÓN'}</button></div>}
         {error && <div className="cr-planos-mesas__error">{error}</div>}
       </div>
 
