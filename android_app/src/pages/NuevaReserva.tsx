@@ -174,11 +174,11 @@ export default function NuevaReserva(){
         <button className="cr-nueva-reserva__cerrar" type="button" onClick={cerrarNuevaReserva}>X CERRAR</button>
       </header>
       <form className="cr-nueva-reserva__form" onSubmit={guardar}>
-        <label className="cr-nueva-reserva__campo-completo">Nombre<input type="text" value={nombre} onChange={e=>setNombre(e.target.value)} autoComplete="name" placeholder="Nombre del cliente" required /></label>
-        <label className="cr-nueva-reserva__campo-completo">Teléfono<input type="tel" value={telefono} onChange={e=>setTelefono(e.target.value)} inputMode="tel" autoComplete="tel" placeholder="Número de teléfono" /></label>
+        <label className="cr-nueva-reserva__campo-completo">Nombre<input type="text" value={nombre} onChange={e=>{setNombre(e.target.value);if(lastCodigo){setLastCodigo('');setMessage('')}}} autoComplete="name" placeholder="Nombre del cliente" required /></label>
+        <label className="cr-nueva-reserva__campo-completo">Teléfono<input type="tel" value={telefono} onChange={e=>{setTelefono(e.target.value);if(lastCodigo){setLastCodigo('');setMessage('')}}} inputMode="tel" autoComplete="tel" placeholder="Número de teléfono" /></label>
         <label className="cr-nueva-reserva__personas">Personas
           <span className="cr-nueva-reserva__contador">
-            <button type="button" onClick={()=>setPersonas(p=>Math.max(1,p-1))}>−</button><strong>{personas} PAX</strong><button type="button" onClick={()=>setPersonas(p=>p+1)}>+</button>
+            <button type="button" onClick={()=>{setPersonas(p=>Math.max(1,p-1));if(lastCodigo){setLastCodigo('');setMessage('')}}}>−</button><strong>{personas} PAX</strong><button type="button" onClick={()=>{setPersonas(p=>p+1);if(lastCodigo){setLastCodigo('');setMessage('')}}}>+</button>
           </span>
         </label>
         <label className="cr-nueva-reserva__hora-bloque">Hora<Wheel values={HORAS} value={hora} onChange={setHora} kind="hora"/></label>
