@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
+import StateChangeModal from './StateChangeModal';
 
 export type ReservationCardData = {
   ReservaID: string;
@@ -62,8 +62,6 @@ export default function ReservationCard({
   const navigate = useNavigate();
   const [showObservations, setShowObservations] = useState(false);
   const [stateOpen, setStateOpen] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
   const [tableChangeOpen, setTableChangeOpen] = useState(false);
   const [lightTheme, setLightTheme] = useState(() => document.documentElement.classList.contains('light'));
   const hasObservations = Boolean(reserva.Observaciones?.trim());
@@ -87,121 +85,6 @@ export default function ReservationCard({
   const esReservaPasada = reserva.FechaReserva < new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
   const esReservaHoy = isToday(reserva.FechaReserva);
   const turnoActivo = reserva.Turno === getActiveTurno();
-
-  const changeState = async (nextState: string) => {
-    if (saving || readOnly) return;
-    setSaving(true);
-    setError('');
-
-    if (nextState === 'CONFIRMADA' && reserva.Estado !== 'PENDIENTE') {
-      setError('Solo se pueden confirmar reservas pendientes.');
-      setSaving(false);
-      return;
-    }
-
-    if (nextState === 'SENTADA') {
-      if (reserva.Estado !== 'CONFIRMADA') {
-        setError('Solo se pueden sentar reservas confirmadas.');
-        setSaving(false);
-        return;
-      }
-      if (!esReservaHoy) {
-        setError('Solo se puede sentar una reserva de HOY.');
-        setSaving(false);
-        return;
-      }
-      if (!turnoActivo) {
-        setError('La reserva pertenece a otro turno. Cambia al turno correspondiente para sentarla.');
-        setSaving(false);
-        return;
-      }
-      if (!mesaValida(reserva.Mesa)) {
-        setSaving(false);
-        goAssignTable(true);
-        return;
-      }
-    }
-
-    if (nextState === 'CANCELADA_LOCAL' && !['PENDIENTE', 'CONFIRMADA', 'SENTADA'].includes(reserva.Estado)) {
-      setError('No se puede cancelar la reserva en este estado.');
-      setSaving(false);
-      return;
-    }
-
-    if (nextState === 'FINALIZADA') {
-      if (reserva.Estado === 'SENTADA') {
-        // Permitido: una reserva sentada puede finalizarse en el turno actual.
-      } else if (['PENDIENTE', 'CONFIRMADA'].includes(reserva.Estado) && esReservaPasada) {
-        // V2 permite cerrar una reserva activa que ya quedó atrás.
-      } else {
-        setError('Solo se pueden finalizar reservas sentadas o reservas activas ya pasadas.');
-        setSaving(false);
-        return;
-      }
-    }
-
-    if (nextState === 'NO_PRESENTADO') {
-      const permitido = ['PENDIENTE', 'CONFIRMADA', 'SENTADA'].includes(reserva.Estado) && esReservaPasada;
-      if (!permitido) {
-        setError('Solo se puede marcar NO ASISTIÓ en una reserva activa ya pasada.');
-        setSaving(false);
-        return;
-      }
-    }
-
-    const ahora = new Date().toISOString();
-    const resultado = await supabase
-      .from('Reservas')
-      .update({ Estado: nextState, FechaEstado: ahora, FechaModificacion: ahora })
-      .eq('ReservaID', reserva.ReservaID)
-      .select('*')
-      .single();
-
-    if (resultado.error) {
-      setError(resultado.error.message);
-      setSaving(false);
-      return;
-    }
-
-    const session = await supabase.auth.getSession();
-    const userId = session.data.session?.user?.id;
-    const { error: logError } = await supabase.from('Log').insert({
-      ReservaID: reserva.ReservaID,
-      Usuario: userId || null,
-      Accion: 'ESTADO_MODIFICADO',
-      Detalle: 'Cambio de estado: ' + reserva.Estado + ' → ' + nextState,
-    });
-    if (logError) console.warn('No se pudo registrar el log de estado', logError);
-
-    setSaving(false);
-    const next = { ...reserva, ...resultado.data, Estado: nextState } as ReservationCardData;
-    onUpdate?.(next);
-    setStateOpen(false);
-  };
-
-  // El modal CAMBIAR ESTADO solo contiene acciones de estado, igual en
-  // RESERVAS HOY y en la ficha. MODIFICAR y ASIGNAR/CAMBIAR MESA son
-  // acciones independientes de la ficha/tarjeta y no aparecen aquí.
-  const stateActions = (() => {
-    if (reserva.Estado === 'PENDIENTE') {
-      return esReservaPasada
-        ? [['FINALIZADA', 'FINALIZAR', 'finalizada'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']]
-        : [['CONFIRMADA', 'CONFIRMAR', 'confirmada'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelada-local']];
-    }
-    if (reserva.Estado === 'CONFIRMADA') {
-      if (esReservaPasada) return [['FINALIZADA', 'FINALIZAR', 'finalizada'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']];
-      const acciones: string[][] = [];
-      if (esReservaHoy && turnoActivo && mesaValida(reserva.Mesa)) acciones.push(['SENTADA', 'SENTAR', 'sentar']);
-      acciones.push(['CANCELADA_LOCAL', 'CANCELAR', 'cancelada-local']);
-      return acciones;
-    }
-    if (reserva.Estado === 'SENTADA') {
-      return esReservaPasada
-        ? [['FINALIZADA', 'FINALIZAR', 'finalizada'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']]
-        : [['FINALIZADA', 'FINALIZAR', 'finalizada']];
-    }
-    return [];
-  })();
 
   const assignedTables = [reserva.Mesa, ...(String(reserva.MesasAdicionales || '').split(',').map(v => v.trim()).filter(Boolean))].filter(Boolean) as string[];
   const mesaLabel = assignedTables.length ? 'MESA ' + assignedTables[0] + (assignedTables.length > 1 ? ' (+' + (assignedTables.length - 1) + ')' : '') : 'SIN ASIGNAR';
@@ -273,46 +156,13 @@ export default function ReservationCard({
         </div>
       )}
 
-      {stateOpen && (
-        <div className="v2-edit-overlay" onClick={() => setStateOpen(false)}>
-          <div className={'v2-edit-modal v2-state-modal' + (lightTheme ? ' light-theme' : '')} onClick={e => e.stopPropagation()}>
-            <h3>CAMBIAR ESTADO</h3>
-            <div className={'v2-state-current status-modal-' + reserva.Estado.toLowerCase().replaceAll('_', '-')}>
-              {statusLabel(reserva.Estado)}
-            </div>
-            {error && <div className="cr-nueva-reserva__mensaje" data-tipo="error">{error}</div>}
-            <div className="v2-edit-actions ficha-state-actions">
-              {stateActions.map(([s, label, kind]) => (
-                <button
-                  key={s}
-                  type="button"
-                  className={'ficha-state-button ficha-state-button--' + kind}
-                  onClick={() => {
-                    if (s === 'MODIFICAR') {
-                      if (onModify) onModify(reserva);
-                      else navigate('/buscar?codigo=' + encodeURIComponent(reserva.CodigoReserva || ''));
-                      setStateOpen(false);
-                      return;
-                    }
-                    if (s === 'ASIGNAR_MESA' || s === 'CAMBIAR_MESA') {
-                      setStateOpen(false);
-                      goAssignTable(false);
-                      return;
-                    }
-                    void changeState(s);
-                  }}
-                  disabled={saving}
-                >
-                  {saving ? '...' : label}
-                </button>
-              ))}
-            </div>
-            <button className="v2-edit-cancel-full" type="button" onClick={() => setStateOpen(false)}>
-              CERRAR SIN CAMBIOS
-            </button>
-          </div>
-        </div>
-      )}
+      <StateChangeModal
+        reserva={reserva}
+        open={stateOpen}
+        lightTheme={lightTheme}
+        onClose={() => setStateOpen(false)}
+        onUpdated={(next) => onUpdate?.(next as ReservationCardData)}
+      />
     </>
   );
 }
