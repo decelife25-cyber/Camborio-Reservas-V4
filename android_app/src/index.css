@@ -3425,11 +3425,12 @@ html.light .cr-nueva-reserva__mesa--asignada strong{
 
 
 
-/* ===== Correcciones 1.0.076 ===== */
+
+/* ===== Correcciones 1.0.077 ===== */
 .cr-planos-mesas__panel--asignacion{
-  height:min(860px,calc(100svh - 24px))!important;
-  max-height:calc(100svh - 24px)!important;
-  overflow:hidden!important;
+  height:calc(100vh - 24px)!important;
+  max-height:none!important;
+  overflow:auto!important;
 }
 .cr-planos-mesas__panel--asignacion .cr-planos-mesas__canvas{
   height:405px!important;
