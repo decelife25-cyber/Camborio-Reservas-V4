@@ -369,7 +369,7 @@ export default function Mesas() {
             mesasAdicionales:adicionales
           }));
         }catch{}
-        navigate('/reservas');
+        navigate('/reservas?desdeMesa=1');
         return;
       }
       const {data,error:updateError}=await supabase.from('Reservas').update({Mesa:principal,MesasAdicionales:adicionales.length?adicionales.join(', '):null,Zona:zonaAsignada,Turno:turno,FechaModificacion:new Date().toISOString()}).eq('ReservaID',assignmentReserva!.ReservaID).select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,Zona,MesasAdicionales,Turno').single();
