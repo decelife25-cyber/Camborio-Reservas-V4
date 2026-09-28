@@ -123,7 +123,11 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
     setSaving(false);
     if(resultado.error){setError(resultado.error.message);return;}
     const next={...r,...resultado.data,Estado:nextState} as SearchReservation;
-    setR(next);onUpdated(next);setStateOpen(false);setDirty(false);setResultado('ESTADO CAMBIADO CORRECTAMENTE');setConfirmAction('resultado');setError('');
+    setR(next);onUpdated(next);
+    if(r.Estado==='PENDIENTE' && nextState==='CONFIRMADA'){
+      window.dispatchEvent(new Event('camborio-pending-count-change'));
+    }
+    setStateOpen(false);setDirty(false);setResultado('ESTADO CAMBIADO CORRECTAMENTE');setConfirmAction('resultado');setError('');
   };
 
   const stateActions = (() => {
@@ -131,9 +135,7 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
       return [['CONFIRMADA','CONFIRMAR','confirmar'],['SENTADA','SENTAR','sentar'],['FINALIZADA','FINALIZAR','finalizada'],['CANCELADA_LOCAL','CANCELAR','cancelar'],['NO_PRESENTADO','NO ASISTIÓ','no-presentado']];
     }
     if(r.Estado==='CONFIRMADA'){
-      return esFechaPasada(r.FechaReserva,String(r.HoraReserva).slice(0,5))
-        ? [['SENTADA','SENTAR','sentar'],['FINALIZADA','FINALIZAR','finalizada'],['CANCELADA_LOCAL','CANCELAR','cancelar'],['NO_PRESENTADO','NO ASISTIÓ','no-presentado']]
-        : [['SENTADA','SENTAR','sentar'],['CANCELADA_LOCAL','CANCELAR','cancelar']];
+      return [['SENTADA','SENTAR','sentar'],['FINALIZADA','FINALIZAR','finalizada'],['CANCELADA_LOCAL','CANCELAR','cancelar'],['NO_PRESENTADO','NO ASISTIÓ','no-presentado']];
     }
     if(r.Estado==='SENTADA'){
       return esFechaPasada(r.FechaReserva,String(r.HoraReserva).slice(0,5))
