@@ -113,29 +113,51 @@ export default function NuevaReserva(){
   const[fecha,setFecha]=useState(todayMadrid()),[hora,setHora]=useState('13'),[minutos,setMinutos]=useState('15');
   const[mesa,setMesa]=useState(''),[observaciones,setObservaciones]=useState('');
   const[saving,setSaving]=useState(false),[message,setMessage]=useState(''),[error,setError]=useState('');
+  const [lastCodigo,setLastCodigo]=useState('');
   const [calendarOpen,setCalendarOpen]=useState(false);
   const [calendarMonth,setCalendarMonth]=useState(()=>{const d=parseISODate(todayMadrid());return new Date(d.getFullYear(),d.getMonth(),1)});
   const [calendarDraft,setCalendarDraft]=useState(fecha);
   const horaReserva=useMemo(()=>hora+':'+minutos,[hora,minutos]);
 
-  async function guardar(e:React.FormEvent){
-    e.preventDefault();setError('');setMessage('');
-    if(!nombre.trim()){setError('Introduce el nombre del cliente.');return;}
+  async function crearReservaBase(){
+    setError('');setMessage('');
+    if(!nombre.trim()){setError('Introduce el nombre del cliente.');return null;}
     const fechaHora=new Date(fecha+'T'+horaReserva+':00');
-    if(Number.isNaN(fechaHora.getTime())||fechaHora.getTime()<Date.now()-60000){setError('No puedes usar una fecha u hora pasada.');return;}
+    if(Number.isNaN(fechaHora.getTime())||fechaHora.getTime()<Date.now()-60000){setError('No puedes usar una fecha u hora pasada.');return null;}
+    if(telefono.trim()){
+      const{data:dup,error:de}=await supabase.from('Reservas').select('ReservaID,Turno,Estado').eq('FechaReserva',fecha).eq('Telefono',telefono.trim());
+      if(de)throw de;
+      const turno=getTurnoFromHora(horaReserva);
+      if((dup||[]).some((r:any)=>r.Turno===turno&&!['CANCELADA_CLIENTE','CANCELADA_LOCAL'].includes(r.Estado))){setError('Ya existe una reserva activa con este teléfono para ese día y turno.');return null;}
+    }
+    const{data,error:ie}=await supabase.from('Reservas').insert({Nombre:nombre.trim(),Telefono:telefono.trim()||null,Personas:personas,FechaReserva:fecha,HoraReserva:horaReserva,Turno:getTurnoFromHora(horaReserva),Mesa:mesa.trim()||null,MesasAdicionales:null,Observaciones:observaciones.trim()||null,Estado:'CONFIRMADA'}).select('ReservaID,CodigoReserva').single();
+    if(ie)throw ie;
+    if(!data?.ReservaID)throw new Error('La reserva se creó pero no devolvió su identificador.');
+    const codigo=data.CodigoReserva||'—';
+    setLastCodigo(codigo);
+    setMessage('RESERVA REALIZADA');
+    setNombre('');setTelefono('');setPersonas(2);setMesa('');setObservaciones('');
+    return {ReservaID:data.ReservaID,CodigoReserva:codigo};
+  }
+
+  async function guardar(e:React.FormEvent){
+    e.preventDefault();
+    setSaving(true);
+    try{ await crearReservaBase(); }
+    catch(err:any){console.error(err);setError(err?.message||'No se pudo crear la reserva.')}
+    finally{setSaving(false)}
+  }
+
+  async function asignarMesaDesdeNuevaReserva(){
+    if(saving)return;
     setSaving(true);
     try{
-      if(telefono.trim()){
-        const{data:dup,error:de}=await supabase.from('Reservas').select('ReservaID,Turno,Estado').eq('FechaReserva',fecha).eq('Telefono',telefono.trim());
-        if(de)throw de;
-        const turno=getTurnoFromHora(horaReserva);
-        if((dup||[]).some((r:any)=>r.Turno===turno&&!['CANCELADA_CLIENTE','CANCELADA_LOCAL'].includes(r.Estado))){setError('Ya existe una reserva activa con este teléfono para ese día y turno.');setSaving(false);return;}
+      const creada=await crearReservaBase();
+      if(creada?.ReservaID){
+        navigate('/mesas?asignar='+encodeURIComponent(creada.ReservaID)+'&volverCodigo='+encodeURIComponent(creada.CodigoReserva||''));
       }
-      const{data,error:ie}=await supabase.from('Reservas').insert({Nombre:nombre.trim(),Telefono:telefono.trim()||null,Personas:personas,FechaReserva:fecha,HoraReserva:horaReserva,Turno:getTurnoFromHora(horaReserva),Mesa:mesa.trim()||null,MesasAdicionales:null,Observaciones:observaciones.trim()||null,Estado:'CONFIRMADA'}).select('CodigoReserva').single();
-      if(ie)throw ie;
-      setMessage('RESERVA REALIZADA · CÓDIGO '+(data?.CodigoReserva||'—'));
-      setNombre('');setTelefono('');setPersonas(2);setMesa('');setObservaciones('');
-    }catch(err:any){console.error(err);setError(err?.message||'No se pudo crear la reserva.')}finally{setSaving(false)}
+    }catch(err:any){console.error(err);setError(err?.message||'No se pudo crear la reserva para asignar la mesa.')}
+    finally{setSaving(false)}
   }
 
   return <section className="cr-nueva-reserva" aria-labelledby="crNuevaReservaTitulo">
@@ -159,9 +181,9 @@ export default function NuevaReserva(){
           <input className="cr-nueva-reserva__fecha-input-oculto" type="date" min={todayMadrid()} value={fecha} onChange={e=>setFecha(e.target.value)} required aria-hidden="true" tabIndex={-1} />
           <button className="cr-nueva-reserva__fecha-boton" type="button" onClick={()=>{setCalendarDraft(fecha);const d=parseISODate(fecha);setCalendarMonth(new Date(d.getFullYear(),d.getMonth(),1));setCalendarOpen(true)}}>{formatDateES(fecha)}<span aria-hidden="true">▾</span></button>
         </label>
-        <button className="cr-nueva-reserva__mesa" type="button" onClick={()=>setMesa('')}><span>Mesa asignada</span><strong>{mesa.trim()?'MESA '+mesa.trim():'SIN ASIGNAR'}</strong></button>
+        <button className={'cr-nueva-reserva__mesa'+(mesa.trim()?' cr-nueva-reserva__mesa--asignada':'')} type="button" onClick={()=>void asignarMesaDesdeNuevaReserva()} disabled={saving}><span>Mesa asignada</span><strong>{mesa.trim()?'MESA '+mesa.trim():'SIN ASIGNAR'}</strong></button>
         <label className="cr-nueva-reserva__campo-completo">Observaciones<textarea rows={2} value={observaciones} onChange={e=>setObservaciones(e.target.value)} placeholder="Observaciones sobre la reserva"/></label>
-        {(error||message)&&<div className="cr-nueva-reserva__mensaje" data-tipo={error?'error':'info'}>{error||message}</div>}
+        {(error||message)&&<div className="cr-nueva-reserva__mensaje" data-tipo={error?'error':'info'}>{error ? error : <><span>RESERVA REALIZADA · CÓDIGO</span> <strong className="cr-nueva-reserva__codigo-destacado">{lastCodigo||'—'}</strong></>}</div>}
         <div className="cr-nueva-reserva__acciones"><button className="cr-button cr-button--primary" type="submit" disabled={saving}>{saving?'GUARDANDO...':'CREAR RESERVA'}</button></div>
       </form>
       {calendarOpen && <div className="cr-fecha-picker" role="dialog" aria-modal="true" aria-label="Seleccionar fecha">
