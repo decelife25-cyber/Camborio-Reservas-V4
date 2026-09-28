@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import FechaPicker from '../components/FechaPicker';
+import { getTurnoFromHora } from '../utils/shifts';
 
 type Turno = 'COMIDA' | 'CENA';
 type Zona = 'terraza' | 'salon' | 'chillout';
