@@ -3519,4 +3519,4 @@ html.light .cr-nueva-reserva__mesa--asignada strong{
 }
 
 /* Corrección: ASIGNAR MESA ocupa prácticamente todo el ancho útil del móvil. */
-@media(max-width:620px){.cr-planos-mesas__panel.cr-planos-mesas__panel--asignacion{width:calc(100vw - 12px)!important;max-width:none!important;margin:0 auto!important;}}
+@media(max-width:620px){.cr-planos-mesas__panel.cr-planos-mesas__panel--asignacion{width:calc(100% - 12px)!important;max-width:none!important;margin:0 auto!important;}}
