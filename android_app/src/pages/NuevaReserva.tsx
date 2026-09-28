@@ -49,7 +49,7 @@ export function Wheel({ values, value, onChange, kind }: { values:string[]; valu
 
   useEffect(()=>{
     return ()=>{if(encajeRef.current!==null)window.clearTimeout(encajeRef.current);};
-  },[desdeAsignacion]);
+  },[]);
 
   const programarEncaje=()=>{
     const control=controlRef.current;
@@ -113,7 +113,7 @@ export default function NuevaReserva(){
   const navigate=useNavigate();
   const location=useLocation();
   const desdeAsignacion=location.search.includes('desdeMesa=1');
-  const borradorInicial=useMemo(()=>{try{const raw=desdeAsignacion?sessionStorage.getItem('camborio_nueva_reserva_borrador'):null;return raw?JSON.parse(raw):null}catch{return null}},[]);
+  const borradorInicial=useMemo(()=>{try{const raw=desdeAsignacion?sessionStorage.getItem('camborio_nueva_reserva_borrador'):null;return raw?JSON.parse(raw):null}catch{return null}},[desdeAsignacion]);
   const[nombre,setNombre]=useState(borradorInicial?.nombre||''),[telefono,setTelefono]=useState(borradorInicial?.telefono||''),[personas,setPersonas]=useState<number>(Number(borradorInicial?.personas||2));
   const[fecha,setFecha]=useState(borradorInicial?.fecha||todayMadrid()),[hora,setHora]=useState(String(borradorInicial?.horaReserva||'13:15').slice(0,2)),[minutos,setMinutos]=useState(String(borradorInicial?.horaReserva||'13:15').slice(3,5));
   const[mesa,setMesa]=useState(borradorInicial?.mesa||''),[mesasAdicionales,setMesasAdicionales]=useState<string[]>(Array.isArray(borradorInicial?.mesasAdicionales)?(borradorInicial.mesasAdicionales as string[]):[]),[observaciones,setObservaciones]=useState(borradorInicial?.observaciones||'');
