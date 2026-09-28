@@ -28,10 +28,6 @@ function mesaValida(mesa:string|null){
   const v=String(mesa||'').trim().toUpperCase();
   return Boolean(v && !['SIN ASIGNAR','NULL','UNDEFINED'].includes(v));
 }
-function turnoActivo(){
-  const hour=Number(new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Madrid',hour:'2-digit',hour12:false}).format(new Date()));
-  return hour>=18?'CENA':'COMIDA';
-}
 function horaMadrid(){return new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Madrid',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date());}
 function esFechaPasada(fecha:string,hora:string){const hoy=todayMadrid();const h=String(hora||'').slice(0,5);return fecha<hoy||(fecha===hoy&&h<horaMadrid());}
 
@@ -101,8 +97,6 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
     }
     if(nextState==='SENTADA'){
       if(r.Estado!=='CONFIRMADA'){setError('Solo se pueden sentar reservas confirmadas.');return;}
-      if(r.FechaReserva!==todayMadrid()){setError('Solo se puede sentar una reserva de HOY.');return;}
-      if(r.Turno!==turnoActivo()){setError('La reserva pertenece a otro turno. Cambia al turno correspondiente para sentarla.');return;}
       if(!mesaValida(r.Mesa)){setStateOpen(false);navigate('/mesas?asignar='+encodeURIComponent(r.ReservaID)+'&volverCodigo='+encodeURIComponent(r.CodigoReserva||'')+'&accion=sentar');return;}
     }
     if(nextState==='CANCELADA_LOCAL' && !['PENDIENTE','CONFIRMADA'].includes(r.Estado)){
@@ -140,8 +134,8 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
     }
     if(r.Estado==='CONFIRMADA'){
       return esFechaPasada(r.FechaReserva,String(r.HoraReserva).slice(0,5))
-        ? [['FINALIZADA','FINALIZAR','finalizada'],['CANCELADA_LOCAL','CANCELAR','cancelar'],['NO_PRESENTADO','NO ASISTIÓ','no-presentado']]
-        : [['CANCELADA_LOCAL','CANCELAR','cancelar']];
+        ? [['SENTADA','SENTAR','sentar'],['FINALIZADA','FINALIZAR','finalizada'],['CANCELADA_LOCAL','CANCELAR','cancelar'],['NO_PRESENTADO','NO ASISTIÓ','no-presentado']]
+        : [['SENTADA','SENTAR','sentar'],['CANCELADA_LOCAL','CANCELAR','cancelar']];
     }
     if(r.Estado==='SENTADA'){
       return esFechaPasada(r.FechaReserva,String(r.HoraReserva).slice(0,5))
