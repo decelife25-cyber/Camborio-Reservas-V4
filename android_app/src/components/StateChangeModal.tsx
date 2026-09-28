@@ -37,7 +37,6 @@ function estadoLabel(status: string) {
 export default function StateChangeModal({
   reserva,
   open,
-  lightTheme,
   onClose,
   onUpdated,
 }: {
