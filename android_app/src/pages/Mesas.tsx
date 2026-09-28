@@ -28,7 +28,7 @@ type Reserva = {
   Email?: string | null;
 };
 
-type NuevaReservaBorrador = { nombre:string; telefono:string; personas:number; fecha:string; horaReserva:string; observaciones:string };
+type NuevaReservaBorrador = { nombre:string; telefono:string; personas:number; fecha:string; horaReserva:string; observaciones:string; mesa?:string; mesasAdicionales?:string[] };
 
 type ConfirmModal = {
   titulo: string;
@@ -206,7 +206,7 @@ export default function Mesas() {
       if(reserva){
         const hora=Number(String(reserva.HoraReserva||'00').slice(0,2)); setFecha(reserva.FechaReserva); setTurno(hora>=18?'CENA':'COMIDA');
         const mesasAsignadas=parseAssignedTables(reserva); setAssignmentTables(mesasAsignadas); assignmentTablesRef.current=mesasAsignadas; assignmentOriginalRef.current=[...mesasAsignadas];
-        if(reserva.Zona==='TERRAZA')setZona('terraza'); else if(reserva.Zona==='CHILL OUT'||reserva.Zona==='CHILLOUT')setZona('chillout'); else setZona('salon');
+        if(reserva.Zona==='TERRAZA')setZona('terraza'); else if(reserva.Zona==='CHILL OUT'||reserva.Zona==='CHILLOUT')setZona('chillout'); else setZona('terraza');
       }
     })();
     return()=>{alive=false};
@@ -376,8 +376,9 @@ export default function Mesas() {
           FechaModificacion:ahora,OrigenReserva:'PRIVADO',CreadaPor:user?.email||'PRIVADO',UsuarioEstado:user?.email||'PRIVADO'
         }).select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,Zona,MesasAdicionales,Turno').single();
         if(insertError){savingRef.current=false;setSaving(false);setError(insertError.message);return;}
-        try{sessionStorage.removeItem('camborio_nueva_reserva_borrador')}catch{}
-        savingRef.current=false;setSaving(false);navigate('/');return;
+        savingRef.current=false;setSaving(false);
+        try{sessionStorage.setItem('camborio_nueva_reserva_borrador',JSON.stringify({...nuevaBorrador,mesa:principal||'',mesasAdicionales:adicionales}));}catch{}
+        navigate('/reservas');return;
       }
       const {data,error:updateError}=await supabase.from('Reservas').update({Mesa:principal,MesasAdicionales:adicionales.length?adicionales.join(', '):null,Zona:zonaAsignada,Turno:turno,FechaModificacion:new Date().toISOString()}).eq('ReservaID',assignmentReserva!.ReservaID).select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,Zona,MesasAdicionales,Turno').single();
       if(updateError){savingRef.current=false;setSaving(false);setError(updateError.message);return;}
