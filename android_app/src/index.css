@@ -3434,14 +3434,17 @@ html.light .cr-nueva-reserva__mesa--asignada strong{
 }
 .cr-planos-mesas__panel.cr-planos-mesas__panel--asignacion{
   box-sizing:border-box!important;
-  width:calc(100vw - 12px)!important;
-  min-width:calc(100vw - 12px)!important;
-  max-width:calc(100vw - 12px)!important;
-  height:calc(100dvh - 12px)!important;
-  min-height:calc(100dvh - 12px)!important;
+  /* El .private-app está calibrado a escala 0.57. El modal debe recuperar
+     el ancho físico completo, sin comprimir el plano de mesas. */
+  width:min(1280px,calc((100vw - 12px)/.57))!important;
+  min-width:min(1280px,calc((100vw - 12px)/.57))!important;
+  max-width:min(1280px,calc((100vw - 12px)/.57))!important;
+  /* Más alto para que el plano conserve su tamaño y el botón quede DENTRO. */
+  height:125dvh!important;
+  min-height:125dvh!important;
   max-height:none!important;
   margin:0!important;
-  overflow:visible!important;
+  overflow:hidden!important;
   display:flex!important;
   flex-direction:column!important;
   padding:12px!important;
@@ -3466,11 +3469,11 @@ html.light .cr-nueva-reserva__mesa--asignada strong{
 @media(max-width:620px){
   .cr-planos-mesas.cr-planos-mesas--asignacion{padding:6px!important}
   .cr-planos-mesas__panel.cr-planos-mesas__panel--asignacion{
-    width:calc(100vw - 12px)!important;
-    min-width:calc(100vw - 12px)!important;
-    max-width:calc(100vw - 12px)!important;
-    height:calc(100dvh - 12px)!important;
-    min-height:calc(100dvh - 12px)!important;
+    width:min(1280px,calc((100vw - 12px)/.57))!important;
+    min-width:min(1280px,calc((100vw - 12px)/.57))!important;
+    max-width:min(1280px,calc((100vw - 12px)/.57))!important;
+    height:125dvh!important;
+    min-height:125dvh!important;
     max-height:none!important;
     padding:12px!important;
   }
