@@ -3342,3 +3342,7 @@ html.light .cr-reserva-card--confirmada .cr-reserva-confirmar__estado,
 html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-card--confirmada .cr-reserva-estado,
 html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha--confirmada .cr-busqueda-ficha__estado{border-color:var(--estado-confirmada);color:var(--estado-confirmada)}
 html.light .status-modal-confirmada{background:rgba(21,116,71,.12)}
+
+/* El botón de estado de la ficha debe usar exactamente el mismo verde que CONFIRMADA en el modal y en la tarjeta. */
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha--confirmada .cr-busqueda-ficha__estado{border-color:var(--estado-confirmada)!important;color:var(--estado-confirmada)!important}
+html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha--confirmada .cr-busqueda-ficha__estado{border-color:var(--estado-confirmada)!important;color:var(--estado-confirmada)!important}
