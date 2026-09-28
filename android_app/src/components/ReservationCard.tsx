@@ -30,6 +30,15 @@ function statusLabel(status: string) {
   return status.replaceAll('_', ' ');
 }
 
+function parseAssignedTablesValue(value: unknown): string[] {
+  if (Array.isArray(value)) return value.flatMap(parseAssignedTablesValue);
+  if (value === null || value === undefined) return [];
+  const raw=String(value).trim();
+  if (!raw) return [];
+  if (raw.startsWith('[')) { try { return parseAssignedTablesValue(JSON.parse(raw)); } catch {} }
+  return raw.split(',').map(v=>v.replace(/[^0-9]/g,'').trim()).filter(Boolean);
+}
+
 function mesaValida(mesa: string | null) {
   const value = String(mesa || '').trim().toUpperCase();
   return Boolean(value && !['SIN ASIGNAR', 'NULL', 'UNDEFINED'].includes(value));
@@ -68,7 +77,7 @@ export default function ReservationCard({
     setTableChangeOpen(true);
   };
 
-  const assignedTables = [reserva.Mesa, ...(String(reserva.MesasAdicionales || '').split(',').map(v => v.trim()).filter(Boolean))].filter(Boolean) as string[];
+  const assignedTables = [...parseAssignedTablesValue(reserva.Mesa), ...parseAssignedTablesValue(reserva.MesasAdicionales)];
   const mesaLabel = assignedTables.length ? 'MESA ' + assignedTables[0] + (assignedTables.length > 1 ? ' (+' + (assignedTables.length - 1) + ')' : '') : 'SIN ASIGNAR';
 
   return (
