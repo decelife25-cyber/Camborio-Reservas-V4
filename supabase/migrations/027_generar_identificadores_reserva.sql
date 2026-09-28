@@ -1,5 +1,4 @@
 -- Genera los identificadores que necesita cualquier alta directa de Reservas.
--- V4 usa ReservaID para editar/actualizar y CodigoReserva para localizar la reserva.
 create unique index if not exists "Reservas_CodigoReserva_unique"
   on public."Reservas" ("CodigoReserva")
   where "CodigoReserva" is not null;
@@ -22,7 +21,7 @@ begin
 
   if nullif(trim(new."CodigoReserva"), '') is null then
     loop
-      v_bytes := gen_random_bytes(6);
+      v_bytes := decode(md5(random()::text || clock_timestamp()::text || new."ReservaID"::text), 'hex');
       v_codigo := '';
       for v_i in 0..5 loop
         v_codigo := v_codigo || substr(v_alfabeto, (get_byte(v_bytes, v_i) % 32) + 1, 1);
@@ -40,7 +39,6 @@ end;
 $$;
 
 drop trigger if exists "Reservas_generar_identificadores_before_insert" on public."Reservas";
-
 create trigger "Reservas_generar_identificadores_before_insert"
 before insert on public."Reservas"
 for each row
