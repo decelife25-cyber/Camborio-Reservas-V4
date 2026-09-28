@@ -3426,49 +3426,37 @@ html.light .cr-nueva-reserva__mesa--asignada strong{
 
 
 
-/* ===== Correcciones 1.0.077 ===== */
-.cr-planos-mesas__panel--asignacion{
-  height:calc(100vh - 24px)!important;
-  max-height:none!important;
-  overflow:auto!important;
-}
-.cr-planos-mesas__panel--asignacion .cr-planos-mesas__canvas{
-  height:405px!important;
-  min-height:405px!important;
-}
-.cr-planos-mesas__panel--asignacion .cr-planos-mesas__canvas-wrap{padding:8px!important}
-.cr-planos-mesas__panel--asignacion .cr-planos-mesas__assignment-actions{margin-top:8px!important}
-.cr-planos-mesas__panel--asignacion .cr-planos-mesas__assignment-actions button{min-height:58px!important}
-html.light .table-button--asignada,html.light .cr-nueva-reserva__mesa--asignada{
-  background:#b89a42!important;color:#111!important;border-color:#9f8438!important;
-}
-html.light .table-button--asignada *,html.light .cr-nueva-reserva__mesa--asignada *{color:#111!important;}
-
-/* ===== Correcciones 1.0.078: modal asignar mesa ===== */
+/* ===== Corrección definitiva modal ASIGNAR MESA ===== */
 .cr-planos-mesas.cr-planos-mesas--asignacion{
+  padding:6px!important;
   align-items:center!important;
+  justify-items:center!important;
 }
 .cr-planos-mesas__panel.cr-planos-mesas__panel--asignacion{
   box-sizing:border-box!important;
-  height:auto!important;
-  min-height:calc(100dvh - 24px)!important;
-  max-height:calc(100dvh - 12px)!important;
+  width:calc(100vw - 12px)!important;
+  min-width:calc(100vw - 12px)!important;
+  max-width:calc(100vw - 12px)!important;
+  height:calc(100dvh - 12px)!important;
+  min-height:calc(100dvh - 12px)!important;
+  max-height:none!important;
+  margin:0!important;
   overflow:visible!important;
-  padding-bottom:16px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  padding:12px!important;
 }
 .cr-planos-mesas__panel--asignacion .cr-planos-mesas__canvas{
   height:405px!important;
   min-height:405px!important;
-  flex:none!important;
+  flex:0 0 405px!important;
 }
 .cr-planos-mesas__panel--asignacion .cr-planos-mesas__assignment-actions{
-  display:block!important;
-  position:relative!important;
+  flex:0 0 auto!important;
   margin-top:8px!important;
   padding-bottom:0!important;
 }
 .cr-planos-mesas__panel--asignacion .cr-planos-mesas__assignment-actions button{
-  display:block!important;
   width:100%!important;
   min-height:58px!important;
   height:58px!important;
@@ -3476,31 +3464,14 @@ html.light .table-button--asignada *,html.light .cr-nueva-reserva__mesa--asignad
   box-sizing:border-box!important;
 }
 @media(max-width:620px){
- .cr-planos-mesas{padding:6px!important;align-items:center!important}
- .cr-planos-mesas__panel.cr-planos-mesas__panel--asignacion{
-   width:100%!important;
-   max-width:none!important;
-   min-height:calc(100dvh - 12px)!important;
-   max-height:calc(100dvh - 12px)!important;
-   padding:12px!important;
-   overflow:visible!important;
- }
-}
-
-/* ===== Corrección 1.0.079: anchura original + altura sin recortar ===== */
-.cr-planos-mesas__panel.cr-planos-mesas__panel--asignacion{
-  width:min(1280px,100%)!important;
-  min-width:0!important;
-  max-width:none!important;
-  min-height:calc(100dvh - 24px)!important;
-  height:auto!important;
-  max-height:calc(100dvh - 12px)!important;
-  overflow:visible!important;
-}
-@media(max-width:620px){
+  .cr-planos-mesas.cr-planos-mesas--asignacion{padding:6px!important}
   .cr-planos-mesas__panel.cr-planos-mesas__panel--asignacion{
-    width:100%!important;
+    width:calc(100vw - 12px)!important;
+    min-width:calc(100vw - 12px)!important;
+    max-width:calc(100vw - 12px)!important;
+    height:calc(100dvh - 12px)!important;
     min-height:calc(100dvh - 12px)!important;
-    max-height:calc(100dvh - 12px)!important;
+    max-height:none!important;
+    padding:12px!important;
   }
 }
