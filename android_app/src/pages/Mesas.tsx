@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import FechaPicker from '../components/FechaPicker';
+import { getTurnoFromHora } from '../utils/shifts';
 
 type Turno = 'COMIDA' | 'CENA';
 type Zona = 'terraza' | 'salon' | 'chillout';
@@ -26,6 +27,8 @@ type Reserva = {
   Turno: string | null;
   Email?: string | null;
 };
+
+type NuevaReservaBorrador = { nombre:string; telefono:string; personas:number; fecha:string; horaReserva:string; observaciones:string; mesa?:string; mesasAdicionales?:string[] };
 
 type ConfirmModal = {
   titulo: string;
@@ -134,7 +137,7 @@ export default function Mesas() {
   const [fecha, setFecha] = useState(todayMadrid());
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [turno, setTurno] = useState<Turno>('COMIDA');
-  const [zona, setZona] = useState<Zona>('salon');
+  const [zona, setZona] = useState<Zona>('terraza');
   const [reservas, setReservas] = useState<Reserva[]>([]);
   const [mesasConfig, setMesasConfig] = useState<Record<string, MesaConfig>>({});
   const [loading, setLoading] = useState(true);
@@ -142,15 +145,16 @@ export default function Mesas() {
   const [selectedTable, setSelectedTable] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const assignmentId = searchParams.get('asignar');
+  const nuevaAssignment = searchParams.get('nueva') === '1';
   const volverCodigo = searchParams.get('volverCodigo') || '';
-  const accion = searchParams.get('accion') || '';
   const [assignmentReserva, setAssignmentReserva] = useState<Reserva | null>(null);
-  const [, setAssignmentTables] = useState<string[]>([]);
+  const [nuevaBorrador, setNuevaBorrador] = useState<NuevaReservaBorrador | null>(null);
+  const [assignmentTables, setAssignmentTables] = useState<string[]>([]);
   const assignmentTablesRef = useRef<string[]>([]);
   const assignmentOriginalRef = useRef<string[]>([]);
   const savingRef = useRef(false);
   const [confirmModal, setConfirmModal] = useState<ConfirmModal | null>(null);
-  const assignmentMode = Boolean(assignmentId);
+  const assignmentMode = Boolean(assignmentId || nuevaAssignment);
 
   const cargar = useCallback(async () => {
     setLoading(true);
@@ -175,36 +179,40 @@ export default function Mesas() {
   useEffect(() => { void cargar(); }, [cargar]);
 
   useEffect(() => {
-    if (!assignmentId) {
-      setAssignmentReserva(null);
-      setAssignmentTables([]);
-      assignmentTablesRef.current = [];
-      assignmentOriginalRef.current = [];
-      setConfirmModal(null);
+    if (!assignmentId && !nuevaAssignment) {
+      setAssignmentReserva(null); setNuevaBorrador(null);
+      setAssignmentTables([]); assignmentTablesRef.current=[]; assignmentOriginalRef.current=[]; setConfirmModal(null);
       return;
     }
-    let alive = true;
-    (async () => {
-      const { data, error } = await supabase.from('Reservas').select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,Zona,MesasAdicionales,Turno,Email').eq('ReservaID', assignmentId).maybeSingle();
-      if (!alive) return;
-      if (error) { setError(error.message); return; }
-      const reserva = (data || null) as Reserva | null;
-      setAssignmentReserva(reserva);
-      if (reserva) {
-        const hora = Number(String(reserva.HoraReserva || '00').slice(0,2));
-        setFecha(reserva.FechaReserva);
-        setTurno(hora >= 18 ? 'CENA' : 'COMIDA');
-        const mesasAsignadas = parseAssignedTables(reserva);
-        setAssignmentTables(mesasAsignadas);
-        assignmentTablesRef.current = mesasAsignadas;
-        assignmentOriginalRef.current = [...mesasAsignadas];
-        if (reserva.Zona === 'TERRAZA') setZona('terraza');
-        else if (reserva.Zona === 'CHILL OUT' || reserva.Zona === 'CHILLOUT') setZona('chillout');
-        else setZona('salon');
+    let alive=true;
+    (async()=>{
+      if(nuevaAssignment && !assignmentId){
+        try{
+          const raw=sessionStorage.getItem('camborio_nueva_reserva_borrador');
+          const borrador=raw?JSON.parse(raw) as NuevaReservaBorrador:null;
+          if(!borrador?.nombre||!borrador?.fecha||!borrador?.horaReserva){setError('No se encontraron los datos de la nueva reserva.');return;}
+          if(!alive)return;
+          const mesasBorrador = [borrador.mesa, ...(Array.isArray(borrador.mesasAdicionales) ? borrador.mesasAdicionales : [])]
+            .map(v => String(v || '').trim())
+            .filter(Boolean);
+          setNuevaBorrador(borrador); setAssignmentReserva(null); setFecha(borrador.fecha);
+          setTurno(getTurnoFromHora(borrador.horaReserva)); setZona('terraza');
+          setAssignmentTables(mesasBorrador); assignmentTablesRef.current=[...mesasBorrador]; assignmentOriginalRef.current=[...mesasBorrador];
+          return;
+        }catch{setError('No se pudieron recuperar los datos de la nueva reserva.');return;}
+      }
+      const {data,error}=await supabase.from('Reservas').select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,Zona,MesasAdicionales,Turno,Email').eq('ReservaID',assignmentId).maybeSingle();
+      if(!alive)return;
+      if(error){setError(error.message);return;}
+      const reserva=(data||null) as Reserva|null; setAssignmentReserva(reserva); setNuevaBorrador(null);
+      if(reserva){
+        const hora=Number(String(reserva.HoraReserva||'00').slice(0,2)); setFecha(reserva.FechaReserva); setTurno(hora>=18?'CENA':'COMIDA');
+        const mesasAsignadas=parseAssignedTables(reserva); setAssignmentTables(mesasAsignadas); assignmentTablesRef.current=mesasAsignadas; assignmentOriginalRef.current=[...mesasAsignadas];
+        if(reserva.Zona==='TERRAZA')setZona('terraza'); else if(reserva.Zona==='CHILL OUT'||reserva.Zona==='CHILLOUT')setZona('chillout'); else setZona('terraza');
       }
     })();
-    return () => { alive = false; };
-  }, [assignmentId]);
+    return()=>{alive=false};
+  }, [assignmentId,nuevaAssignment]);
 
   const layout = PLANOS[zona];
   const reservaSeleccionada = selectedTable ? reservationForTable(reservas, selectedTable) : null;
@@ -278,30 +286,8 @@ export default function Mesas() {
     setSaving(false);
   };
 
-  const assignmentSet = new Set(assignmentTablesRef.current);
+  const assignmentSet = new Set(assignmentTables);
   const assignmentOriginalSet = new Set(assignmentOriginalRef.current);
-
-  const pintarSeleccionMesas = (next: string[]) => {
-    const original = new Set(assignmentOriginalRef.current);
-    document.querySelectorAll<HTMLElement>('.cr-planos-mesas__mesa').forEach(el => {
-      const mesa = el.dataset.mesaNumero || '';
-      if (!mesa) return;
-      el.classList.remove('cr-planos-mesas__mesa--principal','cr-planos-mesas__mesa--adicional','cr-planos-mesas__mesa--seleccionada');
-      if (!next.includes(mesa)) el.classList.add('cr-planos-mesas__mesa--disponible');
-      else if (original.has(mesa)) el.classList.add(next[0] === mesa ? 'cr-planos-mesas__mesa--principal' : 'cr-planos-mesas__mesa--adicional');
-      else el.classList.add('cr-planos-mesas__mesa--seleccionada');
-    });
-    const resumen=document.querySelector<HTMLElement>('[data-cr-asignacion-resumen]');
-    if(resumen){
-      resumen.textContent=next.length?next.join(', '):'SIN ASIGNAR';
-      resumen.classList.toggle('cr-planos-mesas__asignacion--asignada',next.join(',')===assignmentOriginalRef.current.join(','));
-      resumen.classList.toggle('cr-planos-mesas__asignacion--pendiente',next.length>0&&next.join(',')!==assignmentOriginalRef.current.join(','));
-    }
-    const etiqueta=document.querySelector<HTMLElement>('[data-cr-asignacion-etiqueta]');
-    if(etiqueta) etiqueta.textContent=next.length===1?'MESA ASIGNADA':'MESAS ASIGNADAS';
-    const guardar=document.querySelector<HTMLButtonElement>('[data-cr-guardar-asignacion]');
-    if(guardar) guardar.disabled=next.join(',')===assignmentOriginalRef.current.join(',');
-  };
 
   const toggleAssignmentTable = (numero:string) => {
     if(!assignmentMode || mesasConfig[numero]?.Activa===false)return;
@@ -311,10 +297,10 @@ export default function Mesas() {
     const indice=current.indexOf(numero);
     const next=indice===0?[]:indice!==-1?current.filter(x=>x!==numero):[...current,numero];
     assignmentTablesRef.current=next;
-    pintarSeleccionMesas(next);
+    setAssignmentTables(next);
   };
 
-  const tieneCambiosAsignacion=()=>assignmentTablesRef.current.join(',')!==assignmentOriginalRef.current.join(',');
+  const tieneCambiosAsignacion=()=>assignmentTables.join(',')!==assignmentOriginalRef.current.join(',');
 
   const cerrarAsignacion=()=>{
     if(!assignmentMode||savingRef.current)return;
@@ -335,53 +321,94 @@ export default function Mesas() {
     });
   };
 
-  const guardarAsignacion=()=>{
-    if(!assignmentReserva||savingRef.current||saving)return;
-    const mesasActualesLista=assignmentOriginalRef.current;
-    const mesasSeleccionadas=[...assignmentTablesRef.current];
-    const asignacionNueva=mesasSeleccionadas.join(', ');
-    const quitarAsignacion=mesasSeleccionadas.length===0&&mesasActualesLista.length>0;
-    if(!asignacionNueva&&!quitarAsignacion){setError('Selecciona al menos una mesa antes de guardar.');return;}
-    let mensaje='';
-    if(quitarAsignacion)mensaje='¿Quitar la asignación de '+(mesasActualesLista.length===1?'mesa':'mesas')+' '+mesasActualesLista.join(', ')+' y dejar esta reserva sin mesa asignada?';
-    else if(mesasActualesLista.length)mensaje='¿Cambiar de '+(mesasActualesLista.length===1?'mesa':'mesas')+' '+mesasActualesLista.join(', ')+' a '+(mesasSeleccionadas.length===1?'mesa':'mesas')+' '+asignacionNueva+'?';
-    else mensaje='¿Asignar '+(mesasSeleccionadas.length===1?'mesa':'mesas')+' '+asignacionNueva+' a esta reserva?';
-    setConfirmModal({
-      titulo:'CONFIRMAR MESA',
-      mensaje,
-      cancelar:'CANCELAR',
-      aceptar:'CONFIRMAR',
-      alCancelar:()=>setConfirmModal(null),
-      alAceptar:async()=>{
-        setConfirmModal(null);
-        savingRef.current=true;setSaving(true);setError('');
-        const principal=mesasSeleccionadas[0]||null;
-        const adicionales=mesasSeleccionadas.slice(1);
-        const principalLayout=Object.values(PLANOS).flatMap(p=>p.mesas).find(m=>m.numero===principal);
-        const zonaAsignada=principalLayout?principalLayout.zona.toUpperCase().replace('CHILLOUT','CHILL OUT'):null;
-        const {data,error:updateError}=await supabase.from('Reservas').update({
-          Mesa:principal,MesasAdicionales:adicionales.length?adicionales.join(', '):null,Zona:zonaAsignada,Turno:turno,FechaModificacion:new Date().toISOString()
-        }).eq('ReservaID',assignmentReserva.ReservaID).select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,Zona,MesasAdicionales,Turno').single();
-        if(updateError){savingRef.current=false;setSaving(false);setError(updateError.message);return;}
-        let persistida=(data||{...assignmentReserva,Mesa:principal,MesasAdicionales:adicionales.length?adicionales.join(', '):null,Zona:zonaAsignada,Turno:turno}) as Reserva;
-        if(accion==='sentar'){
-          if(persistida.Estado==='PENDIENTE'){
-            const confirmacion=await supabase.from('Reservas').update({Estado:'CONFIRMADA',FechaModificacion:new Date().toISOString()}).eq('ReservaID',persistida.ReservaID).select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,Zona,MesasAdicionales,Turno').single();
-            if(confirmacion.error){savingRef.current=false;setSaving(false);setError(confirmacion.error.message);return;}
-            persistida=(confirmacion.data||persistida) as Reserva;
-          }
-          const sentar=await supabase.from('Reservas').update({Estado:'SENTADA',FechaEstado:new Date().toISOString(),FechaModificacion:new Date().toISOString()}).eq('ReservaID',persistida.ReservaID).select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,Zona,MesasAdicionales,Turno').single();
-          if(sentar.error){savingRef.current=false;setSaving(false);setError(sentar.error.message);return;}
-          persistida=(sentar.data||persistida) as Reserva;
-        }
-        assignmentOriginalRef.current=[...mesasSeleccionadas];assignmentTablesRef.current=[...mesasSeleccionadas];
-        setAssignmentTables([...mesasSeleccionadas]);setAssignmentReserva(persistida);
-        savingRef.current=false;setSaving(false);
-        if(volverCodigo)navigate('/buscar?codigo='+encodeURIComponent(volverCodigo));else navigate('/');
-      }
-    });
-  };
+  const guardarAsignacion = async () => {
+    if ((!assignmentReserva && !nuevaBorrador) || savingRef.current || saving) return;
 
+    const mesasSeleccionadas = [...assignmentTablesRef.current];
+    const principal = mesasSeleccionadas[0] || null;
+    const adicionales = mesasSeleccionadas.slice(1);
+    const asignacionNueva = mesasSeleccionadas.join(', ');
+
+    if (nuevaBorrador) {
+      if (!asignacionNueva) {
+        setError('Selecciona al menos una mesa antes de volver a la reserva.');
+        return;
+      }
+      try {
+        setError('');
+        savingRef.current = true;
+        setSaving(true);
+        sessionStorage.setItem('camborio_nueva_reserva_borrador', JSON.stringify({
+          ...nuevaBorrador,
+          mesa: principal || '',
+          mesasAdicionales: adicionales,
+        }));
+        savingRef.current = false;
+        setSaving(false);
+        navigate('/reservas?desdeMesa=1');
+      } catch (err: any) {
+        savingRef.current = false;
+        setSaving(false);
+        setError(err?.message || 'No se pudo volver al formulario de reserva.');
+      }
+      return;
+    }
+
+    if (!assignmentReserva?.ReservaID) return;
+
+    try {
+      setError('');
+      savingRef.current = true;
+      setSaving(true);
+
+      const principalLayout = Object.values(PLANOS)
+        .flatMap(p => p.mesas)
+        .find(m => m.numero === principal);
+      const zonaAsignada = principalLayout
+        ? principalLayout.zona.toUpperCase().replace('CHILLOUT', 'CHILL OUT')
+        : null;
+
+      const { error: updateError } = await supabase
+        .from('Reservas')
+        .update({
+          Mesa: principal,
+          MesasAdicionales: adicionales.length ? adicionales.join(', ') : null,
+          Zona: zonaAsignada,
+          Turno: turno,
+          FechaModificacion: new Date().toISOString(),
+        })
+        .eq('ReservaID', assignmentReserva.ReservaID);
+
+      if (updateError) throw updateError;
+
+      const persistida = {
+        ...assignmentReserva,
+        Mesa: principal,
+        MesasAdicionales: adicionales.length ? adicionales.join(', ') : null,
+        Zona: zonaAsignada,
+        Turno: turno,
+      } as Reserva;
+
+      assignmentOriginalRef.current = [...mesasSeleccionadas];
+      assignmentTablesRef.current = [...mesasSeleccionadas];
+      setAssignmentTables([...mesasSeleccionadas]);
+
+      savingRef.current = false;
+      setSaving(false);
+
+      if (volverCodigo || persistida.CodigoReserva) {
+        const codigo = volverCodigo || persistida.CodigoReserva || '';
+        navigate('/buscar?codigo=' + encodeURIComponent(codigo));
+      } else {
+        navigate('/');
+      }
+    } catch (err: any) {
+      savingRef.current = false;
+      setSaving(false);
+      console.error('Error guardando asignación de mesas', err);
+      setError(err?.hint || err?.message || 'No se pudo guardar la asignación de mesas.');
+    }
+  };
   const estado: 'disponible' | 'reservada' | 'ocupada' | 'desactivada' = selectedTable && mesasConfig[selectedTable]?.Activa === false ? 'desactivada' : (selectedTable ? visualState(reservaSeleccionada) : 'disponible');
 
   const mesasVisibles = useMemo(() => layout.mesas.map(m => ({
@@ -398,7 +425,7 @@ export default function Mesas() {
           <button type="button" className="cr-planos-mesas__cerrar" onClick={assignmentMode ? cerrarAsignacion : () => navigate('/')}>CERRAR</button>
         </header>
 
-        {assignmentMode && assignmentReserva ? <div className="cr-planos-mesas__reserva-info"><div><span>NOMBRE</span><strong>{assignmentReserva.Nombre || 'SIN NOMBRE'}</strong></div><div className="cr-planos-mesas__reserva-fecha">📅 {formatHeaderDate(assignmentReserva.FechaReserva)}</div><div className="cr-planos-mesas__reserva-grid"><div><span data-cr-asignacion-etiqueta>{assignmentTablesRef.current.length === 1 ? 'MESA ASIGNADA' : 'MESAS ASIGNADAS'}</span><strong data-cr-asignacion-resumen className={assignmentOriginalRef.current.length ? 'cr-planos-mesas__asignacion--asignada' : ''}>{assignmentTablesRef.current.length ? assignmentTablesRef.current.join(', ') : 'SIN ASIGNAR'}</strong></div><div><span>TELÉFONO</span><strong>{assignmentReserva.Telefono || '—'}</strong></div><div><span>HORA</span><strong>{String(assignmentReserva.HoraReserva).slice(0,5)}</strong></div><div><span>PERSONAS</span><strong>{assignmentReserva.Personas || 0} PAX</strong></div></div></div> : <button className="cr-planos-mesas__fecha" type="button" onClick={() => setCalendarOpen(true)} aria-label="Cambiar fecha">📅 {formatHeaderDate(fecha)}</button>}
+        {assignmentMode ? <div className="cr-planos-mesas__reserva-info"><div><span>NOMBRE</span><strong>{assignmentReserva?.Nombre || nuevaBorrador?.nombre || 'SIN NOMBRE'}</strong></div><div className="cr-planos-mesas__reserva-fecha">📅 {formatHeaderDate(assignmentReserva?.FechaReserva || nuevaBorrador?.fecha || fecha)}</div><div className="cr-planos-mesas__reserva-grid"><div><span data-cr-asignacion-etiqueta>{assignmentTables.length === 1 ? 'MESA ASIGNADA' : 'MESAS ASIGNADAS'}</span><strong data-cr-asignacion-resumen className={assignmentOriginalRef.current.length ? 'cr-planos-mesas__asignacion--asignada' : ''}>{assignmentTables.length ? assignmentTables.join(', ') : 'SIN ASIGNAR'}</strong></div><div><span>TELÉFONO</span><strong>{assignmentReserva?.Telefono || nuevaBorrador?.telefono || '—'}</strong></div><div><span>HORA</span><strong>{String(assignmentReserva?.HoraReserva || nuevaBorrador?.horaReserva || '').slice(0,5)}</strong></div><div><span>PERSONAS</span><strong>{assignmentReserva?.Personas || nuevaBorrador?.personas || 0} PAX</strong></div></div></div> : <button className="cr-planos-mesas__fecha" type="button" onClick={() => setCalendarOpen(true)} aria-label="Cambiar fecha">📅 {formatHeaderDate(fecha)}</button>}
 
         {!assignmentMode && <div className="cr-planos-mesas__turnos" role="tablist" aria-label="Turnos">
           <button type="button" className={turno === 'COMIDA' ? 'activo' : ''} onClick={() => setTurno('COMIDA')}>☀ COMIDA</button>
@@ -433,8 +460,7 @@ export default function Mesas() {
                 )}
                 data-mesa-numero={mesa.numero}
                 style={{ '--mesa-x': mesa.x + '%', '--mesa-y': mesa.y + '%' } as CSSProperties}
-                onPointerDown={assignmentMode ? (event) => { event.preventDefault(); toggleAssignmentTable(mesa.numero); } : undefined}
-                onClick={!assignmentMode ? () => setSelectedTable(mesa.numero) : undefined}
+                onClick={assignmentMode ? () => toggleAssignmentTable(mesa.numero) : () => setSelectedTable(mesa.numero)}
                 aria-label={'Mesa ' + mesa.numero + ' ' + mesa.estado}
               >
                 {mesa.numero}
@@ -453,7 +479,7 @@ export default function Mesas() {
           <span><i className="desactivada" />DESACTIVADA</span>
         </div>
 
-        {assignmentMode && <div className="cr-planos-mesas__assignment-actions"><div>SELECCIONA UNA O VARIAS MESAS Y PULSA GUARDAR ASIGNACIÓN PARA ACTUALIZAR LA RESERVA.</div><button type="button" className="primario" data-cr-guardar-asignacion disabled={saving || !tieneCambiosAsignacion()} onClick={guardarAsignacion}>{saving ? 'GUARDANDO...' : 'GUARDAR ASIGNACIÓN'}</button></div>}
+        {assignmentMode && <div className="cr-planos-mesas__assignment-actions"><div>SELECCIONA UNA O VARIAS MESAS Y PULSA GUARDAR ASIGNACIÓN PARA ACTUALIZAR LA RESERVA.</div><button type="button" className="primario" data-cr-guardar-asignacion disabled={saving || (Boolean(nuevaBorrador) && assignmentTables.length === 0)} onClick={() => void guardarAsignacion()}>{saving ? 'GUARDANDO...' : 'GUARDAR ASIGNACIÓN'}</button></div>}
         {error && <div className="cr-planos-mesas__error">{error}</div>}
       </div>
 

@@ -1488,7 +1488,7 @@ html.light .v2-edit-cancel-full{
 }
 .status-cancelada-local,.status-cancelada-cliente{color:#ff4d58;border-color:#ff4d58;background:rgba(255,77,88,.12)}
 .status-no-presentado{color:#c5162e;border-color:#c5162e;background:rgba(197,22,46,.12)}
-.v2-edit-overlay{position:fixed;inset:0;z-index:10020;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.86)}.v2-edit-modal{position:relative;width:min(520px,94vw);box-sizing:border-box;padding:24px;border:1px solid #ffc400;border-radius:16px;background:linear-gradient(180deg,#111 0,#050505 100%);box-shadow:0 20px 60px rgba(0,0,0,.72),inset 0 1px 0 rgba(255,255,255,.08);text-align:center;color:#fff}.v2-edit-modal h3{margin:0 0 10px;color:#ffc400;font:1000 24px/1.05 Arial,sans-serif;letter-spacing:.4px}.v2-state-current{display:inline-flex;align-items:center;justify-content:center;min-width:min(360px,100%);margin:0 auto 16px;padding:14px 18px;border:2px solid currentColor;border-radius:12px;background:rgba(255,255,255,.06);font:1000 32px/1 Arial,sans-serif;letter-spacing:.4px;text-transform:uppercase}.status-modal-pendiente{color:#ffc400;background:rgba(255,196,0,.12)}.status-modal-confirmada{color:#05d677;background:rgba(5,214,119,.12)}.status-modal-sentada{color:#58aaff;background:rgba(88,170,255,.12)}.status-modal-finalizada{color:#d6d6d6;background:rgba(214,214,214,.1)}.status-modal-cancelada-cliente,.status-modal-cancelada-local{color:#ff4d58;background:rgba(255,77,88,.12)}.status-modal-no-presentado{color:#c5162e;background:rgba(197,22,46,.16)}.v2-edit-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:22px}.v2-state-action{min-height:54px;border:0;border-radius:9px;color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.18);font:1000 18px/1 Arial,sans-serif;cursor:pointer;text-transform:uppercase}.v2-state-action--confirmar{background:linear-gradient(180deg,#1bbf62,#087b35)}.v2-state-action--sentar{background:linear-gradient(180deg,#2388ff,#0754bd)}.v2-state-action--finalizar{background:linear-gradient(180deg,#475569,#1e293b)}.v2-state-action--cancelar{background:linear-gradient(180deg,#ef4444,#991b1b)}.v2-state-action--no-presentado{background:linear-gradient(180deg,#f59e0b,#b45309)}.v2-state-action:disabled{opacity:.6;cursor:wait}.v2-edit-cancel-full{width:100%;min-height:54px;margin-top:10px;border:1px solid #ffc400;border-radius:9px;background:linear-gradient(180deg,#ffe27a 0,#d6d0bd 100%);color:#161616;font:1000 18px/1 Arial,sans-serif;text-transform:uppercase}.reservation-code-button{border:0;background:transparent;padding:0;color:inherit;font:inherit;cursor:pointer}.reservation-code-button:disabled{cursor:default}.reservation-code-button:not(:disabled){color:#ffc400;text-decoration:none}.v2-state-modal .cr-nueva-reserva__mensaje{margin:0 0 14px}.v2-state-modal .cr-nueva-reserva__mensaje[data-tipo=error]{border-color:#ff4d58;color:#ffb3b8;background:rgba(197,22,46,.12)}@media(max-width:620px){
+.v2-edit-overlay{position:fixed;inset:0;z-index:10020;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.86)}.v2-edit-modal{position:relative;width:min(520px,94vw);box-sizing:border-box;padding:24px;border:1px solid #ffc400;border-radius:16px;background:linear-gradient(180deg,#111 0,#050505 100%);box-shadow:0 20px 60px rgba(0,0,0,.72),inset 0 1px 0 rgba(255,255,255,.08);text-align:center;color:#fff}.v2-edit-modal h3{margin:0 0 10px;color:#ffc400;font:1000 24px/1.05 Arial,sans-serif;letter-spacing:.4px}.v2-state-current{display:inline-flex;align-items:center;justify-content:center;min-width:0;width:auto;max-width:100%;margin:0 auto 12px;padding:8px 18px;border:1px solid currentColor;border-radius:8px;background:rgba(255,255,255,.06);font:1000 clamp(17px,4vw,20px)/1 Arial,sans-serif;letter-spacing:.4px;text-transform:uppercase}.status-modal-pendiente{color:#ffc400;background:rgba(255,196,0,.12)}.status-modal-confirmada{color:#05d677;background:rgba(5,214,119,.12)}.status-modal-sentada{color:#58aaff;background:rgba(88,170,255,.12)}.status-modal-finalizada{color:#d6d6d6;background:rgba(214,214,214,.1)}.status-modal-cancelada-cliente,.status-modal-cancelada-local{color:#ff4d58;background:rgba(255,77,88,.12)}.status-modal-no-presentado{color:#c5162e;background:rgba(197,22,46,.16)}.v2-edit-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:22px}.v2-state-action{min-height:54px;border:0;border-radius:9px;color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.18);font:1000 18px/1 Arial,sans-serif;cursor:pointer;text-transform:uppercase}.v2-state-action--confirmar{background:linear-gradient(180deg,#1bbf62,#087b35)}.v2-state-action--sentar{background:linear-gradient(180deg,#2388ff,#0754bd)}.v2-state-action--finalizar{background:linear-gradient(180deg,#475569,#1e293b)}.v2-state-action--cancelar{background:linear-gradient(180deg,#ef4444,#991b1b)}.v2-state-action--no-presentado{background:linear-gradient(180deg,#f59e0b,#b45309)}.v2-state-action:disabled{opacity:.6;cursor:wait}.v2-edit-cancel-full{width:100%;min-height:54px;margin-top:10px;border:1px solid #ffc400;border-radius:9px;background:linear-gradient(180deg,#ffe27a 0,#d6d0bd 100%);color:#161616;font:1000 18px/1 Arial,sans-serif;text-transform:uppercase}.reservation-code-button{border:0;background:transparent;padding:0;color:inherit;font:inherit;cursor:pointer}.reservation-code-button:disabled{cursor:default}.reservation-code-button:not(:disabled){color:#ffc400;text-decoration:none}.v2-state-modal .cr-nueva-reserva__mensaje{margin:0 0 14px}.v2-state-modal .cr-nueva-reserva__mensaje[data-tipo=error]{border-color:#ff4d58;color:#ffb3b8;background:rgba(197,22,46,.12)}@media(max-width:620px){
  .v2-new-reservation-overlay{padding:42px 6px 10px}.v2-new-reservation-panel{width:min(76vw,710px);max-height:calc(100svh - 54px);padding:14px 12px}.v2-new-reservation-header h2{font-size:clamp(23px,5.5vw,30px)}.v2-new-reservation-close{min-height:46px;font-size:13px;padding:0 10px}.v2-new-reservation-form{grid-template-columns:1.62fr 1fr 1fr;gap:12px 7px}.v2-new-reservation-form input{min-height:58px;font-size:19px}.v2-personas-field{grid-column:1/-1}.v2-personas-control{min-height:72px}.v2-wheel-wrap{height:118px}.v2-wheel-item{height:40px}.v2-wheel-spacer{height:39px}.v2-wheel-item.is-current{font-size:32px}.v2-mesa-field{grid-column:2/4}.v2-mesa-button{min-height:96px;font-size:22px}.v2-create-button{min-height:58px;font-size:20px}
  .v2-search-form{padding:10px;gap:10px}.v2-search-form label{font-size:17px}.v2-search-controls{grid-template-columns:1fr}.v2-search-controls input,.v2-search-controls button{min-height:62px;font-size:22px}.v2-search-card-head{align-items:flex-start;flex-direction:column}.v2-search-state{width:100%}.v2-search-blocks{grid-template-columns:repeat(2,minmax(0,1fr))}.v2-search-blocks button{min-height:78px}.v2-search-actions{flex-direction:column}.v2-search-client strong{font-size:30px}.v2-search-client>span{font-size:18px}
 }
@@ -3307,4 +3307,166 @@ html.light .v2-state-modal .ficha-state-current{
   .v2-state-modal .ficha-state-button,
   .ficha-state-actions .ficha-state-button{min-height:60px!important}
   .v2-edit-modal .ficha-result-actions .cr-confirmacion-mesa__boton{min-height:58px!important}
+}
+
+/* Modal CAMBIAR ESTADO único para RESERVAS HOY, ficha y CALENDARIO. */
+.state-change-modal{width:min(380px,calc(100vw - 40px))!important;padding:20px!important;border-radius:16px!important}
+.state-change-modal h3{margin-bottom:10px!important}
+.state-change-modal .ficha-state-actions{display:grid!important;grid-template-columns:1fr!important;gap:10px!important;margin-top:18px!important}
+.state-change-modal .ficha-state-button{min-height:60px!important;border-radius:9px!important}
+.state-change-modal .ficha-state-button--cancelada-local,.state-change-modal .ficha-state-button--cancelada-cliente{border-color:#ff4d58!important;background:linear-gradient(180deg,#ff4d58,#b3131d)!important;color:#fff!important}
+.state-change-modal .ficha-state-button--no-presentado{border-color:#ff8a00!important;background:linear-gradient(180deg,#f59e0b,#b45309)!important;color:#1b1000!important}
+.state-change-modal .v2-edit-cancel-full{min-height:56px!important;margin-top:10px!important}
+
+/* COLOR ÚNICO DEL ESTADO CONFIRMADA: el indicador de la tarjeta, fecha,
+   ficha/modal y calendario deben usar exactamente el mismo verde. */
+:root{--estado-confirmada:#05d677}
+.status-confirmada,
+.status-modal-confirmada,
+.v2-search-card--confirmada .v2-search-state,
+.cr-reserva-card--confirmada .cr-reserva-estado,
+.cr-reserva-card--confirmada .cr-reserva-confirmar__estado,
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-card--confirmada .cr-reserva-estado,
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha--confirmada .cr-busqueda-ficha__estado,
+.cr-reserva-acciones__boton--confirmar,
+.cr-reserva-acciones__boton--finalizar{border-color:var(--estado-confirmada);color:var(--estado-confirmada)}
+.status-modal-confirmada{background:rgba(5,214,119,.12)}
+html.light{
+  --estado-confirmada:#157447;
+}
+html.light .status-confirmada,
+html.light .status-modal-confirmada,
+html.light .v2-search-card--confirmada .v2-search-state,
+html.light .cr-reserva-card--confirmada .cr-reserva-estado,
+html.light .cr-reserva-card--confirmada .cr-reserva-confirmar__estado,
+html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-reserva-card--confirmada .cr-reserva-estado,
+html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha--confirmada .cr-busqueda-ficha__estado{border-color:var(--estado-confirmada);color:var(--estado-confirmada)}
+html.light .status-modal-confirmada{background:rgba(21,116,71,.12)}
+
+/* El botón de estado de la ficha debe usar exactamente el mismo verde que CONFIRMADA en el modal y en la tarjeta. */
+.cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha--confirmada .cr-busqueda-ficha__estado{border-color:var(--estado-confirmada)!important;color:var(--estado-confirmada)!important}
+html.light .cr-reservas-hoy[data-cr-vista-reservas=buscar] .cr-busqueda-ficha--confirmada .cr-busqueda-ficha__estado{border-color:var(--estado-confirmada)!important;color:var(--estado-confirmada)!important}
+
+
+/* ===== 1.0.074: código de reserva y mesas ===== */
+.cr-nueva-reserva__mensaje[data-tipo=info]{
+  border-style:solid;
+  border-color:rgba(255,196,0,.42);
+  background:rgba(255,196,0,.06);
+  color:#f2f2f2;
+}
+.cr-nueva-reserva__codigo-destacado{
+  display:inline-block;
+  margin-left:5px;
+  padding:5px 10px;
+  border:1px solid #ffc400;
+  border-radius:6px;
+  background:rgba(255,196,0,.16);
+  color:#ffc400;
+  font:1000 1.08em/1 Arial,sans-serif;
+  letter-spacing:1px;
+}
+.reservation-code{
+  display:inline-flex;
+  align-items:center;
+  border:1px solid #8c7100;
+  border-radius:5px;
+  padding:3px 8px;
+  background:rgba(255,196,0,.05);
+}
+.cr-reserva-card__codigo,
+.cr-reserva-confirmar__codigo,
+.cr-busqueda-ficha__codigo{
+  display:inline-flex!important;
+  align-items:center;
+  border:1px solid rgba(255,196,0,.55)!important;
+  border-radius:6px!important;
+  padding:4px 8px!important;
+  background:rgba(255,196,0,.07)!important;
+  box-sizing:border-box;
+}
+.observation-button{
+  margin-left:8px!important;
+}
+.cr-reserva-card__codigo-icon,
+.cr-reserva-confirmar__codigo-icon,
+.cr-busqueda-ficha__codigo-icon{
+  margin-left:2px;
+}
+
+/* Mesa asignada: amarillo sólido con texto negro, igual en noche y día. */
+.table-button--asignada,
+.cr-busqueda-ficha__bloque--mesa-asignada,
+.cr-nueva-reserva__mesa--asignada{
+  background:linear-gradient(180deg,#ffd83a 0,#ffc400 58%,#edae00 100%)!important;
+  color:#050505!important;
+  border-color:#ffc400!important;
+}
+.table-button--asignada{font-weight:1000!important;}
+.cr-busqueda-ficha__bloque--mesa-asignada span,
+.cr-busqueda-ficha__bloque--mesa-asignada strong,
+.cr-nueva-reserva__mesa--asignada span,
+.cr-nueva-reserva__mesa--asignada strong{
+  color:#050505!important;
+}
+html.light .table-button--asignada,
+html.light .cr-busqueda-ficha__bloque--mesa-asignada,
+html.light .cr-nueva-reserva__mesa--asignada{
+  background:linear-gradient(180deg,#ffd83a 0,#ffc400 58%,#edae00 100%)!important;
+  color:#050505!important;
+  border-color:#c89d00!important;
+}
+html.light .cr-busqueda-ficha__bloque--mesa-asignada span,
+html.light .cr-busqueda-ficha__bloque--mesa-asignada strong,
+html.light .cr-nueva-reserva__mesa--asignada span,
+html.light .cr-nueva-reserva__mesa--asignada strong{
+  color:#050505!important;
+}
+
+
+
+
+/* ===== Corrección definitiva modal ASIGNAR MESA ===== */
+/* ASIGNAR MESA: mantener el ancho físico del plano y hacer que el modal crezca con su contenido.
+   No se modifica el tamaño del canvas ni se comprime el plano. */
+.cr-planos-mesas__panel.cr-planos-mesas__panel--asignacion{
+  box-sizing:border-box!important;
+  width:min(94vw,760px)!important;
+  min-width:0!important;
+  max-width:760px!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  margin:0!important;
+  overflow:visible!important;
+  display:block!important;
+  padding:12px 12px 16px!important;
+}
+.cr-planos-mesas__panel--asignacion .cr-planos-mesas__canvas{
+  height:405px!important;
+  min-height:405px!important;
+  flex:0 0 405px!important;
+}
+.cr-planos-mesas__panel--asignacion .cr-planos-mesas__assignment-actions{
+  flex:0 0 auto!important;
+  margin-top:8px!important;
+  padding-bottom:0!important;
+}
+.cr-planos-mesas__panel--asignacion .cr-planos-mesas__assignment-actions button{
+  width:100%!important;
+  min-height:58px!important;
+  height:58px!important;
+  margin-top:10px!important;
+  box-sizing:border-box!important;
+}
+@media(max-width:620px){
+  .cr-planos-mesas__panel.cr-planos-mesas__panel--asignacion{
+    width:94vw!important;
+    min-width:0!important;
+    max-width:760px!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    padding:12px 12px 16px!important;
+  }
 }

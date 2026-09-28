@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { getTurnoFromHora } from '../utils/shifts';
 
@@ -109,33 +110,60 @@ export function Wheel({ values, value, onChange, kind }: { values:string[]; valu
 }
 
 export default function NuevaReserva(){
-  const[nombre,setNombre]=useState(''),[telefono,setTelefono]=useState(''),[personas,setPersonas]=useState(2);
-  const[fecha,setFecha]=useState(todayMadrid()),[hora,setHora]=useState('13'),[minutos,setMinutos]=useState('15');
-  const[mesa,setMesa]=useState(''),[observaciones,setObservaciones]=useState('');
+  const navigate=useNavigate();
+  const location=useLocation();
+  const desdeAsignacion=location.search.includes('desdeMesa=1');
+  const borradorInicial=useMemo(()=>{try{const raw=desdeAsignacion?sessionStorage.getItem('camborio_nueva_reserva_borrador'):null;return raw?JSON.parse(raw):null}catch{return null}},[desdeAsignacion]);
+  const[nombre,setNombre]=useState(borradorInicial?.nombre||''),[telefono,setTelefono]=useState(borradorInicial?.telefono||''),[personas,setPersonas]=useState<number>(Number(borradorInicial?.personas||2));
+  const[fecha,setFecha]=useState(borradorInicial?.fecha||todayMadrid()),[hora,setHora]=useState(String(borradorInicial?.horaReserva||'13:15').slice(0,2)),[minutos,setMinutos]=useState(String(borradorInicial?.horaReserva||'13:15').slice(3,5));
+  const[mesa,setMesa]=useState(borradorInicial?.mesa||''),[mesasAdicionales,setMesasAdicionales]=useState<string[]>(Array.isArray(borradorInicial?.mesasAdicionales)?(borradorInicial.mesasAdicionales as string[]):[]),[observaciones,setObservaciones]=useState(borradorInicial?.observaciones||'');
   const[saving,setSaving]=useState(false),[message,setMessage]=useState(''),[error,setError]=useState('');
+  const [lastCodigo,setLastCodigo]=useState('');
   const [calendarOpen,setCalendarOpen]=useState(false);
   const [calendarMonth,setCalendarMonth]=useState(()=>{const d=parseISODate(todayMadrid());return new Date(d.getFullYear(),d.getMonth(),1)});
   const [calendarDraft,setCalendarDraft]=useState(fecha);
   const horaReserva=useMemo(()=>hora+':'+minutos,[hora,minutos]);
 
+  async function crearReservaBase(){
+    setError('');setMessage('');
+    if(!nombre.trim()){setError('Introduce el nombre del cliente.');return null;}
+    const fechaHora=new Date(fecha+'T'+horaReserva+':00');
+    if(Number.isNaN(fechaHora.getTime())||fechaHora.getTime()<Date.now()-60000){setError('No puedes usar una fecha u hora pasada.');return null;}
+    if(telefono.trim()){
+      const{data:dup,error:de}=await supabase.from('Reservas').select('ReservaID,Turno,Estado').eq('FechaReserva',fecha).eq('Telefono',telefono.trim());
+      if(de)throw de;
+      const turno=getTurnoFromHora(horaReserva);
+      if((dup||[]).some((r:any)=>r.Turno===turno&&!['CANCELADA_CLIENTE','CANCELADA_LOCAL'].includes(r.Estado))){setError('Ya existe una reserva activa con este teléfono para ese día y turno.');return null;}
+    }
+    const{data,error:ie}=await supabase.from('Reservas').insert({Nombre:nombre.trim(),Telefono:telefono.trim()||null,Personas:personas,FechaReserva:fecha,HoraReserva:horaReserva,Turno:getTurnoFromHora(horaReserva),Mesa:mesa.trim()||null,MesasAdicionales:mesasAdicionales.length?mesasAdicionales.join(', '):null,Observaciones:observaciones.trim()||null,Estado:'CONFIRMADA'}).select('ReservaID,CodigoReserva').single();
+    if(ie)throw ie;
+    if(!data?.ReservaID)throw new Error('La reserva se creó pero no devolvió su identificador.');
+    const codigo=data.CodigoReserva||'—';
+    setLastCodigo(codigo);
+    setMessage('RESERVA REALIZADA');
+    setNombre('');setTelefono('');setPersonas(2);setMesa('');setMesasAdicionales([]);setObservaciones('');try{sessionStorage.removeItem('camborio_nueva_reserva_borrador')}catch{}
+    return {ReservaID:data.ReservaID,CodigoReserva:codigo};
+  }
+
   async function guardar(e:React.FormEvent){
-    e.preventDefault();setError('');setMessage('');
+    e.preventDefault();
+    setSaving(true);
+    try{ await crearReservaBase(); }
+    catch(err:any){console.error(err);setError(err?.message||'No se pudo crear la reserva.')}
+    finally{setSaving(false)}
+  }
+
+  function cerrarNuevaReserva(){try{sessionStorage.removeItem('camborio_nueva_reserva_borrador')}catch{} window.history.back();}
+  async function asignarMesaDesdeNuevaReserva(){
+    if(saving)return;
+    setError('');setMessage('');
     if(!nombre.trim()){setError('Introduce el nombre del cliente.');return;}
     const fechaHora=new Date(fecha+'T'+horaReserva+':00');
     if(Number.isNaN(fechaHora.getTime())||fechaHora.getTime()<Date.now()-60000){setError('No puedes usar una fecha u hora pasada.');return;}
-    setSaving(true);
     try{
-      if(telefono.trim()){
-        const{data:dup,error:de}=await supabase.from('Reservas').select('ReservaID,Turno,Estado').eq('FechaReserva',fecha).eq('Telefono',telefono.trim());
-        if(de)throw de;
-        const turno=getTurnoFromHora(horaReserva);
-        if((dup||[]).some((r:any)=>r.Turno===turno&&!['CANCELADA_CLIENTE','CANCELADA_LOCAL'].includes(r.Estado))){setError('Ya existe una reserva activa con este teléfono para ese día y turno.');setSaving(false);return;}
-      }
-      const{data,error:ie}=await supabase.from('Reservas').insert({Nombre:nombre.trim(),Telefono:telefono.trim()||null,Personas:personas,FechaReserva:fecha,HoraReserva:horaReserva,Turno:getTurnoFromHora(horaReserva),Mesa:mesa.trim()||null,MesasAdicionales:null,Observaciones:observaciones.trim()||null,Estado:'CONFIRMADA'}).select('CodigoReserva').single();
-      if(ie)throw ie;
-      setMessage('RESERVA REALIZADA · CÓDIGO '+(data?.CodigoReserva||'—'));
-      setNombre('');setTelefono('');setPersonas(2);setMesa('');setObservaciones('');
-    }catch(err:any){console.error(err);setError(err?.message||'No se pudo crear la reserva.')}finally{setSaving(false)}
+      sessionStorage.setItem('camborio_nueva_reserva_borrador',JSON.stringify({nombre:nombre.trim(),telefono:telefono.trim(),personas,fecha,horaReserva,observaciones:observaciones.trim(),mesa:mesa.trim(),mesasAdicionales}));
+      navigate('/mesas?nueva=1');
+    }catch(err:any){console.error(err);setError(err?.message||'No se pudo abrir la asignación de mesas.')}
   }
 
   return <section className="cr-nueva-reserva" aria-labelledby="crNuevaReservaTitulo">
@@ -143,7 +171,7 @@ export default function NuevaReserva(){
     <div className="cr-nueva-reserva__panel">
       <header className="cr-nueva-reserva__header">
         <div><h2 id="crNuevaReservaTitulo">CREAR NUEVA RESERVA</h2></div>
-        <button className="cr-nueva-reserva__cerrar" type="button" onClick={()=>window.history.back()}>X CERRAR</button>
+        <button className="cr-nueva-reserva__cerrar" type="button" onClick={cerrarNuevaReserva}>X CERRAR</button>
       </header>
       <form className="cr-nueva-reserva__form" onSubmit={guardar}>
         <label className="cr-nueva-reserva__campo-completo">Nombre<input type="text" value={nombre} onChange={e=>setNombre(e.target.value)} autoComplete="name" placeholder="Nombre del cliente" required /></label>
@@ -159,9 +187,9 @@ export default function NuevaReserva(){
           <input className="cr-nueva-reserva__fecha-input-oculto" type="date" min={todayMadrid()} value={fecha} onChange={e=>setFecha(e.target.value)} required aria-hidden="true" tabIndex={-1} />
           <button className="cr-nueva-reserva__fecha-boton" type="button" onClick={()=>{setCalendarDraft(fecha);const d=parseISODate(fecha);setCalendarMonth(new Date(d.getFullYear(),d.getMonth(),1));setCalendarOpen(true)}}>{formatDateES(fecha)}<span aria-hidden="true">▾</span></button>
         </label>
-        <button className="cr-nueva-reserva__mesa" type="button" onClick={()=>setMesa('')}><span>Mesa asignada</span><strong>{mesa.trim()?'MESA '+mesa.trim():'SIN ASIGNAR'}</strong></button>
+        <button className={'cr-nueva-reserva__mesa'+(mesa.trim()?' cr-nueva-reserva__mesa--asignada':'')} type="button" onClick={()=>void asignarMesaDesdeNuevaReserva()} disabled={saving}><span>Mesa asignada</span><strong>{mesa.trim()?('MESA '+mesa.trim()+(mesasAdicionales.length?' (+'+mesasAdicionales.length+')':'')):'SIN ASIGNAR'}</strong></button>
         <label className="cr-nueva-reserva__campo-completo">Observaciones<textarea rows={2} value={observaciones} onChange={e=>setObservaciones(e.target.value)} placeholder="Observaciones sobre la reserva"/></label>
-        {(error||message)&&<div className="cr-nueva-reserva__mensaje" data-tipo={error?'error':'info'}>{error||message}</div>}
+        {(error||message)&&<div className="cr-nueva-reserva__mensaje" data-tipo={error?'error':'info'}>{error ? error : <><span>RESERVA REALIZADA · CÓDIGO</span> <strong className="cr-nueva-reserva__codigo-destacado">{lastCodigo||'—'}</strong></>}</div>}
         <div className="cr-nueva-reserva__acciones"><button className="cr-button cr-button--primary" type="submit" disabled={saving}>{saving?'GUARDANDO...':'CREAR RESERVA'}</button></div>
       </form>
       {calendarOpen && <div className="cr-fecha-picker" role="dialog" aria-modal="true" aria-label="Seleccionar fecha">
