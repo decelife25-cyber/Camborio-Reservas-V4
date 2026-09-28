@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { getTurnoFromHora } from '../utils/shifts';
 
@@ -49,7 +49,7 @@ export function Wheel({ values, value, onChange, kind }: { values:string[]; valu
 
   useEffect(()=>{
     return ()=>{if(encajeRef.current!==null)window.clearTimeout(encajeRef.current);};
-  },[]);
+  },[desdeAsignacion]);
 
   const programarEncaje=()=>{
     const control=controlRef.current;
@@ -111,7 +111,9 @@ export function Wheel({ values, value, onChange, kind }: { values:string[]; valu
 
 export default function NuevaReserva(){
   const navigate=useNavigate();
-  const borradorInicial=useMemo(()=>{try{const raw=sessionStorage.getItem('camborio_nueva_reserva_borrador');return raw?JSON.parse(raw):null}catch{return null}},[]);
+  const location=useLocation();
+  const desdeAsignacion=location.search.includes('desdeMesa=1');
+  const borradorInicial=useMemo(()=>{try{const raw=desdeAsignacion?sessionStorage.getItem('camborio_nueva_reserva_borrador'):null;return raw?JSON.parse(raw):null}catch{return null}},[]);
   const[nombre,setNombre]=useState(borradorInicial?.nombre||''),[telefono,setTelefono]=useState(borradorInicial?.telefono||''),[personas,setPersonas]=useState<number>(Number(borradorInicial?.personas||2));
   const[fecha,setFecha]=useState(borradorInicial?.fecha||todayMadrid()),[hora,setHora]=useState(String(borradorInicial?.horaReserva||'13:15').slice(0,2)),[minutos,setMinutos]=useState(String(borradorInicial?.horaReserva||'13:15').slice(3,5));
   const[mesa,setMesa]=useState(borradorInicial?.mesa||''),[mesasAdicionales,setMesasAdicionales]=useState<string[]>(Array.isArray(borradorInicial?.mesasAdicionales)?(borradorInicial.mesasAdicionales as string[]):[]),[observaciones,setObservaciones]=useState(borradorInicial?.observaciones||'');
@@ -151,6 +153,7 @@ export default function NuevaReserva(){
     finally{setSaving(false)}
   }
 
+  function cerrarNuevaReserva(){try{sessionStorage.removeItem('camborio_nueva_reserva_borrador')}catch{} window.history.back();}
   async function asignarMesaDesdeNuevaReserva(){
     if(saving)return;
     setError('');setMessage('');
@@ -168,7 +171,7 @@ export default function NuevaReserva(){
     <div className="cr-nueva-reserva__panel">
       <header className="cr-nueva-reserva__header">
         <div><h2 id="crNuevaReservaTitulo">CREAR NUEVA RESERVA</h2></div>
-        <button className="cr-nueva-reserva__cerrar" type="button" onClick={()=>window.history.back()}>X CERRAR</button>
+        <button className="cr-nueva-reserva__cerrar" type="button" onClick={cerrarNuevaReserva}>X CERRAR</button>
       </header>
       <form className="cr-nueva-reserva__form" onSubmit={guardar}>
         <label className="cr-nueva-reserva__campo-completo">Nombre<input type="text" value={nombre} onChange={e=>setNombre(e.target.value)} autoComplete="name" placeholder="Nombre del cliente" required /></label>
