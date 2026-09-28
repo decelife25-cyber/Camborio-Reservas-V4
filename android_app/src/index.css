@@ -3424,45 +3424,31 @@ html.light .cr-nueva-reserva__mesa--asignada strong{
 }
 
 
-/* ===== 1.0.075: mesas asignadas, asignación sin scroll y terraza por defecto ===== */
-html.light .table-button--asignada,
-html.light .cr-busqueda-ficha__bloque--mesa-asignada,
-html.light .cr-nueva-reserva__mesa--asignada{
-  background:#b89a42!important;
-  color:#fff!important;
-  border-color:#9f8438!important;
-}
-html.light .cr-busqueda-ficha__bloque--mesa-asignada span,
-html.light .cr-busqueda-ficha__bloque--mesa-asignada strong,
-html.light .cr-nueva-reserva__mesa--asignada span,
-html.light .cr-nueva-reserva__mesa--asignada strong{
-  color:#fff!important;
-}
+
+/* ===== Correcciones 1.0.076 ===== */
 .cr-planos-mesas__panel--asignacion{
-  max-height:calc(100vh - 8px)!important;
+  height:min(860px,calc(100svh - 24px))!important;
+  max-height:calc(100svh - 24px)!important;
   overflow:hidden!important;
 }
 .cr-planos-mesas__panel--asignacion .cr-planos-mesas__canvas{
-  height:min(50vh,440px);
-  min-height:330px;
+  height:405px!important;
+  min-height:405px!important;
 }
-@media(max-width:620px){
-  .cr-planos-mesas__panel--asignacion{
-    max-height:calc(100vh - 4px)!important;
-    padding:8px!important;
-  }
-  .cr-planos-mesas__panel--asignacion .cr-planos-mesas__canvas{
-    height:330px!important;
-    min-height:330px!important;
-  }
-  .cr-planos-mesas__panel--asignacion .cr-planos-mesas__canvas-wrap{
-    padding:4px!important;
-  }
-  .cr-planos-mesas__panel--asignacion .cr-planos-mesas__assignment-actions{
-    margin-top:4px!important;
-  }
-  .cr-planos-mesas__panel--asignacion .cr-planos-mesas__assignment-actions button{
-    min-height:56px!important;
-    margin-top:6px!important;
-  }
+.cr-planos-mesas__panel--asignacion .cr-planos-mesas__canvas-wrap{
+  padding:8px!important;
 }
+.cr-planos-mesas__panel--asignacion .cr-planos-mesas__assignment-actions{
+  margin-top:8px!important;
+}
+.cr-planos-mesas__panel--asignacion .cr-planos-mesas__assignment-actions button{
+  min-height:58px!important;
+}
+html.light .table-button--asignada,
+html.light .cr-nueva-reserva__mesa--asignada{
+  background:#b89a42!important;
+  color:#111!important;
+  border-color:#9f8438!important;
+}
+html.light .table-button--asignada *,
+html.light .cr-nueva-reserva__mesa--asignada *{color:#111!important;}
