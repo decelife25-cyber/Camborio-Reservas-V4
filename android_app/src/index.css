@@ -3478,10 +3478,29 @@ html.light .table-button--asignada *,html.light .cr-nueva-reserva__mesa--asignad
 @media(max-width:620px){
  .cr-planos-mesas{padding:6px!important;align-items:center!important}
  .cr-planos-mesas__panel.cr-planos-mesas__panel--asignacion{
-   width:calc(100vw - 12px)!important;
+   width:100%!important;
+   max-width:none!important;
    min-height:calc(100dvh - 12px)!important;
    max-height:calc(100dvh - 12px)!important;
    padding:12px!important;
    overflow:visible!important;
  }
+}
+
+/* ===== Corrección 1.0.079: anchura original + altura sin recortar ===== */
+.cr-planos-mesas__panel.cr-planos-mesas__panel--asignacion{
+  width:min(1280px,100%)!important;
+  min-width:0!important;
+  max-width:none!important;
+  min-height:calc(100dvh - 24px)!important;
+  height:auto!important;
+  max-height:calc(100dvh - 12px)!important;
+  overflow:visible!important;
+}
+@media(max-width:620px){
+  .cr-planos-mesas__panel.cr-planos-mesas__panel--asignacion{
+    width:100%!important;
+    min-height:calc(100dvh - 12px)!important;
+    max-height:calc(100dvh - 12px)!important;
+  }
 }
