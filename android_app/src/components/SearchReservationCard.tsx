@@ -118,7 +118,7 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
       }
     }
     if(nextState==='NO_PRESENTADO'){
-      if(!['PENDIENTE','CONFIRMADA','SENTADA'].includes(r.Estado) || !esFechaPasada(r.FechaReserva)){
+      if(!['PENDIENTE','CONFIRMADA','SENTADA'].includes(r.Estado) || !esFechaPasada(r.FechaReserva,String(r.HoraReserva).slice(0,5))){
         setError('Solo se puede marcar NO ASISTIÓ en una reserva activa ya pasada.');return;
       }
     }
