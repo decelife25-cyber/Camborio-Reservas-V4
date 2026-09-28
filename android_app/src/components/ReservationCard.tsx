@@ -30,21 +30,8 @@ function statusLabel(status: string) {
   return status.replaceAll('_', ' ');
 }
 
-function isToday(fecha: string) {
-  return fecha === new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
-}
-
 function madridNowTime() {
   return new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Madrid', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date());
-}
-
-function getActiveTurno(): 'COMIDA' | 'CENA' {
-  const hour = Number(new Intl.DateTimeFormat('en-GB', {
-    timeZone: 'Europe/Madrid',
-    hour: '2-digit',
-    hour12: false,
-  }).format(new Date()));
-  return hour >= 18 ? 'CENA' : 'COMIDA';
 }
 
 function mesaValida(mesa: string | null) {
