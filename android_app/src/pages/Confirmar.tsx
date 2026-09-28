@@ -83,6 +83,7 @@ export default function Confirmar() {
     }
 
     setReservas(current => current.filter(item => item.ReservaID !== reserva.ReservaID));
+    window.dispatchEvent(new Event('camborio-pending-count-change'));
     setConfirming(null);
   }
 
