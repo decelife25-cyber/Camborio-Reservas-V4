@@ -27,6 +27,8 @@ type Reserva = {
   Email?: string | null;
 };
 
+type NuevaReservaBorrador = { nombre:string; telefono:string; personas:number; fecha:string; horaReserva:string; observaciones:string };
+
 type ConfirmModal = {
   titulo: string;
   mensaje: string;
@@ -134,7 +136,7 @@ export default function Mesas() {
   const [fecha, setFecha] = useState(todayMadrid());
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [turno, setTurno] = useState<Turno>('COMIDA');
-  const [zona, setZona] = useState<Zona>('salon');
+  const [zona, setZona] = useState<Zona>('terraza');
   const [reservas, setReservas] = useState<Reserva[]>([]);
   const [mesasConfig, setMesasConfig] = useState<Record<string, MesaConfig>>({});
   const [loading, setLoading] = useState(true);
@@ -142,15 +144,17 @@ export default function Mesas() {
   const [selectedTable, setSelectedTable] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const assignmentId = searchParams.get('asignar');
+  const nuevaAssignment = searchParams.get('nueva') === '1';
   const volverCodigo = searchParams.get('volverCodigo') || '';
   const accion = searchParams.get('accion') || '';
   const [assignmentReserva, setAssignmentReserva] = useState<Reserva | null>(null);
+  const [nuevaBorrador, setNuevaBorrador] = useState<NuevaReservaBorrador | null>(null);
   const [, setAssignmentTables] = useState<string[]>([]);
   const assignmentTablesRef = useRef<string[]>([]);
   const assignmentOriginalRef = useRef<string[]>([]);
   const savingRef = useRef(false);
   const [confirmModal, setConfirmModal] = useState<ConfirmModal | null>(null);
-  const assignmentMode = Boolean(assignmentId);
+  const assignmentMode = Boolean(assignmentId || nuevaAssignment);
 
   const cargar = useCallback(async () => {
     setLoading(true);
@@ -175,36 +179,37 @@ export default function Mesas() {
   useEffect(() => { void cargar(); }, [cargar]);
 
   useEffect(() => {
-    if (!assignmentId) {
-      setAssignmentReserva(null);
-      setAssignmentTables([]);
-      assignmentTablesRef.current = [];
-      assignmentOriginalRef.current = [];
-      setConfirmModal(null);
+    if (!assignmentId && !nuevaAssignment) {
+      setAssignmentReserva(null); setNuevaBorrador(null);
+      setAssignmentTables([]); assignmentTablesRef.current=[]; assignmentOriginalRef.current=[]; setConfirmModal(null);
       return;
     }
-    let alive = true;
-    (async () => {
-      const { data, error } = await supabase.from('Reservas').select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,Zona,MesasAdicionales,Turno,Email').eq('ReservaID', assignmentId).maybeSingle();
-      if (!alive) return;
-      if (error) { setError(error.message); return; }
-      const reserva = (data || null) as Reserva | null;
-      setAssignmentReserva(reserva);
-      if (reserva) {
-        const hora = Number(String(reserva.HoraReserva || '00').slice(0,2));
-        setFecha(reserva.FechaReserva);
-        setTurno(hora >= 18 ? 'CENA' : 'COMIDA');
-        const mesasAsignadas = parseAssignedTables(reserva);
-        setAssignmentTables(mesasAsignadas);
-        assignmentTablesRef.current = mesasAsignadas;
-        assignmentOriginalRef.current = [...mesasAsignadas];
-        if (reserva.Zona === 'TERRAZA') setZona('terraza');
-        else if (reserva.Zona === 'CHILL OUT' || reserva.Zona === 'CHILLOUT') setZona('chillout');
-        else setZona('salon');
+    let alive=true;
+    (async()=>{
+      if(nuevaAssignment && !assignmentId){
+        try{
+          const raw=sessionStorage.getItem('camborio_nueva_reserva_borrador');
+          const borrador=raw?JSON.parse(raw) as NuevaReservaBorrador:null;
+          if(!borrador?.nombre||!borrador?.fecha||!borrador?.horaReserva){setError('No se encontraron los datos de la nueva reserva.');return;}
+          if(!alive)return;
+          setNuevaBorrador(borrador); setAssignmentReserva(null); setFecha(borrador.fecha);
+          setTurno(getTurnoFromHora(borrador.horaReserva)); setZona('terraza');
+          setAssignmentTables([]); assignmentTablesRef.current=[]; assignmentOriginalRef.current=[];
+          return;
+        }catch{setError('No se pudieron recuperar los datos de la nueva reserva.');return;}
+      }
+      const {data,error}=await supabase.from('Reservas').select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,Zona,MesasAdicionales,Turno,Email').eq('ReservaID',assignmentId).maybeSingle();
+      if(!alive)return;
+      if(error){setError(error.message);return;}
+      const reserva=(data||null) as Reserva|null; setAssignmentReserva(reserva); setNuevaBorrador(null);
+      if(reserva){
+        const hora=Number(String(reserva.HoraReserva||'00').slice(0,2)); setFecha(reserva.FechaReserva); setTurno(hora>=18?'CENA':'COMIDA');
+        const mesasAsignadas=parseAssignedTables(reserva); setAssignmentTables(mesasAsignadas); assignmentTablesRef.current=mesasAsignadas; assignmentOriginalRef.current=[...mesasAsignadas];
+        if(reserva.Zona==='TERRAZA')setZona('terraza'); else if(reserva.Zona==='CHILL OUT'||reserva.Zona==='CHILLOUT')setZona('chillout'); else setZona('salon');
       }
     })();
-    return () => { alive = false; };
-  }, [assignmentId]);
+    return()=>{alive=false};
+  }, [assignmentId,nuevaAssignment]);
 
   const layout = PLANOS[zona];
   const reservaSeleccionada = selectedTable ? reservationForTable(reservas, selectedTable) : null;
