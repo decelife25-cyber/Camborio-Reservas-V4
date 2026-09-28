@@ -368,7 +368,7 @@ export default function Mesas() {
           }
         }
         const ahora=new Date().toISOString();
-        const {data,error:insertError}=await supabase.from('Reservas').insert({
+        const {error:insertError}=await supabase.from('Reservas').insert({
           Nombre:nuevaBorrador.nombre,Telefono:nuevaBorrador.telefono||null,Personas:nuevaBorrador.personas,
           FechaReserva:nuevaBorrador.fecha,HoraReserva:nuevaBorrador.horaReserva,Turno:getTurnoFromHora(nuevaBorrador.horaReserva),
           Mesa:principal,MesasAdicionales:adicionales.length?adicionales.join(', '):null,Zona:zonaAsignada,
