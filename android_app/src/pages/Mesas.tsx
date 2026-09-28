@@ -147,6 +147,7 @@ export default function Mesas() {
   const assignmentId = searchParams.get('asignar');
   const nuevaAssignment = searchParams.get('nueva') === '1';
   const volverCodigo = searchParams.get('volverCodigo') || '';
+  const accion = searchParams.get('accion') || '';
   const [assignmentReserva, setAssignmentReserva] = useState<Reserva | null>(null);
   const [nuevaBorrador, setNuevaBorrador] = useState<NuevaReservaBorrador | null>(null);
   const [assignmentTables, setAssignmentTables] = useState<string[]>([]);
@@ -395,6 +396,33 @@ export default function Mesas() {
 
       savingRef.current = false;
       setSaving(false);
+
+      if (accion === 'sentar' && persistida.Mesa) {
+        const mesasTexto = parseAssignedTables(persistida).join(', ');
+        const codigo = volverCodigo || persistida.CodigoReserva || '';
+        setConfirmModal({
+          titulo: 'MESA ASIGNADA',
+          mensaje: 'RESERVA ASIGNADA A MESA ' + mesasTexto,
+          cancelar: 'CAMBIAR MESAS',
+          aceptar: 'SENTAR MESA',
+          alCancelar: () => setConfirmModal(null),
+          alAceptar: async () => {
+            const ahora = new Date().toISOString();
+            const { error: seatError } = await supabase
+              .from('Reservas')
+              .update({ Estado: 'SENTADA', FechaEstado: ahora, FechaModificacion: ahora })
+              .eq('ReservaID', persistida.ReservaID);
+            if (seatError) {
+              setError(seatError.message);
+              setConfirmModal(null);
+              return;
+            }
+            setConfirmModal(null);
+            navigate('/buscar?codigo=' + encodeURIComponent(codigo));
+          },
+        });
+        return;
+      }
 
       if (volverCodigo || persistida.CodigoReserva) {
         const codigo = volverCodigo || persistida.CodigoReserva || '';

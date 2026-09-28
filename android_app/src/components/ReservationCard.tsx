@@ -30,17 +30,8 @@ function statusLabel(status: string) {
   return status.replaceAll('_', ' ');
 }
 
-function isToday(fecha: string) {
-  return fecha === new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
-}
-
-function getActiveTurno(): 'COMIDA' | 'CENA' {
-  const hour = Number(new Intl.DateTimeFormat('en-GB', {
-    timeZone: 'Europe/Madrid',
-    hour: '2-digit',
-    hour12: false,
-  }).format(new Date()));
-  return hour >= 18 ? 'CENA' : 'COMIDA';
+function madridNowTime() {
+  return new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Madrid', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date());
 }
 
 function mesaValida(mesa: string | null) {
@@ -84,10 +75,9 @@ export default function ReservationCard({
     if (!mesaValida(reserva.Mesa)) { if (onAssignTable) { onAssignTable(reserva); } else { goAssignTable(false); } return; }
     setTableChangeOpen(true);
   };
-  const esReservaPasada = reserva.FechaReserva < new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
-  const esReservaHoy = isToday(reserva.FechaReserva);
-  const turnoActivo = reserva.Turno === getActiveTurno();
-
+  const hoyMadrid = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
+  const horaMadrid = madridNowTime();
+  const esReservaPasada = reserva.FechaReserva < hoyMadrid || (reserva.FechaReserva === hoyMadrid && formatTime(reserva.HoraReserva) < horaMadrid);
   const changeState = async (nextState: string) => {
     if (saving || readOnly) return;
     setSaving(true);
@@ -102,16 +92,6 @@ export default function ReservationCard({
     if (nextState === 'SENTADA') {
       if (reserva.Estado !== 'CONFIRMADA') {
         setError('Solo se pueden sentar reservas confirmadas.');
-        setSaving(false);
-        return;
-      }
-      if (!esReservaHoy) {
-        setError('Solo se puede sentar una reserva de HOY.');
-        setSaving(false);
-        return;
-      }
-      if (!turnoActivo) {
-        setError('La reserva pertenece a otro turno. Cambia al turno correspondiente para sentarla.');
         setSaving(false);
         return;
       }
@@ -182,23 +162,18 @@ export default function ReservationCard({
   const stateActions = (() => {
     if (reserva.Estado === 'PENDIENTE') {
       return esReservaPasada
-        ? [['FINALIZADA', 'FINALIZAR', 'finalizada'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']]
-        : [['CONFIRMADA', 'CONFIRMAR', 'confirmada'], ['MODIFICAR', 'MODIFICAR', 'modificar'], ['ASIGNAR_MESA', 'ASIGNAR MESA', 'asignar-mesa'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelada-local']];
+        ? [['FINALIZADA', 'FINALIZAR', 'finalizada'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']]
+        : [['CONFIRMADA', 'CONFIRMAR', 'confirmar'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar']];
     }
     if (reserva.Estado === 'CONFIRMADA') {
-      if (esReservaPasada) return [['FINALIZADA', 'FINALIZAR', 'finalizada'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']];
-      const acciones = [
-        ['MODIFICAR', 'MODIFICAR', 'modificar'],
-        [mesaValida(reserva.Mesa) ? 'CAMBIAR_MESA' : 'ASIGNAR_MESA', mesaValida(reserva.Mesa) ? 'CAMBIAR MESA' : 'ASIGNAR MESA', mesaValida(reserva.Mesa) ? 'cambiar-mesa' : 'asignar-mesa'],
-      ];
-      if (esReservaHoy && turnoActivo && mesaValida(reserva.Mesa)) acciones.push(['SENTADA', 'SENTAR', 'sentar']);
-      acciones.push(['CANCELADA_LOCAL', 'CANCELAR', 'cancelada-local']);
-      return acciones;
+      return esReservaPasada
+        ? [['SENTADA', 'SENTAR', 'sentar'], ['FINALIZADA', 'FINALIZAR', 'finalizada'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']]
+        : [['SENTADA', 'SENTAR', 'sentar'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar']];
     }
     if (reserva.Estado === 'SENTADA') {
       return esReservaPasada
-        ? [['FINALIZADA', 'FINALIZAR', 'finalizada'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']]
-        : [['CAMBIAR_MESA', 'CAMBIAR MESA', 'cambiar-mesa'], ['FINALIZADA', 'FINALIZAR', 'finalizada']];
+        ? [['FINALIZADA', 'FINALIZAR', 'finalizada'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']]
+        : [['FINALIZADA', 'FINALIZAR', 'finalizada']];
     }
     return [];
   })();
@@ -209,7 +184,7 @@ export default function ReservationCard({
   return (
     <>
       <article className="reservation-card">
-        <div className="reservation-time" onClick={() => !readOnly && setStateOpen(true)}>
+        <div className={'reservation-time' + (esReservaPasada ? ' reservation-time--pasada' : '')} onClick={() => !readOnly && setStateOpen(true)}>
           <span className={'status-pill status-' + reserva.Estado.toLowerCase().replaceAll('_', '-').replaceAll(' ', '-')}>
             {statusLabel(reserva.Estado)}
           </span>
