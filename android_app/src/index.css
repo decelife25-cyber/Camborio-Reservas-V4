@@ -3461,7 +3461,7 @@ html.light .cr-nueva-reserva__mesa--asignada strong{
 }
 @media(max-width:620px){
   .cr-planos-mesas__panel.cr-planos-mesas__panel--asignacion{
-    width:94vw!important;
+    width:calc(100vw - 24px)!important;
     min-width:0!important;
     max-width:760px!important;
     height:auto!important;
