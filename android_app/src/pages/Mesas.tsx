@@ -150,7 +150,7 @@ export default function Mesas() {
   const accion = searchParams.get('accion') || '';
   const [assignmentReserva, setAssignmentReserva] = useState<Reserva | null>(null);
   const [nuevaBorrador, setNuevaBorrador] = useState<NuevaReservaBorrador | null>(null);
-  const [, setAssignmentTables] = useState<string[]>([]);
+  const [assignmentTables, setAssignmentTables] = useState<string[]>([]);
   const assignmentTablesRef = useRef<string[]>([]);
   const assignmentOriginalRef = useRef<string[]>([]);
   const savingRef = useRef(false);
