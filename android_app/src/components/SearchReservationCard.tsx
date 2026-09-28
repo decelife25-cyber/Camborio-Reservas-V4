@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { getTurnoFromHora } from '../utils/shifts';
@@ -41,6 +41,8 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
   const[editing,setEditing]=useState<null|'fecha'|'hora'|'personas'|'observaciones'>(null);
   const[value,setValue]=useState('');
   const[stateOpen,setStateOpen]=useState(false);
+  const[lightTheme,setLightTheme]=useState(()=>document.documentElement.classList.contains('light'));
+  useEffect(()=>{const sync=()=>setLightTheme(document.documentElement.classList.contains('light'));sync();window.addEventListener('camborio-theme-change',sync);return()=>window.removeEventListener('camborio-theme-change',sync)},[]);
   const[saving,setSaving]=useState(false);
   const[dirty,setDirty]=useState(false);
   const[error,setError]=useState('');
@@ -232,7 +234,7 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
       </div>
     </div>}
     {stateOpen&&<div className="v2-edit-overlay" onClick={()=>setStateOpen(false)}>
-      <div className="v2-edit-modal v2-state-modal" onClick={e=>e.stopPropagation()}>
+      <div className={"v2-edit-modal v2-state-modal"+(lightTheme?" light-theme":"")} onClick={e=>e.stopPropagation()}>
         <h3>CAMBIAR ESTADO</h3>
         <div className={"v2-state-current ficha-state-current status-modal-"+r.Estado.toLowerCase().replaceAll("_","-")}>{stateLabel(r.Estado)}</div>
         <div className="v2-edit-actions ficha-state-actions">{stateActions.map(([s,label,kind])=><button className={"ficha-state-button ficha-state-button--"+String(kind||s).toLowerCase().replaceAll("_","-")} key={s} type="button" disabled={saving} onClick={()=>void changeState(s)}>{label}</button>)}</div>
