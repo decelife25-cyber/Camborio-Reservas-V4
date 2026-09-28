@@ -108,6 +108,10 @@ export default function Calendario() {
     fetchMonth();
   }, [year, month, daysInMonth]);
 
+  const handleUpdate = (updatedReserva: Partial<Reserva> & { ReservaID: string }) => {
+    setReservasMes(prev => prev.map(r => r.ReservaID === updatedReserva.ReservaID ? { ...r, ...updatedReserva } as Reserva : r));
+  };
+
   const counts = useMemo(() => {
     const map: Record<string, number> = {};
     for (const reserva of reservasMes) {
@@ -218,7 +222,7 @@ export default function Calendario() {
             <div className="calendar-empty-message">No hay reservas para esta fecha.</div>
           ) : (
             reservasSeleccionadas.map(reserva => (
-              <ReservationCard key={reserva.ReservaID} reserva={reserva} onAssignTable={r => navigate('/mesas?asignar=' + encodeURIComponent(r.ReservaID))} />
+              <ReservationCard key={reserva.ReservaID} reserva={reserva} onAssignTable={r => navigate('/mesas?asignar=' + encodeURIComponent(r.ReservaID))} onUpdate={handleUpdate} />
             ))
           )}
         </div>
