@@ -368,7 +368,7 @@ export default function Mesas() {
         ? principalLayout.zona.toUpperCase().replace('CHILLOUT', 'CHILL OUT')
         : null;
 
-      const { data, error: updateError } = await supabase
+      const { error: updateError } = await supabase
         .from('Reservas')
         .update({
           Mesa: principal,
@@ -377,19 +377,17 @@ export default function Mesas() {
           Turno: turno,
           FechaModificacion: new Date().toISOString(),
         })
-        .eq('ReservaID', assignmentReserva.ReservaID)
-        .select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,Zona,MesasAdicionales,Turno')
-        .single();
+        .eq('ReservaID', assignmentReserva.ReservaID);
 
       if (updateError) throw updateError;
 
-      const persistida = (data || {
+      const persistida = {
         ...assignmentReserva,
         Mesa: principal,
         MesasAdicionales: adicionales.length ? adicionales.join(', ') : null,
         Zona: zonaAsignada,
         Turno: turno,
-      }) as Reserva;
+      } as Reserva;
 
       assignmentOriginalRef.current = [...mesasSeleccionadas];
       assignmentTablesRef.current = [...mesasSeleccionadas];
@@ -481,7 +479,7 @@ export default function Mesas() {
           <span><i className="desactivada" />DESACTIVADA</span>
         </div>
 
-        {assignmentMode && <div className="cr-planos-mesas__assignment-actions"><div>SELECCIONA UNA O VARIAS MESAS Y PULSA GUARDAR ASIGNACIÓN PARA ACTUALIZAR LA RESERVA.</div><button type="button" className="primario" data-cr-guardar-asignacion disabled={saving || (Boolean(nuevaBorrador) && assignmentTables.length === 0)} onClick={() => void guardarAsignacion()}>{saving ? 'GUARDANDO...' : 'GUARDAR ASIGNACIÓN'}</button></div>}
+        {assignmentMode && <div className="cr-planos-mesas__assignment-actions"><div>SELECCIONA UNA O VARIAS MESAS Y PULSA GUARDAR ASIGNACIÓN PARA ACTUALIZAR LA RESERVA.</div><button type="button" className="primario" data-cr-guardar-asignacion disabled={saving || (Boolean(nuevaBorrador) && assignmentTables.length === 0)} onPointerDown={(event) => { event.preventDefault(); void guardarAsignacion(); }}>{saving ? 'GUARDANDO...' : 'GUARDAR ASIGNACIÓN'}</button></div>}
         {error && <div className="cr-planos-mesas__error">{error}</div>}
       </div>
 
