@@ -107,7 +107,7 @@ export default function ReservationCard({
         </div>
         <div className="reservation-party">
           <div className="pax"><span>👥</span> {reserva.Personas || 0} PAX</div>
-          <button className="table-button" type="button" onClick={requestTable}>
+          <button className={'table-button'+(assignedTables.length ? ' table-button--asignada' : '')} type="button" onClick={requestTable}>
             {mesaLabel}
           </button>
         </div>
