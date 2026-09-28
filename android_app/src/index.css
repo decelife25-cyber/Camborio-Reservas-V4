@@ -3470,3 +3470,50 @@ html.light .cr-nueva-reserva__mesa--asignada strong{
     padding:12px 12px 16px!important;
   }
 }
+
+
+/* PR106 — Reservas Hoy: hora pasada claramente en rojo. */
+.reservation-time--pasada strong{
+  color:#ef4444!important;
+}
+
+/* PR106 — mismo estado actual compacto y mismo código de color en ambos modales. */
+.v2-state-modal .status-modal-confirmada{
+  color:#257a57!important;
+  border:1px solid #257a57!important;
+  background:transparent!important;
+  border-radius:8px!important;
+}
+.v2-state-modal .status-modal-pendiente{
+  color:#8b6800!important;
+  border:1px solid #b89a42!important;
+  background:transparent!important;
+  border-radius:8px!important;
+}
+.v2-state-modal .status-modal-sentada{
+  color:#1769aa!important;
+  border:1px solid #1769aa!important;
+  background:transparent!important;
+  border-radius:8px!important;
+}
+.v2-state-modal .status-modal-finalizada,
+.v2-state-modal .status-modal-no-presentado,
+.v2-state-modal .status-modal-cancelada-local,
+.v2-state-modal .status-modal-cancelada-cliente{
+  color:#555!important;
+  border:1px solid #888!important;
+  background:transparent!important;
+  border-radius:8px!important;
+}
+.v2-state-modal .ficha-state-button--confirmar{
+  background:linear-gradient(180deg,#5fcf93,#26865b)!important;
+}
+.v2-state-modal .ficha-state-button--finalizada{
+  background:linear-gradient(180deg,#475569,#1e293b)!important;
+}
+.v2-state-modal .ficha-state-button--cancelar{
+  background:linear-gradient(180deg,#ff4d58,#b3131d)!important;
+}
+.v2-state-modal .ficha-state-button--no-presentado{
+  background:linear-gradient(180deg,#f59e0b,#b45309)!important;
+}
