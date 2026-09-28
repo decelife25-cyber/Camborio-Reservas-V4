@@ -3427,24 +3427,18 @@ html.light .cr-nueva-reserva__mesa--asignada strong{
 
 
 /* ===== Corrección definitiva modal ASIGNAR MESA ===== */
-.cr-planos-mesas.cr-planos-mesas--asignacion{
-  padding:6px!important;
-  align-items:center!important;
-  justify-items:center!important;
-}
+/* ASIGNAR MESA: mantener el ancho físico del plano y hacer que el modal crezca con su contenido.
+   No se modifica el tamaño del canvas ni se comprime el plano. */
 .cr-planos-mesas__panel.cr-planos-mesas__panel--asignacion{
   box-sizing:border-box!important;
-  /* El .private-app está calibrado a escala 0.57. El modal debe recuperar
-     el ancho físico completo, sin comprimir el plano de mesas. */
-  width:min(1280px,calc((100vw - 12px)/.57))!important;
-  min-width:min(1280px,calc((100vw - 12px)/.57))!important;
-  max-width:min(1280px,calc((100vw - 12px)/.57))!important;
-  /* Más alto para que el plano conserve su tamaño y el botón quede DENTRO. */
-  height:125dvh!important;
-  min-height:125dvh!important;
+  width:min(1280px,100%)!important;
+  min-width:0!important;
+  max-width:1280px!important;
+  height:auto!important;
+  min-height:0!important;
   max-height:none!important;
   margin:0!important;
-  overflow:hidden!important;
+  overflow:visible!important;
   display:flex!important;
   flex-direction:column!important;
   padding:12px!important;
@@ -3467,13 +3461,12 @@ html.light .cr-nueva-reserva__mesa--asignada strong{
   box-sizing:border-box!important;
 }
 @media(max-width:620px){
-  .cr-planos-mesas.cr-planos-mesas--asignacion{padding:6px!important}
   .cr-planos-mesas__panel.cr-planos-mesas__panel--asignacion{
-    width:min(1280px,calc((100vw - 12px)/.57))!important;
-    min-width:min(1280px,calc((100vw - 12px)/.57))!important;
-    max-width:min(1280px,calc((100vw - 12px)/.57))!important;
-    height:125dvh!important;
-    min-height:125dvh!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:none!important;
+    height:auto!important;
+    min-height:0!important;
     max-height:none!important;
     padding:12px!important;
   }
