@@ -3520,3 +3520,42 @@ html.light .cr-nueva-reserva__mesa--asignada strong{
 
 /* Corrección: ASIGNAR MESA ocupa prácticamente todo el ancho útil del móvil. */
 @media(max-width:620px){.cr-planos-mesas__panel.cr-planos-mesas__panel--asignacion{width:calc(100% - 12px)!important;max-width:none!important;margin:0 auto!important;}}
+
+
+/* Ajuste visual estado actual: indicador compacto, centrado y no confundible con botón. */
+.v2-state-modal .v2-state-current,
+.v2-state-modal .ficha-state-current{
+  width:220px!important;
+  max-width:70%!important;
+  min-width:0!important;
+  margin:0 auto 12px!important;
+  padding:7px 14px!important;
+  min-height:0!important;
+  box-sizing:border-box!important;
+  text-align:center!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  border-radius:7px!important;
+  font-size:17px!important;
+  line-height:1!important;
+  font-weight:1000!important;
+}
+
+/* Mesa: SIN ASIGNAR conserva fondo oscuro y texto amarillo; mesa asignada, amarillo con texto negro. */
+.cr-reserva-card__mesa--sin-asignar{
+  background:#090909!important;
+  color:#ffc400!important;
+  border-color:#ffc400!important;
+}
+html.light .cr-reserva-card__mesa{
+  background:#f4f2ed!important;
+  color:#171717!important;
+  border-color:#c9c5bd!important;
+  box-shadow:none!important;
+}
+html.light .cr-reserva-card__mesa--sin-asignar{
+  background:#fff!important;
+  color:#8b6800!important;
+  border-color:#c9c5bd!important;
+}
