@@ -3431,17 +3431,16 @@ html.light .cr-nueva-reserva__mesa--asignada strong{
    No se modifica el tamaño del canvas ni se comprime el plano. */
 .cr-planos-mesas__panel.cr-planos-mesas__panel--asignacion{
   box-sizing:border-box!important;
-  width:min(1280px,100%)!important;
+  width:min(94vw,760px)!important;
   min-width:0!important;
-  max-width:1280px!important;
+  max-width:760px!important;
   height:auto!important;
   min-height:0!important;
   max-height:none!important;
   margin:0!important;
   overflow:visible!important;
-  display:flex!important;
-  flex-direction:column!important;
-  padding:12px!important;
+  display:block!important;
+  padding:12px 12px 16px!important;
 }
 .cr-planos-mesas__panel--asignacion .cr-planos-mesas__canvas{
   height:405px!important;
@@ -3462,12 +3461,12 @@ html.light .cr-nueva-reserva__mesa--asignada strong{
 }
 @media(max-width:620px){
   .cr-planos-mesas__panel.cr-planos-mesas__panel--asignacion{
-    width:100%!important;
+    width:94vw!important;
     min-width:0!important;
-    max-width:none!important;
+    max-width:760px!important;
     height:auto!important;
     min-height:0!important;
     max-height:none!important;
-    padding:12px!important;
+    padding:12px 12px 16px!important;
   }
 }
