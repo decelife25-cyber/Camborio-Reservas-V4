@@ -96,7 +96,7 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
       return;
     }
     if(nextState==='SENTADA'){
-      if(r.Estado!=='CONFIRMADA'){setError('Solo se pueden sentar reservas confirmadas.');return;}
+      if(!['PENDIENTE','CONFIRMADA'].includes(r.Estado)){setError('Solo se pueden sentar reservas pendientes o confirmadas.');return;}
       if(!mesaValida(r.Mesa)){setStateOpen(false);navigate('/mesas?asignar='+encodeURIComponent(r.ReservaID)+'&volverCodigo='+encodeURIComponent(r.CodigoReserva||'')+'&accion=sentar');return;}
     }
     if(nextState==='CANCELADA_LOCAL' && !['PENDIENTE','CONFIRMADA'].includes(r.Estado)){
@@ -128,9 +128,7 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
 
   const stateActions = (() => {
     if(r.Estado==='PENDIENTE'){
-      return esFechaPasada(r.FechaReserva,String(r.HoraReserva).slice(0,5))
-        ? [['FINALIZADA','FINALIZAR','finalizada'],['CANCELADA_LOCAL','CANCELAR','cancelar'],['NO_PRESENTADO','NO ASISTIÓ','no-presentado']]
-        : [['CONFIRMADA','CONFIRMAR','confirmar'],['CANCELADA_LOCAL','CANCELAR','cancelar']];
+      return [['CONFIRMADA','CONFIRMAR','confirmar'],['SENTADA','SENTAR','sentar'],['FINALIZADA','FINALIZAR','finalizada'],['CANCELADA_LOCAL','CANCELAR','cancelar'],['NO_PRESENTADO','NO ASISTIÓ','no-presentado']];
     }
     if(r.Estado==='CONFIRMADA'){
       return esFechaPasada(r.FechaReserva,String(r.HoraReserva).slice(0,5))
