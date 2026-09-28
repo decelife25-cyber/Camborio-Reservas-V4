@@ -193,9 +193,12 @@ export default function Mesas() {
           const borrador=raw?JSON.parse(raw) as NuevaReservaBorrador:null;
           if(!borrador?.nombre||!borrador?.fecha||!borrador?.horaReserva){setError('No se encontraron los datos de la nueva reserva.');return;}
           if(!alive)return;
+          const mesasBorrador = [borrador.mesa, ...(Array.isArray(borrador.mesasAdicionales) ? borrador.mesasAdicionales : [])]
+            .map(v => String(v || '').trim())
+            .filter(Boolean);
           setNuevaBorrador(borrador); setAssignmentReserva(null); setFecha(borrador.fecha);
           setTurno(getTurnoFromHora(borrador.horaReserva)); setZona('terraza');
-          setAssignmentTables([]); assignmentTablesRef.current=[]; assignmentOriginalRef.current=[];
+          setAssignmentTables(mesasBorrador); assignmentTablesRef.current=[...mesasBorrador]; assignmentOriginalRef.current=[...mesasBorrador];
           return;
         }catch{setError('No se pudieron recuperar los datos de la nueva reserva.');return;}
       }
@@ -319,51 +322,95 @@ export default function Mesas() {
     });
   };
 
-  const guardarAsignacion=()=>{
-    if((!assignmentReserva&&!nuevaBorrador)||savingRef.current||saving)return;
-    const mesasActualesLista=assignmentOriginalRef.current;
-    const mesasSeleccionadas=[...assignmentTables];
-    const asignacionNueva=mesasSeleccionadas.join(', ');
-    const quitarAsignacion=mesasSeleccionadas.length===0&&mesasActualesLista.length>0;
-    if(!asignacionNueva&&!quitarAsignacion){setError('Selecciona al menos una mesa antes de guardar.');return;}
-    let mensaje='';
-    if(nuevaBorrador)mensaje='¿Crear la reserva de '+nuevaBorrador.nombre+' con '+asignacionNueva+'?';
-    else if(quitarAsignacion)mensaje='¿Quitar la asignación de '+(mesasActualesLista.length===1?'mesa':'mesas')+' '+mesasActualesLista.join(', ')+' y dejar esta reserva sin mesa asignada?';
-    else if(mesasActualesLista.length)mensaje='¿Cambiar de '+(mesasActualesLista.length===1?'mesa':'mesas')+' '+mesasActualesLista.join(', ')+' a '+(mesasSeleccionadas.length===1?'mesa':'mesas')+' '+asignacionNueva+'?';
-    else mensaje='¿Asignar '+(mesasSeleccionadas.length===1?'mesa':'mesas')+' '+asignacionNueva+' a esta reserva?';
-    setConfirmModal({titulo:nuevaBorrador?'CREAR RESERVA':'CONFIRMAR MESA',mensaje,cancelar:'CANCELAR',aceptar:'CONFIRMAR',alCancelar:()=>setConfirmModal(null),alAceptar:async()=>{
-      setConfirmModal(null); savingRef.current=true; setSaving(true); setError('');
-      const principal=mesasSeleccionadas[0]||null, adicionales=mesasSeleccionadas.slice(1);
-      const principalLayout=Object.values(PLANOS).flatMap(p=>p.mesas).find(m=>m.numero===principal);
-      const zonaAsignada=principalLayout?principalLayout.zona.toUpperCase().replace('CHILLOUT','CHILL OUT'):null;
-      if(nuevaBorrador){
-        // En una NUEVA reserva, asignar mesa NO crea todavía la reserva.
-        // Solo devolvemos al formulario con todos los datos y las mesas seleccionadas.
-        savingRef.current=false;setSaving(false);
-        try{
-          sessionStorage.setItem('camborio_nueva_reserva_borrador',JSON.stringify({
-            ...nuevaBorrador,
-            mesa:principal||'',
-            mesasAdicionales:adicionales
-          }));
-        }catch{}
-        navigate('/reservas?desdeMesa=1');
+  const guardarAsignacion = async () => {
+    if ((!assignmentReserva && !nuevaBorrador) || savingRef.current || saving) return;
+
+    const mesasSeleccionadas = [...assignmentTablesRef.current];
+    const principal = mesasSeleccionadas[0] || null;
+    const adicionales = mesasSeleccionadas.slice(1);
+    const asignacionNueva = mesasSeleccionadas.join(', ');
+
+    if (nuevaBorrador) {
+      if (!asignacionNueva) {
+        setError('Selecciona al menos una mesa antes de volver a la reserva.');
         return;
       }
-      const {data,error:updateError}=await supabase.from('Reservas').update({Mesa:principal,MesasAdicionales:adicionales.length?adicionales.join(', '):null,Zona:zonaAsignada,Turno:turno,FechaModificacion:new Date().toISOString()}).eq('ReservaID',assignmentReserva!.ReservaID).select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,Zona,MesasAdicionales,Turno').single();
-      if(updateError){savingRef.current=false;setSaving(false);setError(updateError.message);return;}
-      let persistida=(data||{...assignmentReserva!,Mesa:principal,MesasAdicionales:adicionales.length?adicionales.join(', '):null,Zona:zonaAsignada,Turno:turno}) as Reserva;
-      if(accion==='sentar'){
-        if(persistida.Estado==='PENDIENTE'){
-          const confirmacion=await supabase.from('Reservas').update({Estado:'CONFIRMADA',FechaModificacion:new Date().toISOString()}).eq('ReservaID',persistida.ReservaID).select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,Zona,MesasAdicionales,Turno').single();
-          if(confirmacion.error){savingRef.current=false;setSaving(false);setError(confirmacion.error.message);return;} persistida=(confirmacion.data||persistida) as Reserva;
-        }
-        const sentar=await supabase.from('Reservas').update({Estado:'SENTADA',FechaEstado:new Date().toISOString(),FechaModificacion:new Date().toISOString()}).eq('ReservaID',persistida.ReservaID).select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,Zona,MesasAdicionales,Turno').single();
-        if(sentar.error){savingRef.current=false;setSaving(false);setError(sentar.error.message);return;} persistida=(sentar.data||persistida) as Reserva;
+      try {
+        setError('');
+        savingRef.current = true;
+        setSaving(true);
+        sessionStorage.setItem('camborio_nueva_reserva_borrador', JSON.stringify({
+          ...nuevaBorrador,
+          mesa: principal || '',
+          mesasAdicionales: adicionales,
+        }));
+        savingRef.current = false;
+        setSaving(false);
+        navigate('/reservas?desdeMesa=1');
+      } catch (err: any) {
+        savingRef.current = false;
+        setSaving(false);
+        setError(err?.message || 'No se pudo volver al formulario de reserva.');
       }
-      assignmentOriginalRef.current=[...mesasSeleccionadas];assignmentTablesRef.current=[...mesasSeleccionadas];setAssignmentTables([...mesasSeleccionadas]);setAssignmentReserva(persistida);
-      savingRef.current=false;setSaving(false);if(volverCodigo)navigate('/buscar?codigo='+encodeURIComponent(volverCodigo));else navigate('/');
-    }});
+      return;
+    }
+
+    if (!assignmentReserva?.ReservaID) return;
+
+    try {
+      setError('');
+      savingRef.current = true;
+      setSaving(true);
+
+      const principalLayout = Object.values(PLANOS)
+        .flatMap(p => p.mesas)
+        .find(m => m.numero === principal);
+      const zonaAsignada = principalLayout
+        ? principalLayout.zona.toUpperCase().replace('CHILLOUT', 'CHILL OUT')
+        : null;
+
+      const { data, error: updateError } = await supabase
+        .from('Reservas')
+        .update({
+          Mesa: principal,
+          MesasAdicionales: adicionales.length ? adicionales.join(', ') : null,
+          Zona: zonaAsignada,
+          Turno: turno,
+          FechaModificacion: new Date().toISOString(),
+        })
+        .eq('ReservaID', assignmentReserva.ReservaID)
+        .select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,Zona,MesasAdicionales,Turno')
+        .single();
+
+      if (updateError) throw updateError;
+
+      const persistida = (data || {
+        ...assignmentReserva,
+        Mesa: principal,
+        MesasAdicionales: adicionales.length ? adicionales.join(', ') : null,
+        Zona: zonaAsignada,
+        Turno: turno,
+      }) as Reserva;
+
+      assignmentOriginalRef.current = [...mesasSeleccionadas];
+      assignmentTablesRef.current = [...mesasSeleccionadas];
+      setAssignmentTables([...mesasSeleccionadas]);
+
+      savingRef.current = false;
+      setSaving(false);
+
+      if (volverCodigo || persistida.CodigoReserva) {
+        const codigo = volverCodigo || persistida.CodigoReserva || '';
+        navigate('/buscar?codigo=' + encodeURIComponent(codigo));
+      } else {
+        navigate('/');
+      }
+    } catch (err: any) {
+      savingRef.current = false;
+      setSaving(false);
+      console.error('Error guardando asignación de mesas', err);
+      setError(err?.hint || err?.message || 'No se pudo guardar la asignación de mesas.');
+    }
   };
   const estado: 'disponible' | 'reservada' | 'ocupada' | 'desactivada' = selectedTable && mesasConfig[selectedTable]?.Activa === false ? 'desactivada' : (selectedTable ? visualState(reservaSeleccionada) : 'disponible');
 
@@ -435,7 +482,7 @@ export default function Mesas() {
           <span><i className="desactivada" />DESACTIVADA</span>
         </div>
 
-        {assignmentMode && <div className="cr-planos-mesas__assignment-actions"><div>SELECCIONA UNA O VARIAS MESAS Y PULSA GUARDAR ASIGNACIÓN PARA ACTUALIZAR LA RESERVA.</div><button type="button" className="primario" data-cr-guardar-asignacion disabled={saving || !tieneCambiosAsignacion()} onClick={guardarAsignacion}>{saving ? 'GUARDANDO...' : 'GUARDAR ASIGNACIÓN'}</button></div>}
+        {assignmentMode && <div className="cr-planos-mesas__assignment-actions"><div>SELECCIONA UNA O VARIAS MESAS Y PULSA GUARDAR ASIGNACIÓN PARA ACTUALIZAR LA RESERVA.</div><button type="button" className="primario" data-cr-guardar-asignacion disabled={saving || (Boolean(nuevaBorrador) && assignmentTables.length === 0)} onClick={() => void guardarAsignacion()}>{saving ? 'GUARDANDO...' : 'GUARDAR ASIGNACIÓN'}</button></div>}
         {error && <div className="cr-planos-mesas__error">{error}</div>}
       </div>
 
