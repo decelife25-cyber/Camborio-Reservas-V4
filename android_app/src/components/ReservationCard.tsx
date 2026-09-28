@@ -30,19 +30,6 @@ function statusLabel(status: string) {
   return status.replaceAll('_', ' ');
 }
 
-function isToday(fecha: string) {
-  return fecha === new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
-}
-
-function getActiveTurno(): 'COMIDA' | 'CENA' {
-  const hour = Number(new Intl.DateTimeFormat('en-GB', {
-    timeZone: 'Europe/Madrid',
-    hour: '2-digit',
-    hour12: false,
-  }).format(new Date()));
-  return hour >= 18 ? 'CENA' : 'COMIDA';
-}
-
 function mesaValida(mesa: string | null) {
   const value = String(mesa || '').trim().toUpperCase();
   return Boolean(value && !['SIN ASIGNAR', 'NULL', 'UNDEFINED'].includes(value));
@@ -51,12 +38,10 @@ function mesaValida(mesa: string | null) {
 export default function ReservationCard({
   reserva,
   onAssignTable,
-  onModify,
   onUpdate,
 }: {
   reserva: ReservationCardData;
   onAssignTable?: (reserva: ReservationCardData) => void;
-  onModify?: (reserva: ReservationCardData) => void;
   onUpdate?: (reserva: ReservationCardData) => void;
 }) {
   const navigate = useNavigate();
@@ -82,9 +67,6 @@ export default function ReservationCard({
     if (!mesaValida(reserva.Mesa)) { if (onAssignTable) { onAssignTable(reserva); } else { goAssignTable(false); } return; }
     setTableChangeOpen(true);
   };
-  const esReservaPasada = reserva.FechaReserva < new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
-  const esReservaHoy = isToday(reserva.FechaReserva);
-  const turnoActivo = reserva.Turno === getActiveTurno();
 
   const assignedTables = [reserva.Mesa, ...(String(reserva.MesasAdicionales || '').split(',').map(v => v.trim()).filter(Boolean))].filter(Boolean) as string[];
   const mesaLabel = assignedTables.length ? 'MESA ' + assignedTables[0] + (assignedTables.length > 1 ? ' (+' + (assignedTables.length - 1) + ')' : '') : 'SIN ASIGNAR';
