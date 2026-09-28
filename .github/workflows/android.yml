@@ -13,6 +13,7 @@ on:
       - 'android_app/**'
       - 'reservas_apk.png'
       - '.github/workflows/android.yml'
+  workflow_dispatch:
 
 jobs:
   build:
@@ -57,9 +58,6 @@ jobs:
         SRC="reservas_apk.png"
         RES="android_app/android/app/src/main/res"
 
-        # Use the complete official artwork as the native launcher icon.
-        # Do NOT generate an adaptive foreground: Android's adaptive-icon
-        # treatment was cropping the artwork on the Xiaomi launcher.
         declare -A SIZES=(
           [mipmap-mdpi]=48
           [mipmap-hdpi]=72
