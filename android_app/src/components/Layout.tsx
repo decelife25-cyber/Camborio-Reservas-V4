@@ -45,6 +45,12 @@ export default function Layout() {
     if (user) fetchPendingCount();
   }, [user]);
 
+  useEffect(() => {
+    const refreshPendingCount = () => { void fetchPendingCount(); };
+    window.addEventListener('camborio-pending-count-change', refreshPendingCount);
+    return () => window.removeEventListener('camborio-pending-count-change', refreshPendingCount);
+  }, [user]);
+
   const toggleDarkMode = () => {
     const next = !darkMode;
     setDarkMode(next);
@@ -85,7 +91,7 @@ export default function Layout() {
           </button>
           <button className="logout-button" onClick={() => setShowLogoutConfirm(true)}>CERRAR SESIÓN</button>
         </div>
-        <div className="app-version" aria-label="Versión de la aplicación">V1.0.089</div>
+        <div className="app-version" aria-label="Versión de la aplicación">V1.0.090</div>
       </header>
 
       <nav className="private-menu" aria-label="Menú privado">
