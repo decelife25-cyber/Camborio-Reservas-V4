@@ -4,7 +4,6 @@ import { supabase } from '../lib/supabase';
 import { getTurnoFromHora } from '../utils/shifts';
 import FechaPicker from './FechaPicker';
 import { Wheel } from '../pages/NuevaReserva';
-import StateChangeModal from './StateChangeModal';
 
 export type SearchReservation = {
   ReservaID:string; CodigoReserva:string|null; FechaReserva:string; HoraReserva:string;
@@ -22,6 +21,18 @@ function dateParts(v:string){
   return{fecha:String(d).padStart(2,'0')+'/'+String(m).padStart(2,'0'),anio:String(y),dia:dias[dt.getDay()]};
 }
 function stateLabel(s:string){return s.replaceAll('_',' ');}
+function todayMadrid(){
+  return new Date().toLocaleDateString('en-CA',{timeZone:'Europe/Madrid'});
+}
+function mesaValida(mesa:string|null){
+  const v=String(mesa||'').trim().toUpperCase();
+  return Boolean(v && !['SIN ASIGNAR','NULL','UNDEFINED'].includes(v));
+}
+function turnoActivo(){
+  const hour=Number(new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Madrid',hour:'2-digit',hour12:false}).format(new Date()));
+  return hour>=18?'CENA':'COMIDA';
+}
+function esFechaPasada(fecha:string){return fecha<todayMadrid();}
 
 export default function SearchReservationCard({reserva:initial,index,total,onNavigate,onUpdated}:{reserva:SearchReservation;index:number;total:number;onNavigate:(d:number)=>void;onUpdated:(r:SearchReservation)=>void}){
   const navigate=useNavigate();
@@ -77,6 +88,63 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
     setR(next);onUpdated(next);setDirty(false);setResultado('CAMBIOS GUARDADOS CORRECTAMENTE');setConfirmAction('resultado');setError('');
   };
 
+  const changeState=async(nextState:string)=>{
+    if(saving||readOnly)return;
+    setError('');
+
+    if(nextState==='CONFIRMADA' && r.Estado!=='PENDIENTE'){
+      setError('Solo se pueden confirmar reservas pendientes.');
+      return;
+    }
+    if(nextState==='SENTADA'){
+      if(r.Estado!=='CONFIRMADA'){setError('Solo se pueden sentar reservas confirmadas.');return;}
+      if(r.FechaReserva!==todayMadrid()){setError('Solo se puede sentar una reserva de HOY.');return;}
+      if(r.Turno!==turnoActivo()){setError('La reserva pertenece a otro turno. Cambia al turno correspondiente para sentarla.');return;}
+      if(!mesaValida(r.Mesa)){setStateOpen(false);navigate('/mesas?asignar='+encodeURIComponent(r.ReservaID)+'&volverCodigo='+encodeURIComponent(r.CodigoReserva||'')+'&accion=sentar');return;}
+    }
+    if(nextState==='CANCELADA_LOCAL' && !['PENDIENTE','CONFIRMADA'].includes(r.Estado)){
+      setError('Esta reserva no se puede cancelar desde esta ficha.');return;
+    }
+    if(nextState==='FINALIZADA'){
+      if(r.Estado==='SENTADA'){
+        // Permitido según V2.
+      }else if(['PENDIENTE','CONFIRMADA'].includes(r.Estado) && esFechaPasada(r.FechaReserva)){
+        // V2 permite finalizar reservas activas que ya quedaron atrás.
+      }else{
+        setError('Solo se pueden finalizar reservas sentadas o reservas activas ya pasadas.');return;
+      }
+    }
+    if(nextState==='NO_PRESENTADO'){
+      if(!['PENDIENTE','CONFIRMADA','SENTADA'].includes(r.Estado) || !esFechaPasada(r.FechaReserva)){
+        setError('Solo se puede marcar NO ASISTIÓ en una reserva activa ya pasada.');return;
+      }
+    }
+
+    setSaving(true);
+    const ahora=new Date().toISOString();
+    const resultado=await supabase.from('Reservas').update({Estado:nextState,FechaEstado:ahora,FechaModificacion:ahora}).eq('ReservaID',r.ReservaID).select('*').single();
+    setSaving(false);
+    if(resultado.error){setError(resultado.error.message);return;}
+    const next={...r,...resultado.data,Estado:nextState} as SearchReservation;
+    setR(next);onUpdated(next);setStateOpen(false);setDirty(false);setResultado('ESTADO CAMBIADO CORRECTAMENTE');setConfirmAction('resultado');setError('');
+  };
+
+  const stateActions = (() => {
+    if(r.Estado==='PENDIENTE'){
+      return esFechaPasada(r.FechaReserva)
+        ? [['FINALIZADA','FINALIZAR'],['NO_PRESENTADO','NO ASISTIÓ']]
+        : [['CONFIRMADA','CONFIRMAR'],['CANCELADA_LOCAL','CANCELAR']];
+    }
+    if(r.Estado==='CONFIRMADA'){
+      if(esFechaPasada(r.FechaReserva)) return [['FINALIZADA','FINALIZAR'],['NO_PRESENTADO','NO ASISTIÓ']];
+      if(r.FechaReserva===todayMadrid() && r.Turno===turnoActivo() && mesaValida(r.Mesa)) return [['SENTADA','SENTAR'],['CANCELADA_LOCAL','CANCELAR']];
+      return [['CANCELADA_LOCAL','CANCELAR']];
+    }
+    if(r.Estado==='SENTADA'){
+      return esFechaPasada(r.FechaReserva) ? [['FINALIZADA','FINALIZAR'],['NO_PRESENTADO','NO ASISTIÓ']] : [['FINALIZADA','FINALIZAR']];
+    }
+    return [];
+  })();
 
   const solicitarGuardar=()=>{
     if(!dirty||saving||readOnly)return;
@@ -117,7 +185,7 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
         <button className="cr-busqueda-ficha__bloque cr-busqueda-ficha__bloque--fecha" type="button" disabled={readOnly||sentada} onClick={()=>edit('fecha')}><strong>{parts.fecha}</strong><em>{parts.anio}</em></button>
         <button className="cr-busqueda-ficha__bloque cr-busqueda-ficha__bloque--hora" type="button" disabled={readOnly||sentada} onClick={()=>edit('hora')}><strong>{parts.dia}</strong><em>{String(r.HoraReserva||'').slice(0,5)}</em></button>
         <button className="cr-busqueda-ficha__bloque cr-busqueda-ficha__bloque--pax" type="button" disabled={readOnly||sentada} onClick={()=>edit('personas')}><strong>{r.Personas||0} PAX</strong></button>
-        <button className={'cr-busqueda-ficha__bloque cr-busqueda-ficha__bloque--mesa'+(r.Mesa ? ' cr-busqueda-ficha__bloque--mesa-asignada' : '')} type="button" disabled={readOnly} onClick={openMesa}><span>MESA</span><strong className={!r.Mesa?'cr-busqueda-ficha__mesa-sin-asignar':''}>{r.Mesa ? String(r.Mesa)+(String(r.MesasAdicionales||'').split(',').map(v=>v.trim()).filter(Boolean).length ? ' (+'+String(r.MesasAdicionales||'').split(',').map(v=>v.trim()).filter(Boolean).length+')' : '') : 'SIN ASIGNAR'}</strong></button>
+        <button className="cr-busqueda-ficha__bloque cr-busqueda-ficha__bloque--mesa" type="button" disabled={readOnly} onClick={openMesa}><span>MESA</span><strong className={!r.Mesa?'cr-busqueda-ficha__mesa-sin-asignar':''}>{r.Mesa ? String(r.Mesa)+(String(r.MesasAdicionales||'').split(',').map(v=>v.trim()).filter(Boolean).length ? ' (+'+String(r.MesasAdicionales||'').split(',').map(v=>v.trim()).filter(Boolean).length+')' : '') : 'SIN ASIGNAR'}</strong></button>
       </div>
 
       <button className="cr-busqueda-ficha__observaciones" type="button" disabled={readOnly||sentada} onClick={()=>edit('observaciones')}><span>OBSERVACIONES</span><p>{r.Observaciones||'Sin observaciones.'}</p></button>
@@ -160,20 +228,13 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
         </div>
       </div>
     </div>}
-    <StateChangeModal
-      reserva={r}
-      open={stateOpen}
-      onClose={()=>setStateOpen(false)}
-      onUpdated={(next)=>{
-        const updated={...r,...next} as SearchReservation;
-        setR(updated);
-        onUpdated(updated);
-        setDirty(false);
-        setResultado('ESTADO CAMBIADO CORRECTAMENTE');
-        setConfirmAction('resultado');
-        setError('');
-      }}
-    />
-
+    {stateOpen&&<div className="v2-edit-overlay" onClick={()=>setStateOpen(false)}>
+      <div className="v2-edit-modal ficha-edit-modal ficha-state-modal" onClick={e=>e.stopPropagation()}>
+        <p className="cr-confirmacion-mesa__eyebrow">CAMBIAR ESTADO</p>
+        <div className="cr-confirmacion-mesa__texto v2-state-current ficha-state-current">{stateLabel(r.Estado)}</div>
+        <div className="v2-edit-actions ficha-state-actions">{stateActions.map(([s,label])=><button className={"ficha-state-button ficha-state-button--"+String(s).toLowerCase().replaceAll("_","-")} key={s} type="button" disabled={saving} onClick={()=>void changeState(s)}>{label}</button>)}</div>
+        <button className="cr-confirmacion-mesa__boton v2-edit-cancel-full" type="button" onClick={()=>setStateOpen(false)}>CERRAR SIN CAMBIOS</button>
+      </div>
+    </div>}
   </div>;
 }
