@@ -3559,3 +3559,28 @@ html.light .cr-reserva-card__mesa--sin-asignar{
   color:#8b6800!important;
   border-color:#c9c5bd!important;
 }
+
+
+/* Mesa en tarjeta: asignada = fondo de color + texto negro; sin asignar = fondo neutro + texto de color. */
+.table-button--assigned{
+  background:#ffc400!important;
+  color:#070707!important;
+  border-color:#ffc400!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45)!important;
+}
+.table-button--unassigned{
+  background:#090909!important;
+  color:#ffc400!important;
+  border-color:#ffc400!important;
+  box-shadow:none!important;
+}
+html.light .table-button--assigned{
+  background:#8b6800!important;
+  color:#070707!important;
+  border-color:#8b6800!important;
+}
+html.light .table-button--unassigned{
+  background:#fff!important;
+  color:#8b6800!important;
+  border-color:#c9c5bd!important;
+}
