@@ -152,14 +152,14 @@ export default function NuevaReserva(){
 
   async function asignarMesaDesdeNuevaReserva(){
     if(saving)return;
-    setSaving(true);
+    setError('');setMessage('');
+    if(!nombre.trim()){setError('Introduce el nombre del cliente.');return;}
+    const fechaHora=new Date(fecha+'T'+horaReserva+':00');
+    if(Number.isNaN(fechaHora.getTime())||fechaHora.getTime()<Date.now()-60000){setError('No puedes usar una fecha u hora pasada.');return;}
     try{
-      const creada=await crearReservaBase();
-      if(creada?.ReservaID){
-        navigate('/mesas?asignar='+encodeURIComponent(creada.ReservaID)+'&volverCodigo='+encodeURIComponent(creada.CodigoReserva||''));
-      }
-    }catch(err:any){console.error(err);setError(err?.message||'No se pudo crear la reserva para asignar la mesa.')}
-    finally{setSaving(false)}
+      sessionStorage.setItem('camborio_nueva_reserva_borrador',JSON.stringify({nombre:nombre.trim(),telefono:telefono.trim(),personas,fecha,horaReserva,observaciones:observaciones.trim()}));
+      navigate('/mesas?nueva=1');
+    }catch(err:any){console.error(err);setError(err?.message||'No se pudo abrir la asignación de mesas.')}
   }
 
   return <section className="cr-nueva-reserva" aria-labelledby="crNuevaReservaTitulo">
