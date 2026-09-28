@@ -359,6 +359,14 @@ export default function Mesas() {
       const principalLayout=Object.values(PLANOS).flatMap(p=>p.mesas).find(m=>m.numero===principal);
       const zonaAsignada=principalLayout?principalLayout.zona.toUpperCase().replace('CHILLOUT','CHILL OUT'):null;
       if(nuevaBorrador){
+        if(nuevaBorrador.telefono){
+          const {data:duplicadas,error:dupError}=await supabase.from('Reservas').select('ReservaID,Turno,Estado').eq('FechaReserva',nuevaBorrador.fecha).eq('Telefono',nuevaBorrador.telefono);
+          if(dupError){savingRef.current=false;setSaving(false);setError(dupError.message);return;}
+          const turnoNueva=getTurnoFromHora(nuevaBorrador.horaReserva);
+          if((duplicadas||[]).some((r:any)=>r.Turno===turnoNueva&&!['CANCELADA_CLIENTE','CANCELADA_LOCAL'].includes(r.Estado))){
+            savingRef.current=false;setSaving(false);setError('Ya existe una reserva activa con este teléfono para ese día y turno.');return;
+          }
+        }
         const ahora=new Date().toISOString();
         const {data,error:insertError}=await supabase.from('Reservas').insert({
           Nombre:nuevaBorrador.nombre,Telefono:nuevaBorrador.telefono||null,Personas:nuevaBorrador.personas,
