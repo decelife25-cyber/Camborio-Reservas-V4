@@ -32,7 +32,8 @@ function turnoActivo(){
   const hour=Number(new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Madrid',hour:'2-digit',hour12:false}).format(new Date()));
   return hour>=18?'CENA':'COMIDA';
 }
-function esFechaPasada(fecha:string){return fecha<todayMadrid();}
+function horaMadrid(){return new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Madrid',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date());}
+function esFechaPasada(fecha:string,hora:string){const hoy=todayMadrid();const h=String(hora||'').slice(0,5);return fecha<hoy||(fecha===hoy&&h<horaMadrid());}
 
 export default function SearchReservationCard({reserva:initial,index,total,onNavigate,onUpdated}:{reserva:SearchReservation;index:number;total:number;onNavigate:(d:number)=>void;onUpdated:(r:SearchReservation)=>void}){
   const navigate=useNavigate();
@@ -108,7 +109,7 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
     if(nextState==='FINALIZADA'){
       if(r.Estado==='SENTADA'){
         // Permitido según V2.
-      }else if(['PENDIENTE','CONFIRMADA'].includes(r.Estado) && esFechaPasada(r.FechaReserva)){
+      }else if(['PENDIENTE','CONFIRMADA'].includes(r.Estado) && esFechaPasada(r.FechaReserva,String(r.HoraReserva).slice(0,5))){
         // V2 permite finalizar reservas activas que ya quedaron atrás.
       }else{
         setError('Solo se pueden finalizar reservas sentadas o reservas activas ya pasadas.');return;
@@ -131,17 +132,19 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
 
   const stateActions = (() => {
     if(r.Estado==='PENDIENTE'){
-      return esFechaPasada(r.FechaReserva)
-        ? [['FINALIZADA','FINALIZAR'],['NO_PRESENTADO','NO ASISTIÓ']]
-        : [['CONFIRMADA','CONFIRMAR'],['CANCELADA_LOCAL','CANCELAR']];
+      return esFechaPasada(r.FechaReserva,String(r.HoraReserva).slice(0,5))
+        ? [['FINALIZADA','FINALIZAR','finalizada'],['CANCELADA_LOCAL','CANCELAR','cancelar'],['NO_PRESENTADO','NO ASISTIÓ','no-presentado']]
+        : [['CONFIRMADA','CONFIRMAR','confirmar'],['CANCELADA_LOCAL','CANCELAR','cancelar']];
     }
     if(r.Estado==='CONFIRMADA'){
-      if(esFechaPasada(r.FechaReserva)) return [['FINALIZADA','FINALIZAR'],['NO_PRESENTADO','NO ASISTIÓ']];
-      if(r.FechaReserva===todayMadrid() && r.Turno===turnoActivo() && mesaValida(r.Mesa)) return [['SENTADA','SENTAR'],['CANCELADA_LOCAL','CANCELAR']];
-      return [['CANCELADA_LOCAL','CANCELAR']];
+      return esFechaPasada(r.FechaReserva,String(r.HoraReserva).slice(0,5))
+        ? [['FINALIZADA','FINALIZAR','finalizada'],['CANCELADA_LOCAL','CANCELAR','cancelar'],['NO_PRESENTADO','NO ASISTIÓ','no-presentado']]
+        : [['CANCELADA_LOCAL','CANCELAR','cancelar']];
     }
     if(r.Estado==='SENTADA'){
-      return esFechaPasada(r.FechaReserva) ? [['FINALIZADA','FINALIZAR'],['NO_PRESENTADO','NO ASISTIÓ']] : [['FINALIZADA','FINALIZAR']];
+      return esFechaPasada(r.FechaReserva,String(r.HoraReserva).slice(0,5))
+        ? [['FINALIZADA','FINALIZAR','finalizada'],['CANCELADA_LOCAL','CANCELAR','cancelar'],['NO_PRESENTADO','NO ASISTIÓ','no-presentado']]
+        : [['FINALIZADA','FINALIZAR','finalizada']];
     }
     return [];
   })();
@@ -229,11 +232,11 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
       </div>
     </div>}
     {stateOpen&&<div className="v2-edit-overlay" onClick={()=>setStateOpen(false)}>
-      <div className="v2-edit-modal ficha-edit-modal ficha-state-modal" onClick={e=>e.stopPropagation()}>
-        <p className="cr-confirmacion-mesa__eyebrow">CAMBIAR ESTADO</p>
-        <div className="cr-confirmacion-mesa__texto v2-state-current ficha-state-current">{stateLabel(r.Estado)}</div>
-        <div className="v2-edit-actions ficha-state-actions">{stateActions.map(([s,label])=><button className={"ficha-state-button ficha-state-button--"+String(s).toLowerCase().replaceAll("_","-")} key={s} type="button" disabled={saving} onClick={()=>void changeState(s)}>{label}</button>)}</div>
-        <button className="cr-confirmacion-mesa__boton v2-edit-cancel-full" type="button" onClick={()=>setStateOpen(false)}>CERRAR SIN CAMBIOS</button>
+      <div className="v2-edit-modal v2-state-modal" onClick={e=>e.stopPropagation()}>
+        <h3>CAMBIAR ESTADO</h3>
+        <div className={"v2-state-current ficha-state-current status-modal-"+r.Estado.toLowerCase().replaceAll("_","-")}>{stateLabel(r.Estado)}</div>
+        <div className="v2-edit-actions ficha-state-actions">{stateActions.map(([s,label,kind])=><button className={"ficha-state-button ficha-state-button--"+String(kind||s).toLowerCase().replaceAll("_","-")} key={s} type="button" disabled={saving} onClick={()=>void changeState(s)}>{label}</button>)}</div>
+        <button className="v2-edit-cancel-full" type="button" onClick={()=>setStateOpen(false)}>CERRAR SIN CAMBIOS</button>
       </div>
     </div>}
   </div>;
