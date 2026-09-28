@@ -114,7 +114,7 @@ export default function NuevaReserva(){
   const borradorInicial=useMemo(()=>{try{const raw=sessionStorage.getItem('camborio_nueva_reserva_borrador');return raw?JSON.parse(raw):null}catch{return null}},[]);
   const[nombre,setNombre]=useState(borradorInicial?.nombre||''),[telefono,setTelefono]=useState(borradorInicial?.telefono||''),[personas,setPersonas]=useState(borradorInicial?.personas||2);
   const[fecha,setFecha]=useState(borradorInicial?.fecha||todayMadrid()),[hora,setHora]=useState(String(borradorInicial?.horaReserva||'13:15').slice(0,2)),[minutos,setMinutos]=useState(String(borradorInicial?.horaReserva||'13:15').slice(3,5));
-  const[mesa,setMesa]=useState(borradorInicial?.mesa||''),[mesasAdicionales,setMesasAdicionales]=useState<string[]>(Array.isArray(borradorInicial?.mesasAdicionales)?borradorInicial.mesasAdicionales:[]),[observaciones,setObservaciones]=useState(borradorInicial?.observaciones||'');
+  const[mesa,setMesa]=useState(borradorInicial?.mesa||''),[mesasAdicionales,setMesasAdicionales]=useState<string[]>(Array.isArray(borradorInicial?.mesasAdicionales)?(borradorInicial.mesasAdicionales as string[]):[]),[observaciones,setObservaciones]=useState(borradorInicial?.observaciones||'');
   const[saving,setSaving]=useState(false),[message,setMessage]=useState(''),[error,setError]=useState('');
   const [lastCodigo,setLastCodigo]=useState('');
   const [calendarOpen,setCalendarOpen]=useState(false);
