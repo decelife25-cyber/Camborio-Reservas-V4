@@ -439,7 +439,7 @@ export default function Mesas() {
                 data-mesa-numero={mesa.numero}
                 style={{ '--mesa-x': mesa.x + '%', '--mesa-y': mesa.y + '%' } as CSSProperties}
                 onPointerDown={assignmentMode ? (event) => { event.preventDefault(); toggleAssignmentTable(mesa.numero); } : undefined}
-                onClick={!assignmentMode ? () => setSelectedTable(mesa.numero) : undefined}
+                onClick={assignmentMode ? () => toggleAssignmentTable(mesa.numero) : () => setSelectedTable(mesa.numero)}
                 aria-label={'Mesa ' + mesa.numero + ' ' + mesa.estado}
               >
                 {mesa.numero}
