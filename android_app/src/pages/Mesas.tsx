@@ -147,7 +147,6 @@ export default function Mesas() {
   const assignmentId = searchParams.get('asignar');
   const nuevaAssignment = searchParams.get('nueva') === '1';
   const volverCodigo = searchParams.get('volverCodigo') || '';
-  const accion = searchParams.get('accion') || '';
   const [assignmentReserva, setAssignmentReserva] = useState<Reserva | null>(null);
   const [nuevaBorrador, setNuevaBorrador] = useState<NuevaReservaBorrador | null>(null);
   const [assignmentTables, setAssignmentTables] = useState<string[]>([]);
