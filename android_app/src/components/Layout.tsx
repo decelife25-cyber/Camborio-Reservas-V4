@@ -31,7 +31,7 @@ export default function Layout() {
     return () => window.removeEventListener('camborio-theme-change', syncTheme);
   }, []);
 
-  useEffect(() => {
+  async function fetchPendingCount() {
     async function fetchPendingCount() {
       const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
       const { count, error } = await supabase
@@ -43,6 +43,16 @@ export default function Layout() {
     }
 
     if (user) fetchPendingCount();
+  }
+
+  useEffect(() => {
+    if (user) void fetchPendingCount();
+  }, [user]);
+
+  useEffect(() => {
+    const refreshPendingCount = () => { void fetchPendingCount(); };
+    window.addEventListener('camborio-pending-count-change', refreshPendingCount);
+    return () => window.removeEventListener('camborio-pending-count-change', refreshPendingCount);
   }, [user]);
 
   useEffect(() => {
