@@ -141,7 +141,6 @@ export default function ReservationCard({
       <StateChangeModal
         reserva={reserva}
         open={stateOpen}
-        lightTheme={lightTheme}
         onClose={() => setStateOpen(false)}
         onUpdated={(next) => onUpdate?.(next as ReservationCardData)}
       />
