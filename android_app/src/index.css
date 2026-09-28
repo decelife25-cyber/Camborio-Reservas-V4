@@ -3308,3 +3308,12 @@ html.light .v2-state-modal .ficha-state-current{
   .ficha-state-actions .ficha-state-button{min-height:60px!important}
   .v2-edit-modal .ficha-result-actions .cr-confirmacion-mesa__boton{min-height:58px!important}
 }
+
+/* Modal CAMBIAR ESTADO único para RESERVAS HOY, ficha y CALENDARIO. */
+.state-change-modal{width:min(380px,calc(100vw - 40px))!important;padding:20px!important;border-radius:16px!important}
+.state-change-modal h3{margin-bottom:10px!important}
+.state-change-modal .ficha-state-actions{display:grid!important;grid-template-columns:1fr!important;gap:10px!important;margin-top:18px!important}
+.state-change-modal .ficha-state-button{min-height:60px!important;border-radius:9px!important}
+.state-change-modal .ficha-state-button--cancelada-local,.state-change-modal .ficha-state-button--cancelada-cliente{border-color:#ff4d58!important;background:linear-gradient(180deg,#ff4d58,#b3131d)!important;color:#fff!important}
+.state-change-modal .ficha-state-button--no-presentado{border-color:#ff8a00!important;background:linear-gradient(180deg,#f59e0b,#b45309)!important;color:#1b1000!important}
+.state-change-modal .v2-edit-cancel-full{min-height:56px!important;margin-top:10px!important}
