@@ -31,18 +31,25 @@ export default function Layout() {
     return () => window.removeEventListener('camborio-theme-change', syncTheme);
   }, []);
 
-  useEffect(() => {
-    async function fetchPendingCount() {
-      const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
-      const { count, error } = await supabase
-        .from('Reservas')
-        .select('ReservaID', { count: 'exact', head: true })
-        .eq('Estado', 'PENDIENTE')
-        .gte('FechaReserva', today);
-      if (!error) setPendingCount(count || 0);
-    }
+  async function fetchPendingCount() {
+    if (!user) return;
+    const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
+    const { count, error } = await supabase
+      .from('Reservas')
+      .select('ReservaID', { count: 'exact', head: true })
+      .eq('Estado', 'PENDIENTE')
+      .gte('FechaReserva', today);
+    if (!error) setPendingCount(count || 0);
+  }
 
-    if (user) fetchPendingCount();
+  useEffect(() => {
+    void fetchPendingCount();
+  }, [user]);
+
+  useEffect(() => {
+    const refreshPendingCount = () => { void fetchPendingCount(); };
+    window.addEventListener('camborio-pending-count-change', refreshPendingCount);
+    return () => window.removeEventListener('camborio-pending-count-change', refreshPendingCount);
   }, [user]);
 
   const toggleDarkMode = () => {
@@ -85,7 +92,7 @@ export default function Layout() {
           </button>
           <button className="logout-button" onClick={() => setShowLogoutConfirm(true)}>CERRAR SESIÓN</button>
         </div>
-        <div className="app-version" aria-label="Versión de la aplicación">V1.0.087</div>
+        <div className="app-version" aria-label="Versión de la aplicación">V1.0.093</div>
       </header>
 
       <nav className="private-menu" aria-label="Menú privado">

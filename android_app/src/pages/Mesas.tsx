@@ -369,6 +369,12 @@ export default function Mesas() {
         ? principalLayout.zona.toUpperCase().replace('CHILLOUT', 'CHILL OUT')
         : null;
 
+      const ahoraAsignacion = new Date().toISOString();
+      const estadoTrasAsignacion = accion === 'sentar'
+        ? 'SENTADA'
+        : assignmentReserva.Estado === 'PENDIENTE'
+          ? 'CONFIRMADA'
+          : assignmentReserva.Estado;
       const { error: updateError } = await supabase
         .from('Reservas')
         .update({
@@ -376,7 +382,11 @@ export default function Mesas() {
           MesasAdicionales: adicionales.length ? adicionales.join(', ') : null,
           Zona: zonaAsignada,
           Turno: turno,
-          FechaModificacion: new Date().toISOString(),
+          Estado: estadoTrasAsignacion,
+          ...(estadoTrasAsignacion !== assignmentReserva.Estado
+            ? { FechaEstado: ahoraAsignacion }
+            : {}),
+          FechaModificacion: ahoraAsignacion,
         })
         .eq('ReservaID', assignmentReserva.ReservaID);
 
@@ -388,6 +398,7 @@ export default function Mesas() {
         MesasAdicionales: adicionales.length ? adicionales.join(', ') : null,
         Zona: zonaAsignada,
         Turno: turno,
+        Estado: estadoTrasAsignacion,
       } as Reserva;
 
       assignmentOriginalRef.current = [...mesasSeleccionadas];
@@ -398,29 +409,8 @@ export default function Mesas() {
       setSaving(false);
 
       if (accion === 'sentar' && persistida.Mesa) {
-        const mesasTexto = parseAssignedTables(persistida).join(', ');
         const codigo = volverCodigo || persistida.CodigoReserva || '';
-        setConfirmModal({
-          titulo: 'MESA ASIGNADA',
-          mensaje: 'RESERVA ASIGNADA A MESA ' + mesasTexto,
-          cancelar: 'CAMBIAR MESAS',
-          aceptar: 'SENTAR MESA',
-          alCancelar: () => setConfirmModal(null),
-          alAceptar: async () => {
-            const ahora = new Date().toISOString();
-            const { error: seatError } = await supabase
-              .from('Reservas')
-              .update({ Estado: 'SENTADA', FechaEstado: ahora, FechaModificacion: ahora })
-              .eq('ReservaID', persistida.ReservaID);
-            if (seatError) {
-              setError(seatError.message);
-              setConfirmModal(null);
-              return;
-            }
-            setConfirmModal(null);
-            navigate('/buscar?codigo=' + encodeURIComponent(codigo));
-          },
-        });
+        navigate('/buscar?codigo=' + encodeURIComponent(codigo));
         return;
       }
 
