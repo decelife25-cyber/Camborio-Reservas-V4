@@ -7,8 +7,8 @@ android {
         applicationId "com.camborio.reservas.privada"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode = 530
-        versionName "1.0.091"
+        versionCode = 531
+        versionName "1.0.092"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
