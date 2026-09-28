@@ -22,6 +22,3 @@ function dateParts(v:string){
   return{fecha:String(d).padStart(2,'0')+'/'+String(m).padStart(2,'0'),anio:String(y),dia:dias[dt.getDay()]};
 }
 function stateLabel(s:string){return s.replaceAll('_',' ');}
-function todayMadrid(){
-  return new Date().toLocaleDateString('en-CA',{timeZone:'Europe/Madrid'});
-}
