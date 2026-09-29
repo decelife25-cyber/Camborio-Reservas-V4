@@ -203,14 +203,18 @@ export default function ReservationCard({
             <span className="phone-icon">☎</span>
             <span>{reserva.Telefono || '—'}</span>
             <span>•</span>
-            <button
-              type="button"
-              className="reservation-code reservation-code-button"
-              onClick={() => !esSinReserva && reserva.CodigoReserva && navigate('/buscar?codigo=' + encodeURIComponent(reserva.CodigoReserva))}
-              disabled={esSinReserva || !reserva.CodigoReserva}
-            >
-              {esSinReserva ? ('MESA ' + (reserva.Mesa || '')) : (reserva.CodigoReserva || '—')}
-            </button>
+            {esSinReserva ? (
+              <span className="reservation-code reservation-code--sin-reserva">MESA {reserva.Mesa || '—'}</span>
+            ) : (
+              <button
+                type="button"
+                className="reservation-code reservation-code-button"
+                onClick={() => reserva.CodigoReserva && navigate('/buscar?codigo=' + encodeURIComponent(reserva.CodigoReserva))}
+                disabled={!reserva.CodigoReserva}
+              >
+                {reserva.CodigoReserva || '—'}
+              </button>
+            )}
             {hasObservations && (
               <button
                 type="button"
