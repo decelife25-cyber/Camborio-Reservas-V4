@@ -249,7 +249,7 @@ export default function Mesas() {
     const { data, error: insertError } = await supabase
       .from('Reservas')
       .insert({
-        CodigoReserva: 'MESA-' + selectedTable + '-' + Date.now().toString(36).toUpperCase(),
+        CodigoReserva: null,
         FechaCreacion: now.toISOString(),
         FechaReserva: fecha,
         HoraReserva: now.toTimeString().slice(0, 8),
