@@ -3580,3 +3580,12 @@ html.light .table-button--unassigned{
   color:#8b6800!important;
   border-color:#c9c5bd!important;
 }
+
+/* Las mesas siguen la interacción directa de V2; el foco táctil no debe parecer una segunda pulsación. */
+.cr-planos-mesas__mesa{
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+}
+.cr-planos-mesas__mesa:focus:not(:focus-visible){
+  outline:none;
+}
