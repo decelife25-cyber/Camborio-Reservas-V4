@@ -10,6 +10,7 @@ export type SearchReservation = {
   Nombre:string|null; Telefono:string|null; Personas:number|null; Estado:string;
   Mesa:string|null; MesasAdicionales?:string|null; Turno?:string|null;
   Observaciones?:string|null; FechaCreacion?:string|null;
+  ClienteSinReserva?:boolean|string|null; OrigenReserva?:string|null; ClienteID?:string|null;
 };
 
 
@@ -46,7 +47,10 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
   const[resultado,setResultado]=useState('');
 
   const parts=dateParts(r.FechaReserva);
-  const esSinReserva=String(r.Nombre||'').trim().toUpperCase()==='SIN RESERVA'&&!String(r.Telefono||'').trim();
+  const nombreNormalizado=String(r.Nombre||'').trim().toUpperCase().replace(/\s+/g,' ');
+  const telefonoNormalizado=String(r.Telefono||'').trim().toUpperCase().replace(/\s+/g,' ');
+  const clienteSinReserva=r.ClienteSinReserva===true||String(r.ClienteSinReserva||'').trim().toLowerCase()==='true';
+  const esSinReserva=clienteSinReserva||((nombreNormalizado==='SIN RESERVA'||nombreNormalizado==='CLIENTE SIN RESERVA')&&(!telefonoNormalizado||telefonoNormalizado==='SIN TELÉFONO'||telefonoNormalizado==='SIN TELEFONO'));
   const readOnly=['FINALIZADA','CANCELADA_CLIENTE','CANCELADA_LOCAL','NO_PRESENTADO'].includes(r.Estado);
   const sentada=r.Estado==='SENTADA';
   const edit=(field:typeof editing)=>{
@@ -158,7 +162,7 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
   };
 
   const openMesa=()=>{
-    if(readOnly||esSinReserva)return;
+    if(readOnly)return;
     const mesas=[r.Mesa,...String(r.MesasAdicionales||'').split(',').map(v=>v.trim()).filter(Boolean)].filter(Boolean);
     if(!mesas.length){navigate('/mesas?asignar='+encodeURIComponent(r.ReservaID)+'&volverCodigo='+encodeURIComponent(r.CodigoReserva||''));return;}
     setConfirmAction('mesas');
@@ -177,7 +181,7 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
       <div className="cr-busqueda-ficha__cabecera">
         <div className="cr-busqueda-ficha__cliente">
           <strong><span className="cr-busqueda-ficha__cliente-icon">👤</span>{r.Nombre||'Sin nombre'}</strong>
-          <span><span className="cr-busqueda-ficha__telefono-icon">📞</span><span className="cr-busqueda-ficha__telefono">{r.Telefono||'Sin teléfono'}</span>{esSinReserva?<span className="cr-busqueda-ficha__codigo cr-busqueda-ficha__codigo--sin-reserva">MESA {r.Mesa||'—'}</span>:r.CodigoReserva&&<button type="button" className="cr-busqueda-ficha__codigo" onClick={e=>{e.stopPropagation();navigate('/buscar?codigo='+encodeURIComponent(r.CodigoReserva||''));}}>🏷️ {r.CodigoReserva}</button>}</span>
+          <span><span className="cr-busqueda-ficha__telefono-icon">📞</span><span className="cr-busqueda-ficha__telefono">{esSinReserva?'SIN TELÉFONO':(r.Telefono||'Sin teléfono')}</span>{esSinReserva?<span className="cr-busqueda-ficha__codigo cr-busqueda-ficha__codigo--sin-reserva">{r.CodigoReserva||'—'}</span>:r.CodigoReserva&&<button type="button" className="cr-busqueda-ficha__codigo" onClick={e=>{e.stopPropagation();navigate('/buscar?codigo='+encodeURIComponent(r.CodigoReserva||''));}}>🏷️ {r.CodigoReserva}</button>}</span>
         </div>
         <button className="cr-busqueda-ficha__estado" type="button" onClick={()=>!readOnly&&setStateOpen(true)} disabled={readOnly}>{stateLabel(r.Estado)}{!readOnly?' ▼':''}</button>
       </div>
@@ -186,7 +190,7 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
         <button className="cr-busqueda-ficha__bloque cr-busqueda-ficha__bloque--fecha" type="button" disabled={readOnly||sentada||esSinReserva} onClick={()=>edit('fecha')}><strong>{parts.fecha}</strong><em>{parts.anio}</em></button>
         <button className="cr-busqueda-ficha__bloque cr-busqueda-ficha__bloque--hora" type="button" disabled={readOnly||sentada||esSinReserva} onClick={()=>edit('hora')}><strong>{parts.dia}</strong><em>{String(r.HoraReserva||'').slice(0,5)}</em></button>
         <button className="cr-busqueda-ficha__bloque cr-busqueda-ficha__bloque--pax" type="button" disabled={readOnly||sentada||esSinReserva} onClick={()=>edit('personas')}><strong>{r.Personas||0} PAX</strong></button>
-        <button className="cr-busqueda-ficha__bloque cr-busqueda-ficha__bloque--mesa" type="button" disabled={readOnly||esSinReserva} onClick={openMesa}><span>MESA</span><strong className={!r.Mesa?'cr-busqueda-ficha__mesa-sin-asignar':''}>{r.Mesa ? String(r.Mesa)+(String(r.MesasAdicionales||'').split(',').map(v=>v.trim()).filter(Boolean).length ? ' (+'+String(r.MesasAdicionales||'').split(',').map(v=>v.trim()).filter(Boolean).length+')' : '') : 'SIN ASIGNAR'}</strong></button>
+        <button className="cr-busqueda-ficha__bloque cr-busqueda-ficha__bloque--mesa" type="button" disabled={readOnly} onClick={openMesa}><span>MESA</span><strong className={!r.Mesa?'cr-busqueda-ficha__mesa-sin-asignar':''}>{r.Mesa ? String(r.Mesa)+(String(r.MesasAdicionales||'').split(',').map(v=>v.trim()).filter(Boolean).length ? ' (+'+String(r.MesasAdicionales||'').split(',').map(v=>v.trim()).filter(Boolean).length+')' : '') : 'SIN ASIGNAR'}</strong></button>
       </div>
 
       <button className="cr-busqueda-ficha__observaciones" type="button" disabled={readOnly||sentada} onClick={()=>edit('observaciones')}><span>OBSERVACIONES</span><p>{r.Observaciones||'Sin observaciones.'}</p></button>
