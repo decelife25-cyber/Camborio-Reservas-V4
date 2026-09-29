@@ -5,7 +5,7 @@ security invoker
 set search_path = public
 as $$
 declare
-  r jsonb;
+  item jsonb;
   servicio text;
   dia text;
   hora text;
@@ -15,13 +15,16 @@ begin
   if jsonb_typeof(p_horarios) <> 'array' then
     raise exception 'p_horarios debe ser un array JSON';
   end if;
+  if jsonb_array_length(p_horarios) = 0 then
+    raise exception 'No hay horarios para guardar';
+  end if;
 
-  for r in select * from jsonb_array_elements(p_horarios) loop
-    servicio := upper(trim(r->>'Servicio'));
-    dia := trim(r->>'DiaSemana');
-    hora := trim(r->>'Hora');
-    margen := nullif(r->>'MargenHoras','')::numeric;
-    activo := coalesce((r->>'Activo')::boolean, false);
+  for item in select * from jsonb_array_elements(p_horarios) loop
+    servicio := upper(trim(item->>'Servicio'));
+    dia := trim(item->>'DiaSemana');
+    hora := trim(item->>'Hora');
+    margen := nullif(item->>'MargenHoras','')::numeric;
+    activo := coalesce((item->>'Activo')::boolean, false);
 
     if servicio not in ('COMIDA','CENA') then
       raise exception 'Servicio no válido: %', servicio;
@@ -39,12 +42,12 @@ begin
 
   insert into public."Horarios" ("DiaSemana","Servicio","Hora","MargenHoras","Activo")
   select
-    trim(r->>'DiaSemana'),
-    upper(trim(r->>'Servicio')),
-    (trim(r->>'Hora'))::time,
-    nullif(r->>'MargenHoras','')::numeric,
-    coalesce((r->>'Activo')::boolean, false)
-  from jsonb_array_elements(p_horarios) r;
+    trim(x.data->>'DiaSemana'),
+    upper(trim(x.data->>'Servicio')),
+    (trim(x.data->>'Hora'))::time,
+    nullif(x.data->>'MargenHoras','')::numeric,
+    coalesce((x.data->>'Activo')::boolean, false)
+  from jsonb_array_elements(p_horarios) as x(data);
 end;
 $$;
 
