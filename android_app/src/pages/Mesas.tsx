@@ -298,6 +298,11 @@ export default function Mesas() {
       const seleccionada = next.includes(numero);
       const original = assignmentOriginalRef.current.includes(numero);
       const indice = next.indexOf(numero);
+      if (!seleccionada && (
+        button.classList.contains('cr-planos-mesas__mesa--reservada') ||
+        button.classList.contains('cr-planos-mesas__mesa--ocupada') ||
+        button.classList.contains('cr-planos-mesas__mesa--desactivada')
+      )) return;
       button.classList.remove(
         'cr-planos-mesas__mesa--principal',
         'cr-planos-mesas__mesa--adicional',
