@@ -15,6 +15,9 @@ export type ReservationCardData = {
   MesasAdicionales?: string | null;
   Turno?: string | null;
   Observaciones?: string | null;
+  ClienteSinReserva?: boolean | string | null;
+  OrigenReserva?: string | null;
+  ClienteID?: string | null;
 };
 
 function formatTime(value: string) {
@@ -66,18 +69,25 @@ export default function ReservationCard({
     return () => window.removeEventListener('camborio-theme-change', syncTheme);
   }, []);
 
+  const nombreNormalizado = String(reserva.Nombre || '').trim().toUpperCase().replace(/\s+/g, ' ');
+  const telefonoNormalizado = String(reserva.Telefono || '').trim().toUpperCase().replace(/\s+/g, ' ');
+  const clienteSinReserva = reserva.ClienteSinReserva === true || String(reserva.ClienteSinReserva || '').trim().toLowerCase() === 'true';
+  const origenNormalizado = String(reserva.OrigenReserva || '').trim().toUpperCase().replace(/[\s-]+/g, '_');
+  const esSinReserva = clienteSinReserva || ((origenNormalizado === 'SIN_RESERVA' || origenNormalizado === 'PRIVADO_SIN_RESERVA') && (nombreNormalizado === 'SIN RESERVA' || nombreNormalizado === 'CLIENTE SIN RESERVA')) || (origenNormalizado === 'PRIVADO' && (nombreNormalizado === 'SIN RESERVA' || nombreNormalizado === 'CLIENTE SIN RESERVA') && (!telefonoNormalizado || telefonoNormalizado === 'SIN TELÉFONO' || telefonoNormalizado === 'SIN TELEFONO'));
   const readOnly = ['FINALIZADA', 'CANCELADA_CLIENTE', 'CANCELADA_LOCAL', 'NO_PRESENTADO'].includes(reserva.Estado);
 
   const goAssignTable = (autoSeat = false) => {
     navigate('/mesas?asignar=' + encodeURIComponent(reserva.ReservaID) + '&volverCodigo=' + encodeURIComponent(reserva.CodigoReserva || '') + (autoSeat ? '&accion=sentar' : ''));
   };
   const requestTable = () => {
+    if (esSinReserva) return;
     if (!mesaValida(reserva.Mesa)) { if (onAssignTable) { onAssignTable(reserva); } else { goAssignTable(false); } return; }
     setTableChangeOpen(true);
   };
   const hoyMadrid = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
   const horaMadrid = madridNowTime();
   const esReservaPasada = reserva.FechaReserva < hoyMadrid || (reserva.FechaReserva === hoyMadrid && formatTime(reserva.HoraReserva) < horaMadrid);
+  const esReservaActivaAtrasada = esReservaPasada && ['PENDIENTE', 'CONFIRMADA'].includes(reserva.Estado);
   const changeState = async (nextState: string) => {
     if (saving || readOnly) return;
     setSaving(true);
@@ -163,6 +173,7 @@ export default function ReservationCard({
   };
 
   const stateActions = (() => {
+    if (esSinReserva) return [['FINALIZADA', 'FINALIZAR', 'finalizada']];
     if (reserva.Estado === 'PENDIENTE') {
       return [
         ['CONFIRMADA', 'CONFIRMAR', 'confirmar'],
@@ -189,7 +200,7 @@ export default function ReservationCard({
   return (
     <>
       <article className="reservation-card">
-        <div className={'reservation-time' + (esReservaPasada ? ' reservation-time--pasada' : '')} onClick={() => !readOnly && setStateOpen(true)}>
+        <div className={'reservation-time' + (esReservaActivaAtrasada ? ' reservation-time--pasada' : '')} onClick={() => !readOnly && setStateOpen(true)}>
           <span className={'status-pill status-' + reserva.Estado.toLowerCase().replaceAll('_', '-').replaceAll(' ', '-')}>
             {statusLabel(reserva.Estado)}
           </span>
@@ -199,16 +210,20 @@ export default function ReservationCard({
           <div className="customer-name"><span>👤</span>{reserva.Nombre || 'SIN NOMBRE'}</div>
           <div className="customer-meta">
             <span className="phone-icon">☎</span>
-            <span>{reserva.Telefono || '—'}</span>
+            <span className={esSinReserva ? 'reservation-phone--sin-reserva' : ''}>{esSinReserva ? 'SIN TELÉFONO' : (reserva.Telefono || '—')}</span>
             <span>•</span>
-            <button
-              type="button"
-              className="reservation-code reservation-code-button"
-              onClick={() => reserva.CodigoReserva && navigate('/buscar?codigo=' + encodeURIComponent(reserva.CodigoReserva))}
-              disabled={!reserva.CodigoReserva}
-            >
-              {reserva.CodigoReserva || '—'}
-            </button>
+            {esSinReserva ? (
+              <span className="reservation-code reservation-code--sin-reserva">{reserva.CodigoReserva || '—'}</span>
+            ) : (
+              <button
+                type="button"
+                className="reservation-code reservation-code-button"
+                onClick={() => reserva.CodigoReserva && navigate('/buscar?codigo=' + encodeURIComponent(reserva.CodigoReserva))}
+                disabled={!reserva.CodigoReserva}
+              >
+                {reserva.CodigoReserva || '—'}
+              </button>
+            )}
             {hasObservations && (
               <button
                 type="button"

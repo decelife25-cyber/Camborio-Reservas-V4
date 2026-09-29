@@ -2401,12 +2401,12 @@ html.light .filter-modal__cancel{
 .cr-planos-mesas__canvas{position:relative;height:min(58vw,560px);min-height:390px;border:2px solid #d8d8d8;border-radius:8px;background:linear-gradient(180deg,#f8f8f8,#ececec);overflow:hidden;box-shadow:inset 0 0 35px rgba(0,0,0,.12)}
 .cr-planos-mesas__rotulo{position:absolute;left:50%;top:0;z-index:2;transform:translate(-50%,-2px);padding:7px 28px 8px;border-radius:0 0 9px 9px;background:#020202;color:#fff;font:1000 clamp(24px,4vw,42px)/1 var(--cr-font);letter-spacing:1px;box-shadow:0 2px 8px rgba(0,0,0,.28)}
 .cr-planos-mesas__terraza-marco{position:absolute;left:13%;right:14%;top:31%;bottom:19%;border:7px solid #6b3309;border-top-color:#6f390e;border-bottom:0;border-radius:2px;box-shadow:inset 0 0 0 2px rgba(0,0,0,.35),0 0 0 1px rgba(0,0,0,.25)}
-.cr-planos-mesas__mesa{position:absolute;left:var(--mesa-x);top:var(--mesa-y);z-index:3;transform:translate(-50%,-50%);display:grid;place-items:center;width:clamp(58px,8.2vw,86px);height:clamp(58px,8.2vw,86px);border:2px solid rgba(0,0,0,.58);border-radius:12px;color:#06110c;font:1000 clamp(23px,3.2vw,38px)/1 var(--cr-font);box-shadow:0 5px 12px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.35);cursor:pointer;touch-action:manipulation}
+.cr-planos-mesas__mesa{position:absolute;left:var(--mesa-x);top:var(--mesa-y);z-index:3;transform:translate(-50%,-50%);display:grid;place-items:center;width:clamp(58px,8.2vw,86px);height:clamp(58px,8.2vw,86px);border:2px solid rgba(0,0,0,.58);border-radius:12px;color:#06110c;font:1000 clamp(23px,3.2vw,38px)/1 var(--cr-font);box-shadow:0 5px 12px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.35);cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;transition:none!important;animation:none!important}
 .cr-planos-mesas__mesa--disponible{background:linear-gradient(145deg,#19d783 0,#049a5b 100%)}
 .cr-planos-mesas__mesa--reservada{background:linear-gradient(145deg,#ff9f1a 0,#c75f00 100%);color:#160b00;cursor:pointer}
 .cr-planos-mesas__mesa--ocupada{background:linear-gradient(145deg,#e20d22 0,#62070f 100%);color:#ffe5e8;cursor:pointer}
 .cr-planos-mesas__mesa--desactivada{background:linear-gradient(145deg,#777 0,#2f2f2f 100%);color:#d8d8d8;cursor:not-allowed}
-.cr-planos-mesas__mesa:hover,.cr-planos-mesas__mesa:focus{outline:3px solid rgba(255,196,0,.65);outline-offset:2px}
+.cr-planos-mesas__mesa:hover,.cr-planos-mesas__mesa:focus,.cr-planos-mesas__mesa:focus-visible{outline:none!important;outline-offset:0}.cr-planos-mesas__mesa:active{transform:translate(-50%,-50%)!important}
 .cr-planos-mesas__leyenda{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:12px 0 0;color:#ddd;font:800 14px/1 Arial,sans-serif;text-transform:uppercase}
 .cr-planos-mesas__leyenda span{display:inline-flex;align-items:center;gap:6px}
 .cr-planos-mesas__leyenda i{width:14px;height:14px;border-radius:4px;display:inline-block}
@@ -3580,3 +3580,26 @@ html.light .table-button--unassigned{
   color:#8b6800!important;
   border-color:#c9c5bd!important;
 }
+
+/* Las mesas siguen la interacción directa de V2; el foco táctil no debe parecer una segunda pulsación. */
+.cr-planos-mesas__mesa{
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+}
+.cr-planos-mesas__mesa:focus:not(:focus-visible){
+  outline:none;
+}
+
+/* Cliente sin reserva: el identificador de mesa es informativo, no un código editable. */
+.reservation-code--sin-reserva,
+.cr-busqueda-ficha__codigo--sin-reserva{
+  border:0!important;
+  background:transparent!important;
+  padding:0!important;
+  border-radius:0!important;
+  color:#ffc400!important;
+  font-weight:900!important;
+}
+
+.reservation-phone--sin-reserva{font-size:.78em;font-weight:700;letter-spacing:.2px}
+.cr-planos-mesas__mesa{-webkit-user-select:none;user-select:none;transition:none!important;animation:none!important}
