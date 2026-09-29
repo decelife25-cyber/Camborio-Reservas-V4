@@ -302,12 +302,10 @@ export default function Mesas() {
   };
 
   useEffect(() => {
-    const panel = document.querySelector('.cr-planos-mesas__panel');
-    if (!panel) return;
     const onClick = (event: Event) => {
       const target = event.target as HTMLElement | null;
       const button = target?.closest('[data-mesa-numero]') as HTMLButtonElement | null;
-      if (!button || !panel.contains(button)) return;
+      if (!button) return;
       const numero = button.dataset.mesaNumero || '';
       if (!numero) return;
       if (assignmentMode) {
@@ -315,10 +313,9 @@ export default function Mesas() {
       } else {
         setSelectedTable(numero);
       }
-      button.blur();
     };
-    panel.addEventListener('click', onClick);
-    return () => panel.removeEventListener('click', onClick);
+    document.addEventListener('click', onClick);
+    return () => document.removeEventListener('click', onClick);
   }, [assignmentMode]);
 
   const tieneCambiosAsignacion=()=>assignmentTables.join(',')!==assignmentOriginalRef.current.join(',');
