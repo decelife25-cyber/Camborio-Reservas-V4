@@ -80,6 +80,7 @@ export default function ReservationCard({
     navigate('/mesas?asignar=' + encodeURIComponent(reserva.ReservaID) + '&volverCodigo=' + encodeURIComponent(reserva.CodigoReserva || '') + (autoSeat ? '&accion=sentar' : ''));
   };
   const requestTable = () => {
+    if (esSinReserva) return;
     if (!mesaValida(reserva.Mesa)) { if (onAssignTable) { onAssignTable(reserva); } else { goAssignTable(false); } return; }
     setTableChangeOpen(true);
   };
@@ -209,7 +210,7 @@ export default function ReservationCard({
           <div className="customer-name"><span>👤</span>{reserva.Nombre || 'SIN NOMBRE'}</div>
           <div className="customer-meta">
             <span className="phone-icon">☎</span>
-            <span>{esSinReserva ? 'SIN TELÉFONO' : (reserva.Telefono || '—')}</span>
+            <span className={esSinReserva ? 'reservation-phone--sin-reserva' : ''}>{esSinReserva ? 'SIN TELÉFONO' : (reserva.Telefono || '—')}</span>
             <span>•</span>
             {esSinReserva ? (
               <span className="reservation-code reservation-code--sin-reserva">{reserva.CodigoReserva || '—'}</span>
