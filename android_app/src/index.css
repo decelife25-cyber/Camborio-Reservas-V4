@@ -3600,3 +3600,6 @@ html.light .table-button--unassigned{
   color:#ffc400!important;
   font-weight:900!important;
 }
+
+.reservation-phone--sin-reserva{font-size:.78em;font-weight:700;letter-spacing:.2px}
+.cr-planos-mesas__mesa{-webkit-user-select:none;user-select:none;transition:none!important;animation:none!important}
