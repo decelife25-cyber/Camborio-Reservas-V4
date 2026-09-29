@@ -90,8 +90,8 @@ export default function ReservationCard({
     }
 
     if (nextState === 'SENTADA') {
-      if (reserva.Estado !== 'CONFIRMADA') {
-        setError('Solo se pueden sentar reservas confirmadas.');
+      if (!['PENDIENTE', 'CONFIRMADA'].includes(reserva.Estado)) {
+        setError('Solo se pueden sentar reservas pendientes o confirmadas.');
         setSaving(false);
         return;
       }
@@ -156,19 +156,24 @@ export default function ReservationCard({
     setSaving(false);
     const next = { ...reserva, ...resultado.data, Estado: nextState } as ReservationCardData;
     onUpdate?.(next);
+    if (reserva.Estado === 'PENDIENTE' && nextState === 'CONFIRMADA') {
+      window.dispatchEvent(new Event('camborio-pending-count-change'));
+    }
     setStateOpen(false);
   };
 
   const stateActions = (() => {
     if (reserva.Estado === 'PENDIENTE') {
-      return esReservaPasada
-        ? [['FINALIZADA', 'FINALIZAR', 'finalizada'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']]
-        : [['CONFIRMADA', 'CONFIRMAR', 'confirmar'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar']];
+      return [
+        ['CONFIRMADA', 'CONFIRMAR', 'confirmar'],
+        ['SENTADA', 'SENTAR', 'sentar'],
+        ['FINALIZADA', 'FINALIZAR', 'finalizada'],
+        ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar'],
+        ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado'],
+      ];
     }
     if (reserva.Estado === 'CONFIRMADA') {
-      return esReservaPasada
-        ? [['SENTADA', 'SENTAR', 'sentar'], ['FINALIZADA', 'FINALIZAR', 'finalizada'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']]
-        : [['SENTADA', 'SENTAR', 'sentar'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar']];
+      return [['SENTADA', 'SENTAR', 'sentar'], ['FINALIZADA', 'FINALIZAR', 'finalizada'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']];
     }
     if (reserva.Estado === 'SENTADA') {
       return esReservaPasada
@@ -217,7 +222,7 @@ export default function ReservationCard({
         </div>
         <div className="reservation-party">
           <div className="pax"><span>👥</span> {reserva.Personas || 0} PAX</div>
-          <button className="table-button" type="button" onClick={requestTable}>
+          <button className={"table-button" + (assignedTables.length ? " table-button--assigned" : " table-button--unassigned")} type="button" onClick={requestTable}>
             {mesaLabel}
           </button>
         </div>
