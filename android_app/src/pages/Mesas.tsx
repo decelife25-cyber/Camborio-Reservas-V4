@@ -351,20 +351,22 @@ export default function Mesas() {
   };
 
   useEffect(() => {
-    const onClick = (event: Event) => {
+    const onPointerDown = (event: PointerEvent) => {
       const target = event.target as HTMLElement | null;
       const button = target?.closest('[data-mesa-numero]') as HTMLButtonElement | null;
       if (!button) return;
       const numero = button.dataset.mesaNumero || '';
       if (!numero) return;
+      event.preventDefault();
+      event.stopPropagation();
       if (assignmentMode) {
         toggleAssignmentTable(numero);
         return;
       }
       setSelectedTable(numero);
     };
-    document.addEventListener('click', onClick);
-    return () => document.removeEventListener('click', onClick);
+    document.addEventListener('pointerdown', onPointerDown, { capture: true });
+    return () => document.removeEventListener('pointerdown', onPointerDown, { capture: true });
   }, [assignmentMode, mesasConfig, mesasVisibles, nuevaBorrador]);
 
   const tieneCambiosAsignacion=()=>assignmentTablesRef.current.join(',')!==assignmentOriginalRef.current.join(',');
@@ -457,6 +459,9 @@ export default function Mesas() {
         .eq('ReservaID', assignmentReserva.ReservaID);
 
       if (updateError) throw updateError;
+      if (assignmentReserva.Estado === 'PENDIENTE' && estadoTrasAsignacion === 'CONFIRMADA') {
+        window.dispatchEvent(new Event('camborio-pending-count-change'));
+      }
 
       const persistida = {
         ...assignmentReserva,
