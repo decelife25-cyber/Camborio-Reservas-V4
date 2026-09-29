@@ -45,22 +45,31 @@ export default function Confirmar() {
     setError('');
     const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
 
-    const { data, error: queryError } = await supabase
-      .from('Reservas')
-      .select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa')
-      .eq('Estado', 'PENDIENTE')
-      .gte('FechaReserva', today)
-      .order('FechaReserva', { ascending: true })
-      .order('HoraReserva', { ascending: true });
+    for (let intento = 0; intento < 3; intento += 1) {
+      if (intento > 0) {
+        await new Promise(resolve => setTimeout(resolve, 300 * intento));
+        await supabase.auth.getSession();
+      }
 
-    if (queryError) {
-      console.error('Error cargando reservas por confirmar', queryError);
-      setError('No se pudieron cargar las reservas.');
-      setReservas([]);
-    } else {
-      setReservas((data || []) as Reserva[]);
+      const { data, error: queryError } = await supabase
+        .from('Reservas')
+        .select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa')
+        .eq('Estado', 'PENDIENTE')
+        .gte('FechaReserva', today)
+        .order('FechaReserva', { ascending: true })
+        .order('HoraReserva', { ascending: true });
+
+      if (!queryError) {
+        setReservas((data || []) as Reserva[]);
+        setLoading(false);
+        return;
+      }
+
+      console.error('Error cargando reservas por confirmar (intento ' + (intento + 1) + '/3)', queryError);
     }
 
+    setError('No se pudieron cargar las reservas.');
+    setReservas([]);
     setLoading(false);
   }
 
