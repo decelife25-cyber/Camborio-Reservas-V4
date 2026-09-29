@@ -3589,3 +3589,14 @@ html.light .table-button--unassigned{
 .cr-planos-mesas__mesa:focus:not(:focus-visible){
   outline:none;
 }
+
+/* Cliente sin reserva: el identificador de mesa es informativo, no un código editable. */
+.reservation-code--sin-reserva,
+.cr-busqueda-ficha__codigo--sin-reserva{
+  border:0!important;
+  background:transparent!important;
+  padding:0!important;
+  border-radius:0!important;
+  color:#ffc400!important;
+  font-weight:900!important;
+}
