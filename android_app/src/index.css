@@ -601,8 +601,6 @@ html.light .app-version { color: rgba(0,0,0,.58); }
   padding:7px 6px 12px;
 }
 .calendar-month-header {
-  position: sticky;
-  top: 0;
   z-index: 20;
   background: #000;
   display:flex;
@@ -626,9 +624,7 @@ html.light .app-version { color: rgba(0,0,0,.58); }
   background:#151515;
   color:#fff;
 }
-.calendar-weekdays {
-  position: sticky;
-  top: 52px;
+ .calendar-weekdays {
   z-index: 19;
   background: #000;
   display:grid;
