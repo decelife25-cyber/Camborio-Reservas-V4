@@ -66,6 +66,7 @@ export default function ReservationCard({
     return () => window.removeEventListener('camborio-theme-change', syncTheme);
   }, []);
 
+  const esSinReserva = String(reserva.Nombre || '').trim().toUpperCase() === 'SIN RESERVA' && !String(reserva.Telefono || '').trim();
   const readOnly = ['FINALIZADA', 'CANCELADA_CLIENTE', 'CANCELADA_LOCAL', 'NO_PRESENTADO'].includes(reserva.Estado);
 
   const goAssignTable = (autoSeat = false) => {
@@ -163,6 +164,7 @@ export default function ReservationCard({
   };
 
   const stateActions = (() => {
+    if (esSinReserva) return [['FINALIZADA', 'FINALIZAR', 'finalizada']];
     if (reserva.Estado === 'PENDIENTE') {
       return [
         ['CONFIRMADA', 'CONFIRMAR', 'confirmar'],
@@ -204,10 +206,10 @@ export default function ReservationCard({
             <button
               type="button"
               className="reservation-code reservation-code-button"
-              onClick={() => reserva.CodigoReserva && navigate('/buscar?codigo=' + encodeURIComponent(reserva.CodigoReserva))}
-              disabled={!reserva.CodigoReserva}
+              onClick={() => !esSinReserva && reserva.CodigoReserva && navigate('/buscar?codigo=' + encodeURIComponent(reserva.CodigoReserva))}
+              disabled={esSinReserva || !reserva.CodigoReserva}
             >
-              {reserva.CodigoReserva || '—'}
+              {esSinReserva ? ('MESA ' + (reserva.Mesa || '')) : (reserva.CodigoReserva || '—')}
             </button>
             {hasObservations && (
               <button
