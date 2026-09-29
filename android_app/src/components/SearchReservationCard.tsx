@@ -50,7 +50,8 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
   const nombreNormalizado=String(r.Nombre||'').trim().toUpperCase().replace(/\s+/g,' ');
   const telefonoNormalizado=String(r.Telefono||'').trim().toUpperCase().replace(/\s+/g,' ');
   const clienteSinReserva=r.ClienteSinReserva===true||String(r.ClienteSinReserva||'').trim().toLowerCase()==='true';
-  const esSinReserva=clienteSinReserva||((nombreNormalizado==='SIN RESERVA'||nombreNormalizado==='CLIENTE SIN RESERVA')&&(!telefonoNormalizado||telefonoNormalizado==='SIN TELÉFONO'||telefonoNormalizado==='SIN TELEFONO'));
+  const origenNormalizado=String(r.OrigenReserva||'').trim().toUpperCase().replace(/[\s-]+/g,'_');
+  const esSinReserva=clienteSinReserva||((origenNormalizado==='SIN_RESERVA'||origenNormalizado==='PRIVADO_SIN_RESERVA')&&(nombreNormalizado==='SIN RESERVA'||nombreNormalizado==='CLIENTE SIN RESERVA'))||(origenNormalizado==='PRIVADO'&&(nombreNormalizado==='SIN RESERVA'||nombreNormalizado==='CLIENTE SIN RESERVA')&&(!telefonoNormalizado||telefonoNormalizado==='SIN TELÉFONO'||telefonoNormalizado==='SIN TELEFONO'));
   const readOnly=['FINALIZADA','CANCELADA_CLIENTE','CANCELADA_LOCAL','NO_PRESENTADO'].includes(r.Estado);
   const sentada=r.Estado==='SENTADA';
   const edit=(field:typeof editing)=>{
