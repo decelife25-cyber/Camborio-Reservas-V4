@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import ReservationCard from '../components/ReservationCard';
 import { useNavigate } from 'react-router-dom';
@@ -73,29 +73,50 @@ export default function Inicio() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [filtroEstados, setFiltroEstados] = useState<Record<EstadoFiltro, boolean>>(cargarFiltroGuardado);
+  const fetchRequestRef = useRef(0);
   const [filtroAbierto, setFiltroAbierto] = useState(false);
   const [filtroEdicion, setFiltroEdicion] = useState<Record<EstadoFiltro, boolean>>(filtroEstados);
 
   async function fetchReservas() {
+    const requestId = ++fetchRequestRef.current;
     if (!session?.access_token) return;
+
     setLoading(true);
     setError('');
-    const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
 
-    const { data, error: queryError } = await supabase
+    const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
+    const query = () => supabase
       .from('Reservas')
       .select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,MesasAdicionales,Turno,Observaciones')
       .eq('FechaReserva', today)
       .order('HoraReserva', { ascending: true });
 
-    if (queryError) {
-      console.error('Error cargando reservas de hoy', queryError);
-      setError('No se pudieron cargar las reservas.');
-      setReservas([]);
-    } else {
-      setReservas((data || []) as Reserva[]);
+    let lastError: unknown = null;
+
+    for (let intento = 0; intento < 3; intento += 1) {
+      if (intento > 0) {
+        await new Promise(resolve => setTimeout(resolve, 300 * intento));
+        if (requestId !== fetchRequestRef.current) return;
+        await supabase.auth.getSession();
+      }
+
+      const { data, error: queryError } = await query();
+
+      if (!queryError) {
+        if (requestId !== fetchRequestRef.current) return;
+        setReservas((data || []) as Reserva[]);
+        setLoading(false);
+        return;
+      }
+
+      lastError = queryError;
+      console.error('Error cargando reservas de hoy (intento ' + (intento + 1) + '/3)', queryError);
     }
 
+    if (requestId !== fetchRequestRef.current) return;
+    console.error('Error definitivo cargando reservas de hoy', lastError);
+    setError('No se pudieron cargar las reservas.');
+    setReservas([]);
     setLoading(false);
   }
 
