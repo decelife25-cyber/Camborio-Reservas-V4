@@ -82,20 +82,29 @@ export default function Inicio() {
     setError('');
     const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
 
-    const { data, error: queryError } = await supabase
+    const consulta = () => supabase
       .from('Reservas')
       .select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,MesasAdicionales,Turno,Observaciones')
       .eq('FechaReserva', today)
       .order('HoraReserva', { ascending: true });
 
-    if (queryError) {
-      console.error('Error cargando reservas de hoy', queryError);
-      setError('No se pudieron cargar las reservas.');
-      setReservas([]);
-    } else {
-      setReservas((data || []) as Reserva[]);
+    let lastError: unknown = null;
+    for (let intento = 0; intento < 3; intento += 1) {
+      const { data, error: queryError } = await consulta();
+      if (!queryError) {
+        setReservas((data || []) as Reserva[]);
+        setLoading(false);
+        return;
+      }
+      lastError = queryError;
+      if (intento < 2) {
+        await new Promise(resolve => setTimeout(resolve, 300 * (intento + 1)));
+      }
     }
 
+    console.error('Error cargando reservas de hoy tras reintentos', lastError);
+    setError('No se pudieron cargar las reservas.');
+    setReservas([]);
     setLoading(false);
   }
 
