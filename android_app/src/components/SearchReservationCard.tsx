@@ -130,7 +130,7 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
     if(resultado.error){setError(resultado.error.message);return;}
     const next={...r,...resultado.data,Estado:nextState} as SearchReservation;
     setR(next);onUpdated(next);
-    if(r.Estado==='PENDIENTE' && nextState==='CONFIRMADA'){
+    if(r.Estado==='PENDIENTE' && nextState!=='PENDIENTE'){
       window.dispatchEvent(new Event('camborio-pending-count-change'));
     }
     setStateOpen(false);setDirty(false);setResultado('ESTADO CAMBIADO CORRECTAMENTE');setConfirmAction('resultado');setError('');

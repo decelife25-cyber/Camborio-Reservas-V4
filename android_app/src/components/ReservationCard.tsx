@@ -166,7 +166,7 @@ export default function ReservationCard({
     setSaving(false);
     const next = { ...reserva, ...resultado.data, Estado: nextState } as ReservationCardData;
     onUpdate?.(next);
-    if (reserva.Estado === 'PENDIENTE' && nextState === 'CONFIRMADA') {
+    if (reserva.Estado === 'PENDIENTE' && nextState !== 'PENDIENTE') {
       window.dispatchEvent(new Event('camborio-pending-count-change'));
     }
     setStateOpen(false);
