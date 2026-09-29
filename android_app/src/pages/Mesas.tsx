@@ -301,6 +301,26 @@ export default function Mesas() {
     setAssignmentTables(next);
   };
 
+  useEffect(() => {
+    const panel = document.querySelector('.cr-planos-mesas__panel');
+    if (!panel) return;
+    const onClick = (event: Event) => {
+      const target = event.target as HTMLElement | null;
+      const button = target?.closest('[data-mesa-numero]') as HTMLButtonElement | null;
+      if (!button || !panel.contains(button)) return;
+      const numero = button.dataset.mesaNumero || '';
+      if (!numero) return;
+      if (assignmentMode) {
+        toggleAssignmentTable(numero);
+      } else {
+        setSelectedTable(numero);
+      }
+      button.blur();
+    };
+    panel.addEventListener('click', onClick);
+    return () => panel.removeEventListener('click', onClick);
+  }, [assignmentMode]);
+
   const tieneCambiosAsignacion=()=>assignmentTables.join(',')!==assignmentOriginalRef.current.join(',');
 
   const cerrarAsignacion=()=>{
@@ -478,7 +498,6 @@ export default function Mesas() {
                 )}
                 data-mesa-numero={mesa.numero}
                 style={{ '--mesa-x': mesa.x + '%', '--mesa-y': mesa.y + '%' } as CSSProperties}
-                onClick={assignmentMode ? () => toggleAssignmentTable(mesa.numero) : () => setSelectedTable(mesa.numero)}
                 aria-label={'Mesa ' + mesa.numero + ' ' + mesa.estado}
               >
                 {mesa.numero}
