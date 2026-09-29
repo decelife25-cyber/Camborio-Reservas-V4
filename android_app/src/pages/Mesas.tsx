@@ -342,7 +342,8 @@ export default function Mesas() {
   const toggleAssignmentTable = (numero:string) => {
     if(!assignmentMode || mesasConfig[numero]?.Activa===false)return;
     const mesaVisible=mesasVisibles.find(m=>m.numero===numero);
-    if(mesaVisible && mesaVisible.estado!=='disponible' && !assignmentTablesRef.current.includes(numero))return;
+    const esMesaOriginal = assignmentOriginalRef.current.includes(numero);
+    if(mesaVisible && mesaVisible.estado!=='disponible' && !assignmentTablesRef.current.includes(numero) && !esMesaOriginal)return;
     const current=assignmentTablesRef.current;
     const indice=current.indexOf(numero);
     const next=indice===0?[]:indice!==-1?current.filter(x=>x!==numero):[...current,numero];
@@ -350,24 +351,55 @@ export default function Mesas() {
     sincronizarSeleccionMesasDOM(next);
   };
 
+  const mesaTapTimerRef = useRef<number | null>(null);
+  const mesaTapLastKeyRef = useRef('');
+
+  const limpiarToqueMesa = () => {
+    if (mesaTapTimerRef.current !== null) {
+      window.clearTimeout(mesaTapTimerRef.current);
+      mesaTapTimerRef.current = null;
+    }
+    mesaTapLastKeyRef.current = '';
+  };
+
   useEffect(() => {
-    const onPointerDown = (event: PointerEvent) => {
+    const onClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement | null;
       const button = target?.closest('[data-mesa-numero]') as HTMLButtonElement | null;
       if (!button) return;
       const numero = button.dataset.mesaNumero || '';
       if (!numero) return;
-      event.preventDefault();
-      event.stopPropagation();
+
       if (assignmentMode) {
         toggleAssignmentTable(numero);
         return;
       }
+
+      const zonaMesa = button.dataset.mesaZona || zona;
+      const claveToque = zonaMesa + ':' + numero;
+      const esDobleToque = mesaTapTimerRef.current !== null && mesaTapLastKeyRef.current === claveToque;
+
+      if (!esDobleToque) {
+        limpiarToqueMesa();
+        mesaTapLastKeyRef.current = claveToque;
+        mesaTapTimerRef.current = window.setTimeout(() => {
+          mesaTapTimerRef.current = null;
+          mesaTapLastKeyRef.current = '';
+          setSelectedTable(numero);
+        }, 320);
+        return;
+      }
+
+      limpiarToqueMesa();
       setSelectedTable(numero);
     };
-    document.addEventListener('pointerdown', onPointerDown, { capture: true });
-    return () => document.removeEventListener('pointerdown', onPointerDown, { capture: true });
-  }, [assignmentMode, mesasConfig, mesasVisibles, nuevaBorrador]);
+
+    document.addEventListener('click', onClick);
+    return () => {
+      document.removeEventListener('click', onClick);
+      limpiarToqueMesa();
+    };
+  }, [assignmentMode, zona, mesasConfig, mesasVisibles, nuevaBorrador]);
 
   const tieneCambiosAsignacion=()=>assignmentTablesRef.current.join(',')!==assignmentOriginalRef.current.join(',');
 
