@@ -491,7 +491,7 @@ export default function Mesas() {
         .eq('ReservaID', assignmentReserva.ReservaID);
 
       if (updateError) throw updateError;
-      if (assignmentReserva.Estado === 'PENDIENTE' && estadoTrasAsignacion === 'CONFIRMADA') {
+      if (assignmentReserva.Estado === 'PENDIENTE' && estadoTrasAsignacion !== 'PENDIENTE') {
         window.dispatchEvent(new Event('camborio-pending-count-change'));
       }
 
