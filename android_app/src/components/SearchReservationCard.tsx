@@ -46,10 +46,11 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
   const[resultado,setResultado]=useState('');
 
   const parts=dateParts(r.FechaReserva);
+  const esSinReserva=String(r.Nombre||'').trim().toUpperCase()==='SIN RESERVA'&&!String(r.Telefono||'').trim();
   const readOnly=['FINALIZADA','CANCELADA_CLIENTE','CANCELADA_LOCAL','NO_PRESENTADO'].includes(r.Estado);
   const sentada=r.Estado==='SENTADA';
   const edit=(field:typeof editing)=>{
-    if(readOnly||sentada)return;
+    if(readOnly||sentada||esSinReserva)return;
     setError('');
     setEditing(field);
     setValue(field==='fecha'?r.FechaReserva:field==='hora'?String(r.HoraReserva).slice(0,5):field==='personas'?String(r.Personas||1):r.Observaciones||'');
@@ -72,7 +73,7 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
   };
 
   const save=async()=>{
-    if(!dirty||saving||readOnly)return;
+    if(!dirty||saving||readOnly||esSinReserva)return;
     const fecha=r.FechaReserva;
     const hora=String(r.HoraReserva).slice(0,5);
     if(new Date(fecha+'T'+hora+':00').getTime()<Date.now()-60000){setError('No puedes usar una fecha u hora pasada.');return;}
@@ -131,6 +132,7 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
   };
 
   const stateActions = (() => {
+    if(esSinReserva)return [['FINALIZADA','FINALIZAR','finalizada']];
     if(r.Estado==='PENDIENTE'){
       return [['CONFIRMADA','CONFIRMAR','confirmar'],['SENTADA','SENTAR','sentar'],['FINALIZADA','FINALIZAR','finalizada'],['CANCELADA_LOCAL','CANCELAR','cancelar'],['NO_PRESENTADO','NO ASISTIÓ','no-presentado']];
     }
@@ -156,7 +158,7 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
   };
 
   const openMesa=()=>{
-    if(readOnly)return;
+    if(readOnly||esSinReserva)return;
     const mesas=[r.Mesa,...String(r.MesasAdicionales||'').split(',').map(v=>v.trim()).filter(Boolean)].filter(Boolean);
     if(!mesas.length){navigate('/mesas?asignar='+encodeURIComponent(r.ReservaID)+'&volverCodigo='+encodeURIComponent(r.CodigoReserva||''));return;}
     setConfirmAction('mesas');
@@ -175,16 +177,16 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
       <div className="cr-busqueda-ficha__cabecera">
         <div className="cr-busqueda-ficha__cliente">
           <strong><span className="cr-busqueda-ficha__cliente-icon">👤</span>{r.Nombre||'Sin nombre'}</strong>
-          <span><span className="cr-busqueda-ficha__telefono-icon">📞</span><span className="cr-busqueda-ficha__telefono">{r.Telefono||'Sin teléfono'}</span>{r.CodigoReserva&&<button type="button" className="cr-busqueda-ficha__codigo" onClick={e=>{e.stopPropagation();navigate('/buscar?codigo='+encodeURIComponent(r.CodigoReserva||''));}}>🏷️ {r.CodigoReserva}</button>}</span>
+          <span><span className="cr-busqueda-ficha__telefono-icon">📞</span><span className="cr-busqueda-ficha__telefono">{r.Telefono||'Sin teléfono'}</span>{esSinReserva?<span className="cr-busqueda-ficha__codigo cr-busqueda-ficha__codigo--sin-reserva">MESA {r.Mesa||'—'}</span>:r.CodigoReserva&&<button type="button" className="cr-busqueda-ficha__codigo" onClick={e=>{e.stopPropagation();navigate('/buscar?codigo='+encodeURIComponent(r.CodigoReserva||''));}}>🏷️ {r.CodigoReserva}</button>}</span>
         </div>
         <button className="cr-busqueda-ficha__estado" type="button" onClick={()=>!readOnly&&setStateOpen(true)} disabled={readOnly}>{stateLabel(r.Estado)}{!readOnly?' ▼':''}</button>
       </div>
 
       <div className="cr-busqueda-ficha__bloques">
-        <button className="cr-busqueda-ficha__bloque cr-busqueda-ficha__bloque--fecha" type="button" disabled={readOnly||sentada} onClick={()=>edit('fecha')}><strong>{parts.fecha}</strong><em>{parts.anio}</em></button>
-        <button className="cr-busqueda-ficha__bloque cr-busqueda-ficha__bloque--hora" type="button" disabled={readOnly||sentada} onClick={()=>edit('hora')}><strong>{parts.dia}</strong><em>{String(r.HoraReserva||'').slice(0,5)}</em></button>
-        <button className="cr-busqueda-ficha__bloque cr-busqueda-ficha__bloque--pax" type="button" disabled={readOnly||sentada} onClick={()=>edit('personas')}><strong>{r.Personas||0} PAX</strong></button>
-        <button className="cr-busqueda-ficha__bloque cr-busqueda-ficha__bloque--mesa" type="button" disabled={readOnly} onClick={openMesa}><span>MESA</span><strong className={!r.Mesa?'cr-busqueda-ficha__mesa-sin-asignar':''}>{r.Mesa ? String(r.Mesa)+(String(r.MesasAdicionales||'').split(',').map(v=>v.trim()).filter(Boolean).length ? ' (+'+String(r.MesasAdicionales||'').split(',').map(v=>v.trim()).filter(Boolean).length+')' : '') : 'SIN ASIGNAR'}</strong></button>
+        <button className="cr-busqueda-ficha__bloque cr-busqueda-ficha__bloque--fecha" type="button" disabled={readOnly||sentada||esSinReserva} onClick={()=>edit('fecha')}><strong>{parts.fecha}</strong><em>{parts.anio}</em></button>
+        <button className="cr-busqueda-ficha__bloque cr-busqueda-ficha__bloque--hora" type="button" disabled={readOnly||sentada||esSinReserva} onClick={()=>edit('hora')}><strong>{parts.dia}</strong><em>{String(r.HoraReserva||'').slice(0,5)}</em></button>
+        <button className="cr-busqueda-ficha__bloque cr-busqueda-ficha__bloque--pax" type="button" disabled={readOnly||sentada||esSinReserva} onClick={()=>edit('personas')}><strong>{r.Personas||0} PAX</strong></button>
+        <button className="cr-busqueda-ficha__bloque cr-busqueda-ficha__bloque--mesa" type="button" disabled={readOnly||esSinReserva} onClick={openMesa}><span>MESA</span><strong className={!r.Mesa?'cr-busqueda-ficha__mesa-sin-asignar':''}>{r.Mesa ? String(r.Mesa)+(String(r.MesasAdicionales||'').split(',').map(v=>v.trim()).filter(Boolean).length ? ' (+'+String(r.MesasAdicionales||'').split(',').map(v=>v.trim()).filter(Boolean).length+')' : '') : 'SIN ASIGNAR'}</strong></button>
       </div>
 
       <button className="cr-busqueda-ficha__observaciones" type="button" disabled={readOnly||sentada} onClick={()=>edit('observaciones')}><span>OBSERVACIONES</span><p>{r.Observaciones||'Sin observaciones.'}</p></button>
