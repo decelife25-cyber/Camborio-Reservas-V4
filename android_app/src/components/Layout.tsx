@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Settings, Sun, Moon } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -19,6 +19,7 @@ export default function Layout() {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
@@ -34,17 +35,31 @@ export default function Layout() {
   async function fetchPendingCount() {
     if (!user) return;
     const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
-    const { count, error } = await supabase
-      .from('Reservas')
-      .select('ReservaID', { count: 'exact', head: true })
-      .eq('Estado', 'PENDIENTE')
-      .gte('FechaReserva', today);
-    if (!error) setPendingCount(count || 0);
+
+    for (let intento = 0; intento < 3; intento += 1) {
+      if (intento > 0) {
+        await new Promise(resolve => setTimeout(resolve, 250 * intento));
+        await supabase.auth.getSession();
+      }
+
+      const { count, error } = await supabase
+        .from('Reservas')
+        .select('ReservaID', { count: 'exact', head: true })
+        .eq('Estado', 'PENDIENTE')
+        .gte('FechaReserva', today);
+
+      if (!error) {
+        setPendingCount(count || 0);
+        return;
+      }
+
+      console.error('Error actualizando contador de pendientes (intento ' + (intento + 1) + '/3)', error);
+    }
   }
 
   useEffect(() => {
     void fetchPendingCount();
-  }, [user]);
+  }, [user, location.pathname]);
 
   useEffect(() => {
     const refreshPendingCount = () => { void fetchPendingCount(); };
