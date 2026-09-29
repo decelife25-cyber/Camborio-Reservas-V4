@@ -287,6 +287,11 @@ export default function Mesas() {
     setSaving(false);
   };
 
+  const mesasVisibles = useMemo(() => layout.mesas.map(m => ({
+    ...m,
+    estado: mesasConfig[m.numero]?.Activa === false ? 'desactivada' : visualState(reservationForTable(reservas, m.numero)),
+  })), [layout.mesas, mesasConfig, reservas]);
+
   const assignmentSet = new Set(assignmentTablesRef.current);
   const assignmentOriginalSet = new Set(assignmentOriginalRef.current);
 
@@ -489,11 +494,6 @@ export default function Mesas() {
     }
   };
   const estado: 'disponible' | 'reservada' | 'ocupada' | 'desactivada' = selectedTable && mesasConfig[selectedTable]?.Activa === false ? 'desactivada' : (selectedTable ? visualState(reservaSeleccionada) : 'disponible');
-
-  const mesasVisibles = useMemo(() => layout.mesas.map(m => ({
-    ...m,
-    estado: mesasConfig[m.numero]?.Activa === false ? 'desactivada' : visualState(reservationForTable(reservas, m.numero)),
-  })), [layout.mesas, mesasConfig, reservas]);
 
   return (
     <section className="cr-planos-mesas" aria-label="Planos de mesas">
