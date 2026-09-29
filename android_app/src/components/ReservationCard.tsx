@@ -72,7 +72,8 @@ export default function ReservationCard({
   const nombreNormalizado = String(reserva.Nombre || '').trim().toUpperCase().replace(/\s+/g, ' ');
   const telefonoNormalizado = String(reserva.Telefono || '').trim().toUpperCase().replace(/\s+/g, ' ');
   const clienteSinReserva = reserva.ClienteSinReserva === true || String(reserva.ClienteSinReserva || '').trim().toLowerCase() === 'true';
-  const esSinReserva = clienteSinReserva || ((nombreNormalizado === 'SIN RESERVA' || nombreNormalizado === 'CLIENTE SIN RESERVA') && (!telefonoNormalizado || telefonoNormalizado === 'SIN TELÉFONO' || telefonoNormalizado === 'SIN TELEFONO'));
+  const origenNormalizado = String(reserva.OrigenReserva || '').trim().toUpperCase().replace(/[\s-]+/g, '_');
+  const esSinReserva = clienteSinReserva || ((origenNormalizado === 'SIN_RESERVA' || origenNormalizado === 'PRIVADO_SIN_RESERVA') && (nombreNormalizado === 'SIN RESERVA' || nombreNormalizado === 'CLIENTE SIN RESERVA')) || (origenNormalizado === 'PRIVADO' && (nombreNormalizado === 'SIN RESERVA' || nombreNormalizado === 'CLIENTE SIN RESERVA') && (!telefonoNormalizado || telefonoNormalizado === 'SIN TELÉFONO' || telefonoNormalizado === 'SIN TELEFONO'));
   const readOnly = ['FINALIZADA', 'CANCELADA_CLIENTE', 'CANCELADA_LOCAL', 'NO_PRESENTADO'].includes(reserva.Estado);
 
   const goAssignTable = (autoSeat = false) => {
