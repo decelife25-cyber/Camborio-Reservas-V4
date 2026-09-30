@@ -11,6 +11,7 @@ type Reserva = {
   HoraReserva: string;
   Nombre: string | null;
   Telefono: string | null;
+  Email?: string | null;
   Personas: number | null;
   Estado: string;
   Mesa: string | null;
@@ -87,7 +88,7 @@ export default function Inicio() {
     const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
     const query = () => supabase
       .from('Reservas')
-      .select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,MesasAdicionales,Turno,Observaciones')
+      .select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Email,Personas,Estado,Mesa,MesasAdicionales,Turno,Observaciones')
       .eq('FechaReserva', today)
       .order('HoraReserva', { ascending: true });
 
