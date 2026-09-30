@@ -87,14 +87,7 @@ export default function ReservationCard({
   };
   const hoyMadrid = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
   const horaMadrid = madridNowTime();
-  const esFechaPasada = reserva.FechaReserva < hoyMadrid;
-  const esFechaFutura = reserva.FechaReserva > hoyMadrid;
-  const esHoraPasadaHoy = reserva.FechaReserva === hoyMadrid && formatTime(reserva.HoraReserva) < horaMadrid;
-  const esReservaPasada = esFechaPasada || esHoraPasadaHoy;
-  const turnoActual = getTurnoFromHora(horaMadrid);
-  const turnoReserva = String(reserva.Turno || '').trim().toUpperCase() || getTurnoFromHora(reserva.HoraReserva);
-  const esTurnoActual = turnoReserva === turnoActual;
-  const esContextoFuturoOIncorrecto = esFechaFutura || (reserva.FechaReserva === hoyMadrid && !esTurnoActual);
+  const esReservaPasada = reserva.FechaReserva < hoyMadrid || (reserva.FechaReserva === hoyMadrid && formatTime(reserva.HoraReserva) < horaMadrid);
   const esReservaActivaAtrasada = esReservaPasada && ['PENDIENTE', 'CONFIRMADA'].includes(reserva.Estado);
   const changeState = async (nextState: string) => {
     if (saving || readOnly) return;
