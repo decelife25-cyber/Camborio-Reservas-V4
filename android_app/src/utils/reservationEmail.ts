@@ -1,10 +1,11 @@
-import { supabase } from './supabase';
+import { supabase } from '../lib/supabase';
 
 type ReservationEmailData = {
   ReservaID?: string | null;
   CodigoReserva?: string | null;
   Telefono?: string | null;
   Email?: string | null;
+  Estado?: string | null;
 };
 
 export async function enviarEmailReservaConfirmada(reserva: ReservationEmailData) {
