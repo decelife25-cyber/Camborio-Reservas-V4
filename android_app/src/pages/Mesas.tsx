@@ -526,6 +526,36 @@ export default function Mesas() {
         return;
       }
 
+      // Regla V2: una mesa no puede pertenecer a dos reservas activas
+      // en el mismo día y turno. La comprobación se hace contra Supabase
+      // justo antes de guardar para no depender de un plano potencialmente antiguo.
+      const { data: reservasMismoContexto, error: errorColision } = await supabase
+        .from('Reservas')
+        .select('ReservaID,Mesa,MesasAdicionales,Estado')
+        .eq('FechaReserva', fechaReserva)
+        .eq('Turno', turnoReserva || turnoContexto)
+        .in('Estado', ['PENDIENTE', 'CONFIRMADA', 'SENTADA'])
+        .neq('ReservaID', assignmentReserva.ReservaID);
+
+      if (errorColision) throw errorColision;
+
+      const conflicto = (reservasMismoContexto || []).find((reserva: any) => {
+        const mesasOcupadas = parseAssignedTables(reserva as Reserva);
+        return mesasSeleccionadas.some(mesa => mesasOcupadas.includes(mesa));
+      });
+
+      if (conflicto) {
+        const mesasConflicto = parseAssignedTables(conflicto as Reserva)
+          .filter(mesa => mesasSeleccionadas.includes(mesa));
+        setError(
+          'CR_COLISION_MESA: la mesa ' + mesasConflicto.join(', ') +
+          ' ya está asignada a otra reserva para este día y turno.'
+        );
+        savingRef.current = false;
+        setSaving(false);
+        return;
+      }
+
       const ahoraAsignacion = new Date().toISOString();
       const estadoTrasAsignacion = accion === 'sentar'
         ? 'SENTADA'
