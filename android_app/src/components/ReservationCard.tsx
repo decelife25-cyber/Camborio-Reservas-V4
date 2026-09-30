@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { getReservationStateActions } from '../utils/reservationStateActions';
+import { sendAuthorizedConfirmationEmail } from '../services/reservationEmail';
 
 export type ReservationCardData = {
   ReservaID: string;
@@ -164,16 +165,6 @@ export default function ReservationCard({
       return;
     }
 
-    if (nextState === 'CONFIRMADA' && resultado.data?.EmailReservaAutorizado === true && resultado.data?.Email) {
-      const { error: emailError } = await supabase.functions.invoke('public-reservas', {
-        body: { action: 'send-confirmation-email', reservaId: reserva.ReservaID },
-      });
-      if (emailError) {
-        console.warn('Reserva confirmada, pero no se pudo enviar el email de confirmación', emailError);
-        setError('Reserva confirmada, pero no se pudo enviar el email de confirmación.');
-      }
-    }
-
     const session = await supabase.auth.getSession();
     const userId = session.data.session?.user?.id;
     const { error: logError } = await supabase.from('Log').insert({
@@ -184,23 +175,12 @@ export default function ReservationCard({
     });
     if (logError) console.warn('No se pudo registrar el log de estado', logError);
 
-    // Tras confirmar una reserva pública con consentimiento, enviar la comunicación de confirmación.
     if (reserva.Estado === 'PENDIENTE' && nextState === 'CONFIRMADA' && resultado.data?.EmailReservaAutorizado === true && resultado.data?.Email) {
       try {
-        const session = await supabase.auth.getSession();
-        const accessToken = session.data.session?.access_token;
-        if (accessToken) {
-          const { error: emailError } = await supabase.functions.invoke('public-reservas', {
-            body: {
-              action: 'confirmation-email',
-              reservaId: reserva.ReservaID,
-              _authorization: 'Bearer ' + accessToken,
-            },
-          });
-          if (emailError) console.warn('No se pudo enviar el email de confirmación', emailError);
-        }
+        await sendAuthorizedConfirmationEmail(reserva.ReservaID);
       } catch (emailError) {
-        console.warn('Error enviando email de confirmación', emailError);
+        console.warn('Reserva confirmada, pero no se pudo enviar el email de confirmación', emailError);
+        setError('Reserva confirmada, pero no se pudo enviar el email de confirmación.');
       }
     }
 
