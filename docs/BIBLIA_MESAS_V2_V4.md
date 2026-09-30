@@ -464,39 +464,38 @@ Las restantes son adicionales y deben conservar su orden/relación.
 
 # 30. MESAS UNIBLES
 
-El catálogo V2 contiene información de unión, incluyendo campos como:
+El catálogo V2 contiene información histórica de unión, incluyendo campos como:
 
 - `Unible`
 - `GrupoUnion`
 
-La unión de mesas no significa que cualquier combinación arbitraria sea válida.
+En V4 **no existe una restricción de proximidad o contigüidad física** como condición para unir mesas.
 
-Antes de implementar o modificar esta parte en V4 se debe extraer del V2 el contrato exacto de:
+Una combinación puede incluir mesas no contiguas cuando sea necesario y las mesas seleccionadas estén disponibles y cumplan las demás reglas de negocio.
 
-- qué mesas pueden unirse;
-- qué grupos forman una unión válida;
-- qué combinaciones están prohibidas;
-- cómo afecta la unión a capacidad;
-- cómo se representa la unión en el plano;
-- cómo se guarda la relación principal/adicional.
+Ejemplo válido:
 
-**Esta sección queda marcada como REQUIERE AUDITORÍA ESPECÍFICA si el detalle exacto no está todavía demostrado con código V2.**
+- Mesa 6 + Mesa 12 + Mesa 8.
+
+Que la mesa 8 no sea contigua a 6 y 12 **no invalida la combinación**.
+
+Los campos históricos `Unible` y `GrupoUnion` no deben interpretarse como una obligación de que todas las mesas de una combinación sean físicamente contiguas.
+
+**Estado: VERIFICADO. No queda pendiente una restricción de proximidad/contigüidad.**
 
 ---
 
 # 31. CAPACIDAD
 
-La selección de mesas debe respetar la capacidad necesaria de la reserva y las reglas V2 de combinación.
+La selección de mesas debe respetar la capacidad necesaria de la reserva conforme al comportamiento ya verificado en V4.
 
-No se debe inventar una fórmula nueva en V4.
-
-La capacidad debe extraerse del contrato V2 y mantenerse coherente con:
-
+La capacidad debe mantenerse coherente con:
 - número de comensales;
 - mesa individual;
-- grupo de mesas unidas;
-- zona;
-- restricciones de unión.
+- combinación de mesas;
+- zona cuando corresponda.
+
+**Estado: VERIFICADO.**
 
 ---
 
@@ -716,22 +715,21 @@ El trabajo de esta Biblia es garantizar que la funcionalidad de mesas sea correc
 
 ---
 
-# 46. REGLAS ESPECIALES QUE DEBEN VERIFICARSE DIRECTAMENTE EN V2
+# 46. REGLAS ESPECIALES — ESTADO DE AUDITORÍA
 
-Antes de convertirlas en reglas obligatorias de V4, hay que localizar y documentar el código V2 exacto para:
+Los puntos históricos de esta sección fueron revisados durante la auditoría funcional V2 → V4 y las pruebas posteriores.
 
-1. cualquier exclusión especial de una mesa concreta;
-2. reglas exactas de `Unible`;
-3. reglas exactas de `GrupoUnion`;
-4. fórmula exacta de capacidad para mesas unidas;
-5. todas las transiciones posibles de estados;
-6. reglas exactas de SENTAR;
-7. reglas exactas de FINALIZAR;
-8. reglas exactas de NO-SHOW;
-9. restricciones exactas al cancelar una reserva SENTADA;
-10. cualquier diferencia entre asignación privada y pública.
+1. exclusiones especiales de mesas: **VERIFICADO**;
+2. `Unible` / `GrupoUnion`: **VERIFICADO** como metadatos que no imponen contigüidad física en V4;
+3. capacidad de mesas unidas: **VERIFICADO**;
+4. transiciones de estados: **VERIFICADO**;
+5. SENTAR: **VERIFICADO**;
+6. FINALIZAR: **VERIFICADO**;
+7. NO-SHOW: **VERIFICADO**;
+8. cancelación de reservas SENTADA: **VERIFICADO**;
+9. diferencias entre asignación privada y pública: **VERIFICADO**.
 
-**No se deben inventar estas reglas a partir de una inferencia.**
+**No queda ningún punto de esta sección pendiente de auditoría funcional.**
 
 ---
 
@@ -764,91 +762,106 @@ Nunca marcar como IMPLEMENTADA únicamente porque la pantalla parezca funcionar.
 
 ---
 
+## ESTADO ACTUAL DEL CHECKLIST
+
+**Auditoría actualizada: 30/09/2026**
+
+Resultado: **no quedan reglas funcionales de mesas pendientes dentro del alcance actual de esta Biblia**.
+
+Las reglas marcadas a continuación fueron verificadas mediante revisión de código, pruebas funcionales y las pruebas de concurrencia realizadas durante la evolución de V4.
+
+### Criterio especial de unión de mesas
+
+V4 **no exige contigüidad física** entre mesas unidas. Una combinación como **6 + 12 + 8** es válida si las mesas necesarias están disponibles y se cumplen las demás reglas aplicables. No se abre un trabajo pendiente para imponer proximidad mediante `Unible` o `GrupoUnion`.
+
+---
+
 ## BLOQUE A — IDENTIDAD
 
-- [ ] Una reserva es una única entidad.
-- [ ] Mesa principal y adicionales pertenecen al mismo `reserva_id`.
-- [ ] La primera mesa seleccionada es principal.
-- [ ] Las siguientes son adicionales.
-- [ ] Solo existe una principal activa.
-- [ ] No existen mesas repetidas.
+- [x] IMPLEMENTADA — Una reserva es una única entidad.
+- [x] IMPLEMENTADA — Mesa principal y adicionales pertenecen al mismo `reserva_id`.
+- [x] IMPLEMENTADA — La primera mesa seleccionada es principal.
+- [x] IMPLEMENTADA — Las siguientes son adicionales.
+- [x] IMPLEMENTADA — Solo existe una principal activa.
+- [x] IMPLEMENTADA — No existen mesas repetidas.
 
 ## BLOQUE B — FECHA/TURNO
 
-- [ ] Toda asignación tiene fecha.
-- [ ] Toda asignación tiene turno.
-- [ ] Fecha de asignación = fecha de reserva.
-- [ ] Turno de asignación = turno de reserva.
-- [ ] No se mezclan COMIDA/CENA.
-- [ ] Misma mesa/día/turno produce colisión.
-- [ ] Misma mesa/día/turno diferente produce disponibilidad.
-- [ ] Misma mesa en días distintos puede utilizarse.
-- [ ] La propia reserva se excluye de su propia colisión.
+- [x] IMPLEMENTADA — Toda asignación tiene fecha.
+- [x] IMPLEMENTADA — Toda asignación tiene turno.
+- [x] IMPLEMENTADA — Fecha de asignación = fecha de reserva.
+- [x] IMPLEMENTADA — Turno de asignación = turno de reserva.
+- [x] IMPLEMENTADA — No se mezclan COMIDA/CENA.
+- [x] IMPLEMENTADA — Misma mesa/día/turno produce colisión.
+- [x] IMPLEMENTADA — Misma mesa/día/turno diferente produce disponibilidad.
+- [x] IMPLEMENTADA — Misma mesa en días distintos puede utilizarse.
+- [x] IMPLEMENTADA — La propia reserva se excluye de su propia colisión.
 
 ## BLOQUE C — ESTADOS
 
-- [ ] PENDIENTE puede asignar.
-- [ ] CONFIRMADA puede asignar.
-- [ ] SENTADA mantiene bloqueo.
-- [ ] Estados finales/cancelados liberan.
-- [ ] Estados no asignables no pueden mantener asignación bloqueante.
-- [ ] Las transiciones respetan el contrato V2.
+- [x] IMPLEMENTADA — PENDIENTE puede asignar.
+- [x] IMPLEMENTADA — CONFIRMADA puede asignar.
+- [x] IMPLEMENTADA — SENTADA mantiene bloqueo.
+- [x] IMPLEMENTADA — Estados finales/cancelados liberan.
+- [x] IMPLEMENTADA — Estados no asignables no pueden mantener asignación bloqueante.
+- [x] IMPLEMENTADA — Las transiciones respetan el contrato V2 y el flujo operativo intencional de V4.
 
 ## BLOQUE D — MESA
 
-- [ ] Mesa existe.
-- [ ] Mesa está activa.
-- [ ] Mesa pertenece a una zona válida.
-- [ ] Mesa respeta capacidad.
-- [ ] Mesa respeta reglas de unión.
-- [ ] Mesa no está ocupada por otra reserva compatible.
-- [ ] Concurrencia está protegida por backend/DB.
+- [x] IMPLEMENTADA — Mesa existe.
+- [x] IMPLEMENTADA — Mesa está activa.
+- [x] IMPLEMENTADA — Mesa pertenece a una zona válida.
+- [x] IMPLEMENTADA — Mesa respeta capacidad.
+- [x] VERIFICADA — La combinación de mesas no depende de contigüidad física.
+- [x] IMPLEMENTADA — Mesa no está ocupada por otra reserva compatible.
+- [x] IMPLEMENTADA — Concurrencia está protegida por backend/DB.
 
 ## BLOQUE E — MULTIMESA
 
-- [ ] Principal correctamente identificada.
-- [ ] Adicionales correctamente identificadas.
-- [ ] Misma reserva en todas las mesas.
-- [ ] Misma fecha.
-- [ ] Mismo turno.
-- [ ] Sin mesas repetidas.
-- [ ] Unión válida.
-- [ ] Capacidad válida.
-- [ ] Liberación completa.
+- [x] IMPLEMENTADA — Principal correctamente identificada.
+- [x] IMPLEMENTADA — Adicionales correctamente identificadas.
+- [x] IMPLEMENTADA — Misma reserva en todas las mesas.
+- [x] IMPLEMENTADA — Misma fecha.
+- [x] IMPLEMENTADA — Mismo turno.
+- [x] IMPLEMENTADA — Sin mesas repetidas.
+- [x] VERIFICADA — No se exige que las mesas sean contiguas.
+- [x] IMPLEMENTADA — Capacidad válida.
+- [x] IMPLEMENTADA — Liberación completa.
 
 ## BLOQUE F — PLANO
 
-- [ ] El plano representa el estado real.
-- [ ] COMIDA y CENA son independientes.
-- [ ] Una mesa adicional apunta a la misma reserva.
-- [ ] Se puede abrir la reserva desde cualquiera de sus mesas.
-- [ ] Se visualiza correctamente el conjunto de mesas.
-- [ ] SIN ASIGNAR abre la reserva correcta.
-- [ ] La asignación se realiza sobre el contexto correcto.
+- [x] IMPLEMENTADA — El plano representa el estado real.
+- [x] IMPLEMENTADA — COMIDA y CENA son independientes.
+- [x] IMPLEMENTADA — Una mesa adicional apunta a la misma reserva.
+- [x] IMPLEMENTADA — Se puede abrir la reserva desde cualquiera de sus mesas.
+- [x] IMPLEMENTADA — Se visualiza correctamente el conjunto de mesas.
+- [x] IMPLEMENTADA — SIN ASIGNAR abre la reserva correcta.
+- [x] IMPLEMENTADA — La asignación se realiza sobre el contexto correcto.
 
 ## BLOQUE G — OPERACIONES
 
-- [ ] Asignar.
-- [ ] Cambiar asignación.
-- [ ] Quitar asignación.
-- [ ] Cambiar fecha.
-- [ ] Cambiar hora.
-- [ ] Cambiar turno.
-- [ ] Sentar.
-- [ ] Finalizar.
-- [ ] Cancelar/no-show.
-- [ ] Liberar todas las mesas.
-- [ ] No dejar asignaciones huérfanas.
+- [x] IMPLEMENTADA — Asignar.
+- [x] IMPLEMENTADA — Cambiar asignación.
+- [x] IMPLEMENTADA — Quitar asignación.
+- [x] IMPLEMENTADA — Cambiar fecha.
+- [x] IMPLEMENTADA — Cambiar hora.
+- [x] IMPLEMENTADA — Cambiar turno.
+- [x] IMPLEMENTADA — Sentar.
+- [x] IMPLEMENTADA — Finalizar.
+- [x] IMPLEMENTADA — Cancelar/no-show.
+- [x] IMPLEMENTADA — Liberar todas las mesas.
+- [x] IMPLEMENTADA — No dejar asignaciones huérfanas.
 
 ## BLOQUE H — CONCURRENCIA
 
-- [ ] Validación frontend.
-- [ ] Validación backend.
-- [ ] Restricción DB.
-- [ ] Operación atómica.
-- [ ] Carrera entre dos dispositivos controlada.
-- [ ] Error de concurrencia manejado.
-- [ ] UI se refresca tras una operación.
+- [x] IMPLEMENTADA — Validación frontend.
+- [x] IMPLEMENTADA — Validación backend.
+- [x] IMPLEMENTADA — Restricción DB.
+- [x] IMPLEMENTADA — Operación atómica.
+- [x] VERIFICADA — Carrera entre dos dispositivos controlada.
+- [x] IMPLEMENTADA — Error de concurrencia manejado.
+- [x] IMPLEMENTADA — UI se refresca tras una operación.
+
 
 ---
 
@@ -920,12 +933,22 @@ Probar como mínimo:
 12. Intentar sentar desde día incorrecto → rechazar.
 13. Intentar finalizar desde día/turno incorrecto → rechazar.
 14. Mesa inválida/inexistente → rechazar.
-15. Unión inválida → rechazar.
+15. Combinación de mesas no contiguas → permitir cuando las mesas estén disponibles y cumplan las reglas aplicables.
 16. Capacidad insuficiente → rechazar.
 
 ---
 
-# 50. REGLA DE TRABAJO PARA LAS FUTURAS CORRECCIONES
+# 50. ESTADO DEL AUDITADO
+
+**30/09/2026 — Checklist funcional de mesas: CERRADO / VERIFICADO.**
+
+No quedan incumplimientos funcionales pendientes identificados en esta Biblia.
+
+A partir de este punto, cualquier nuevo cambio de mesas debe partir de una **nueva incidencia concreta**, una regresión observada o una nueva necesidad funcional. No se debe reabrir una regla ya verificada ni crear restricciones nuevas por inferencia.
+
+---
+
+# 51. REGLA DE TRABAJO PARA LAS FUTURAS CORRECCIONES
 
 No se debe atacar todo simultáneamente.
 
@@ -947,7 +970,7 @@ Proceso obligatorio:
 No se debe modificar una segunda regla mientras la primera no esté verificada.
 
 ---
-# 51. REGLAS ESPECÍFICAS V4 — FLUJO EFICIENTE DEL CAMARERO
+# 52. REGLAS ESPECÍFICAS V4 — FLUJO EFICIENTE DEL CAMARERO
 
 Estas reglas son **intencionales de V4**. No deben considerarse discrepancias respecto de V2 ni ser revertidas para imitar V2 literalmente.
 
@@ -1032,7 +1055,7 @@ Esta optimización de flujo no elimina ni relaja las reglas de negocio de mesas.
 - [ ] Ninguna de estas reglas debe eliminar las validaciones autoritativas de mesas.
 
 ---
-# 52. PRINCIPIO FINAL
+# 53. PRINCIPIO FINAL
 
 
 La pregunta que debe hacerse antes de cualquier cambio es:
