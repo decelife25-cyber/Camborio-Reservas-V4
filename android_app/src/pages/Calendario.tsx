@@ -136,6 +136,14 @@ export default function Calendario() {
     });
   };
 
+  const handleUpdate = (updated: Reserva) => {
+    setReservasMes(current =>
+      current.map(reserva =>
+        reserva.ReservaID === updated.ReservaID ? { ...reserva, ...updated } : reserva
+      )
+    );
+  };
+
   useEffect(() => { localStorage.setItem(FILTRO_STORAGE_KEY, JSON.stringify(filtroEstados)); }, [filtroEstados]);
   const abrirFiltro=()=>{ setFiltroEdicion(filtroEstados); setFiltroAbierto(true); };
   const toggleFiltroEstado=(estado:EstadoFiltro)=>setFiltroEdicion(current=>({...current,[estado]:!current[estado]}));
@@ -218,7 +226,7 @@ export default function Calendario() {
             <div className="calendar-empty-message">No hay reservas para esta fecha.</div>
           ) : (
             reservasSeleccionadas.map(reserva => (
-              <ReservationCard key={reserva.ReservaID} reserva={reserva} onAssignTable={r => navigate('/mesas?asignar=' + encodeURIComponent(r.ReservaID))} />
+              <ReservationCard key={reserva.ReservaID} reserva={reserva} onAssignTable={r => navigate('/mesas?asignar=' + encodeURIComponent(r.ReservaID))} onUpdate={handleUpdate} />
             ))
           )}
         </div>
