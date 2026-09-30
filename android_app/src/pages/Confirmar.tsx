@@ -14,6 +14,7 @@ type Reserva = {
   Personas: number | null;
   Estado: string;
   Mesa: string | null;
+  Email?: string | null;
   EmailReservaAutorizado?: boolean | null;
 };
 
@@ -55,7 +56,7 @@ export default function Confirmar() {
 
       const { data, error: queryError } = await supabase
         .from('Reservas')
-        .select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa')
+        .select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,Email,EmailReservaAutorizado')
         .eq('Estado', 'PENDIENTE')
         .gte('FechaReserva', today)
         .order('FechaReserva', { ascending: true })
