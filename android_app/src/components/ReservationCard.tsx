@@ -141,9 +141,15 @@ export default function ReservationCard({
     }
 
     const ahora = new Date().toISOString();
+    const liberaMesas = ['FINALIZADA', 'CANCELADA_LOCAL', 'NO_PRESENTADO'].includes(nextState);
     const resultado = await supabase
       .from('Reservas')
-      .update({ Estado: nextState, FechaEstado: ahora, FechaModificacion: ahora })
+      .update({
+        Estado: nextState,
+        FechaEstado: ahora,
+        FechaModificacion: ahora,
+        ...(liberaMesas ? { Mesa: null, MesasAdicionales: null, Zona: null } : {}),
+      })
       .eq('ReservaID', reserva.ReservaID)
       .select('*')
       .single();
