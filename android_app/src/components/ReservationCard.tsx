@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { getTurnoFromHora } from '../utils/shifts';
 
 export type ReservationCardData = {
   ReservaID: string;
@@ -86,7 +87,14 @@ export default function ReservationCard({
   };
   const hoyMadrid = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
   const horaMadrid = madridNowTime();
-  const esReservaPasada = reserva.FechaReserva < hoyMadrid || (reserva.FechaReserva === hoyMadrid && formatTime(reserva.HoraReserva) < horaMadrid);
+  const esFechaPasada = reserva.FechaReserva < hoyMadrid;
+  const esFechaFutura = reserva.FechaReserva > hoyMadrid;
+  const esHoraPasadaHoy = reserva.FechaReserva === hoyMadrid && formatTime(reserva.HoraReserva) < horaMadrid;
+  const esReservaPasada = esFechaPasada || esHoraPasadaHoy;
+  const turnoActual = getTurnoFromHora(horaMadrid);
+  const turnoReserva = String(reserva.Turno || '').trim().toUpperCase() || getTurnoFromHora(reserva.HoraReserva);
+  const esTurnoActual = turnoReserva === turnoActual;
+  const esContextoFuturoOIncorrecto = esFechaFutura || (reserva.FechaReserva === hoyMadrid && !esTurnoActual);
   const esReservaActivaAtrasada = esReservaPasada && ['PENDIENTE', 'CONFIRMADA'].includes(reserva.Estado);
   const changeState = async (nextState: string) => {
     if (saving || readOnly) return;
@@ -174,23 +182,42 @@ export default function ReservationCard({
 
   const stateActions = (() => {
     if (esSinReserva) return [['FINALIZADA', 'FINALIZAR', 'finalizada']];
+
+    // V2 como base: no mostramos acciones que sabemos que no son válidas.
+    // Mejora V4: PENDIENTE puede SENTAR de forma fluida en el contexto operativo.
     if (reserva.Estado === 'PENDIENTE') {
+      if (esContextoFuturoOIncorrecto) {
+        return [['CONFIRMADA', 'CONFIRMAR', 'confirmar'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar']];
+      }
+      if (esReservaPasada) {
+        return [['FINALIZADA', 'FINALIZAR', 'finalizada'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']];
+      }
       return [
         ['CONFIRMADA', 'CONFIRMAR', 'confirmar'],
         ['SENTADA', 'SENTAR', 'sentar'],
-        ['FINALIZADA', 'FINALIZAR', 'finalizada'],
         ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar'],
-        ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado'],
       ];
     }
+
     if (reserva.Estado === 'CONFIRMADA') {
-      return [['SENTADA', 'SENTAR', 'sentar'], ['FINALIZADA', 'FINALIZAR', 'finalizada'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']];
+      if (esContextoFuturoOIncorrecto) {
+        return [['CANCELADA_LOCAL', 'CANCELAR', 'cancelar']];
+      }
+      if (esReservaPasada) {
+        return [['FINALIZADA', 'FINALIZAR', 'finalizada'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']];
+      }
+      return [['SENTADA', 'SENTAR', 'sentar'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar']];
     }
+
     if (reserva.Estado === 'SENTADA') {
+      if (esContextoFuturoOIncorrecto) {
+        return [['CANCELADA_LOCAL', 'CANCELAR', 'cancelar']];
+      }
       return esReservaPasada
-        ? [['FINALIZADA', 'FINALIZAR', 'finalizada'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']]
+        ? [['FINALIZAR', 'FINALIZAR', 'finalizada'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']]
         : [['FINALIZADA', 'FINALIZAR', 'finalizada']];
     }
+
     return [];
   })();
 
