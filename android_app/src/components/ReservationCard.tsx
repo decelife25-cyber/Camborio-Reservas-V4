@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { getReservationStateActions } from '../utils/reservationStateActions';
+import { sendAuthorizedConfirmationEmail } from '../services/reservationEmail';
 
 export type ReservationCardData = {
   ReservaID: string;
@@ -10,6 +11,7 @@ export type ReservationCardData = {
   HoraReserva: string;
   Nombre: string | null;
   Telefono: string | null;
+  EmailReservaAutorizado?: boolean | null;
   Personas: number | null;
   Estado: string;
   Mesa: string | null;
@@ -172,6 +174,15 @@ export default function ReservationCard({
       Detalle: 'Cambio de estado: ' + reserva.Estado + ' → ' + nextState,
     });
     if (logError) console.warn('No se pudo registrar el log de estado', logError);
+
+    if (returnTo === '/' && reserva.Estado === 'PENDIENTE' && nextState === 'CONFIRMADA' && resultado.data?.EmailReservaAutorizado === true && resultado.data?.Email) {
+      try {
+        await sendAuthorizedConfirmationEmail(reserva.ReservaID);
+      } catch (emailError) {
+        console.warn('Reserva confirmada, pero no se pudo enviar el email de confirmación', emailError);
+        setError('Reserva confirmada, pero no se pudo enviar el email de confirmación.');
+      }
+    }
 
     setSaving(false);
     const next = { ...reserva, ...resultado.data, Estado: nextState } as ReservationCardData;
