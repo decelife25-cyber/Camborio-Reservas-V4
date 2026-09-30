@@ -1241,6 +1241,90 @@ html.light .observation-text { color:#222; }
   .reservation-scroll .table-button { min-height: 40px; font-size: 17px; }
 }
 
+/* V4.1.1 — adaptación responsive para pantallas estrechas (WP62).
+   No cambia el diseño en pantallas normales: solo evita recortes de fecha/metadatos
+   cuando el ancho CSS disponible es reducido. */
+@media (max-width: 380px) {
+  .date-turn-header {
+    min-height: 104px;
+    flex-wrap: wrap;
+    align-content: center;
+    row-gap: 5px;
+    padding: 7px 4px;
+  }
+
+  .today-title {
+    flex: 0 0 100%;
+    width: 100%;
+    justify-content: center;
+    font-size: clamp(18px, 5.2vw, 21px);
+    line-height: 1.05;
+    white-space: nowrap;
+    overflow: visible;
+  }
+
+  .today-title > span:last-child {
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  .turn-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .turn-button {
+    flex: 0 1 112px;
+    width: 112px;
+    min-width: 0;
+    padding: 0 3px;
+    font-size: 14px;
+  }
+
+  .reservation-scroll .reservation-card {
+    grid-template-columns: 132px minmax(0, 1fr) 124px;
+  }
+
+  .reservation-scroll .reservation-main {
+    min-width: 0;
+    padding: 9px 7px 9px 9px;
+  }
+
+  .reservation-scroll .customer-name {
+    min-width: 0;
+    font-size: 21px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .reservation-scroll .customer-meta {
+    min-width: 0;
+    font-size: 16px;
+    gap: 5px;
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+
+  .reservation-scroll .reservation-code {
+    flex: 0 0 auto;
+    font-size: 17px;
+    white-space: nowrap;
+  }
+
+  .reservation-scroll .reservation-party {
+    padding: 8px 6px;
+  }
+
+  .reservation-scroll .pax {
+    font-size: 19px;
+  }
+
+  .reservation-scroll .table-button {
+    font-size: 15px;
+  }
+}
+
 /* V4.1 — modo día: más contraste, menos líneas negras y amarillo convertido a ámbar/cobre legible. */
 html.light .private-app {
   color: #202020;
