@@ -9,7 +9,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         def packageVersion = new groovy.json.JsonSlurper().parseText(file("../../package.json").text).version
         def versionParts = packageVersion.tokenize('.')
-        versionCode = versionParts.last().toInteger()
+        versionCode = 439 + versionParts.last().toInteger()
         versionName packageVersion
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
