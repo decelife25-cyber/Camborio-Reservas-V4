@@ -7,8 +7,10 @@ android {
         applicationId "com.camborio.reservas.privada"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode = 545
-        versionName "1.0.106"
+        def packageVersion = new groovy.json.JsonSlurper().parseText(file("../../package.json").text).version
+        def versionParts = packageVersion.tokenize('.')
+        versionCode = versionParts.last().toInteger()
+        versionName packageVersion
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
