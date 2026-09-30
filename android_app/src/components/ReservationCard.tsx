@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { getReservationStateActions } from '../utils/reservationStateActions';
 
 export type ReservationCardData = {
   ReservaID: string;
@@ -172,27 +173,13 @@ export default function ReservationCard({
     setStateOpen(false);
   };
 
-  const stateActions = (() => {
-    if (esSinReserva) return [['FINALIZADA', 'FINALIZAR', 'finalizada']];
-    if (reserva.Estado === 'PENDIENTE') {
-      return [
-        ['CONFIRMADA', 'CONFIRMAR', 'confirmar'],
-        ['SENTADA', 'SENTAR', 'sentar'],
-        ['FINALIZADA', 'FINALIZAR', 'finalizada'],
-        ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar'],
-        ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado'],
-      ];
-    }
-    if (reserva.Estado === 'CONFIRMADA') {
-      return [['SENTADA', 'SENTAR', 'sentar'], ['FINALIZADA', 'FINALIZAR', 'finalizada'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']];
-    }
-    if (reserva.Estado === 'SENTADA') {
-      return esReservaPasada
-        ? [['FINALIZADA', 'FINALIZAR', 'finalizada'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']]
-        : [['FINALIZADA', 'FINALIZAR', 'finalizada']];
-    }
-    return [];
-  })();
+  const stateActions = getReservationStateActions({
+    estado: reserva.Estado,
+    fecha: reserva.FechaReserva,
+    hora: reserva.HoraReserva,
+    turno: reserva.Turno,
+    esSinReserva,
+  });
 
   const assignedTables = [reserva.Mesa, ...(String(reserva.MesasAdicionales || '').split(',').map(v => v.trim()).filter(Boolean))].filter(Boolean) as string[];
   const mesaLabel = assignedTables.length ? 'MESA ' + assignedTables[0] + (assignedTables.length > 1 ? ' (+' + (assignedTables.length - 1) + ')' : '') : 'SIN ASIGNAR';

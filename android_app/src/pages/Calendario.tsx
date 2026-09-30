@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import ReservationCard from '../components/ReservationCard';
+import type { ReservationCardData } from '../components/ReservationCard';
 import { useNavigate } from 'react-router-dom';
 
 type Reserva = {
@@ -136,6 +137,16 @@ export default function Calendario() {
     });
   };
 
+  const handleUpdate = (updated: ReservationCardData) => {
+    setReservasMes(current =>
+      current.map(reserva =>
+        reserva.ReservaID === updated.ReservaID
+          ? { ...reserva, ...updated, Turno: updated.Turno ?? null }
+          : reserva
+      )
+    );
+  };
+
   useEffect(() => { localStorage.setItem(FILTRO_STORAGE_KEY, JSON.stringify(filtroEstados)); }, [filtroEstados]);
   const abrirFiltro=()=>{ setFiltroEdicion(filtroEstados); setFiltroAbierto(true); };
   const toggleFiltroEstado=(estado:EstadoFiltro)=>setFiltroEdicion(current=>({...current,[estado]:!current[estado]}));
@@ -218,7 +229,7 @@ export default function Calendario() {
             <div className="calendar-empty-message">No hay reservas para esta fecha.</div>
           ) : (
             reservasSeleccionadas.map(reserva => (
-              <ReservationCard key={reserva.ReservaID} reserva={reserva} onAssignTable={r => navigate('/mesas?asignar=' + encodeURIComponent(r.ReservaID))} />
+              <ReservationCard key={reserva.ReservaID} reserva={reserva} onAssignTable={r => navigate('/mesas?asignar=' + encodeURIComponent(r.ReservaID))} onUpdate={handleUpdate} />
             ))
           )}
         </div>
