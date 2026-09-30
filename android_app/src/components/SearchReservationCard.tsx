@@ -5,10 +5,11 @@ import { getTurnoFromHora } from '../utils/shifts';
 import { getReservationStateActions } from '../utils/reservationStateActions';
 import FechaPicker from './FechaPicker';
 import { Wheel } from '../pages/NuevaReserva';
+import { enviarEmailReservaConfirmada } from '../utils/reservationEmail';
 
 export type SearchReservation = {
   ReservaID:string; CodigoReserva:string|null; FechaReserva:string; HoraReserva:string;
-  Nombre:string|null; Telefono:string|null; Personas:number|null; Estado:string;
+  Nombre:string|null; Telefono:string|null; Email?:string|null; Personas:number|null; Estado:string;
   Mesa:string|null; MesasAdicionales?:string|null; Turno?:string|null;
   Observaciones?:string|null; FechaCreacion?:string|null;
   ClienteSinReserva?:boolean|string|null; OrigenReserva?:string|null; ClienteID?:string|null;
@@ -91,6 +92,7 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
     setSaving(false);
     if(e){setError(e.message);return;}
     const next={...r,...data,...changes} as SearchReservation;
+    if(r.Estado==='PENDIENTE' && nextState==='CONFIRMADA') void enviarEmailReservaConfirmada(next);
     setR(next);onUpdated(next);setDirty(false);setResultado('CAMBIOS GUARDADOS CORRECTAMENTE');setConfirmAction('resultado');setError('');
   };
 
