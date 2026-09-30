@@ -947,8 +947,93 @@ Proceso obligatorio:
 No se debe modificar una segunda regla mientras la primera no esté verificada.
 
 ---
+# 51. REGLAS ESPECÍFICAS V4 — FLUJO EFICIENTE DEL CAMARERO
 
-# 51. PRINCIPIO FINAL
+Estas reglas son **intencionales de V4**. No deben considerarse discrepancias respecto de V2 ni ser revertidas para imitar V2 literalmente.
+
+El objetivo es reducir pasos innecesarios para el camarero manteniendo las mismas garantías de negocio de mesas.
+
+### 51.1 PENDIENTE + ASIGNAR MESA
+
+Si una reserva está en `PENDIENTE` y el camarero le asigna una mesa:
+
+- la asignación significa que el camarero ha aceptado la reserva;
+- al guardar la asignación, la reserva pasa automáticamente a `CONFIRMADA`;
+- no debe obligarse al camarero a ejecutar primero **CONFIRMAR** y después **ASIGNAR MESA**.
+
+**Regla V4:** asignar mesa a una reserva PENDIENTE = aceptar/confirmar la reserva.
+
+### 51.2 PENDIENTE + SENTAR SIN MESA
+
+Si una reserva `PENDIENTE` no tiene mesa y el camarero pulsa **SENTAR**:
+
+1. se abre la asignación de mesa;
+2. el camarero selecciona la mesa o mesas válidas;
+3. al guardar, la reserva pasa por la aceptación (`CONFIRMADA`);
+4. la misma operación continúa hasta `SENTADA`;
+5. no se exige una segunda acción manual de confirmar.
+
+El flujo debe ser continuo: **asignar → aceptar → sentar**.
+
+### 51.3 CONFIRMADA + SENTAR SIN MESA
+
+Si una reserva `CONFIRMADA` no tiene mesa y el camarero pulsa **SENTAR**:
+
+1. se abre la asignación;
+2. se seleccionan las mesas válidas;
+3. al guardar, la operación completa el asiento;
+4. la reserva queda `SENTADA`.
+
+No se debe obligar al camarero a asignar primero y volver a pulsar SENTAR.
+
+### 51.4 CONFIRMADA + SENTAR CON MESA
+
+Si una reserva `CONFIRMADA` ya tiene una asignación válida:
+
+- **SENTAR** debe pasar directamente a `SENTADA`;
+- no debe abrir innecesariamente el selector de mesas.
+
+### 51.5 ASIGNAR NO SIGNIFICA SENTAR
+
+La acción normal **ASIGNAR MESA** no debe sentar a la reserva.
+
+Solo debe producir el cambio `PENDIENTE → CONFIRMADA` cuando corresponda.
+
+El paso a `SENTADA` se realiza únicamente cuando la acción solicitada es **SENTAR**.
+
+### 51.6 PRINCIPIO OPERATIVO
+
+> **Siempre que sea seguro hacerlo, una acción del camarero debe completar todo el trabajo lógico que esa acción expresa, evitando pasos manuales redundantes.**
+
+Esto es una optimización deliberada de V4 para el trabajo en TPV/comandero.
+
+### 51.7 COMPATIBILIDAD CON LAS GARANTÍAS DE MESAS
+
+Esta optimización de flujo no elimina ni relaja las reglas de negocio de mesas. Incluso en estos flujos automáticos siguen siendo obligatorias:
+
+- fecha correcta;
+- turno correcto;
+- mesa existente y activa;
+- zona coherente;
+- ausencia de mesas repetidas;
+- capacidad y unión válidas;
+- ausencia de colisión;
+- autoridad del backend;
+- atomicidad de la operación;
+- liberación completa cuando corresponda.
+
+### 51.8 CHECKLIST V4
+
+- [ ] PENDIENTE + asignar → `CONFIRMADA`.
+- [ ] PENDIENTE + sentar sin mesa → asignar + `CONFIRMADA` + `SENTADA` en un flujo continuo.
+- [ ] CONFIRMADA + sentar sin mesa → asignar + `SENTADA` en un flujo continuo.
+- [ ] CONFIRMADA + sentar con mesa → `SENTADA` directa.
+- [ ] Asignar normalmente nunca sienta.
+- [ ] Ninguna de estas reglas debe eliminar las validaciones autoritativas de mesas.
+
+---
+# 52. PRINCIPIO FINAL
+
 
 La pregunta que debe hacerse antes de cualquier cambio es:
 
