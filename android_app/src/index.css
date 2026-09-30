@@ -387,16 +387,18 @@ html.light .app-version { color: rgba(0,0,0,.58); }
 
 
 
-/* V2 calibration for the Android WebView viewport.
-   The V2 panel is rendered at the compact mobile scale; this APK WebView
-   reports a wider CSS viewport than the same physical device. */
+/* Responsive Android canvas.
+   The legacy fixed 0.57 scale made the same UI fit one phone but clip on
+   narrower/wider WebViews. Keep the V2 visual canvas, but derive its scale
+   from the actual CSS viewport width so the whole canvas always fits. */
 .private-app {
-  transform: scale(0.57);
+  --private-ui-scale: clamp(0.47, calc(100vw / 760px), 0.57);
+  transform: scale(var(--private-ui-scale));
   transform-origin: top left;
-  width: 175.44%;
-  min-height: 175.44svh;
-  height: 175.44svh;
-  padding-top: max(12px, env(safe-area-inset-top, 12px));
+  width: calc(100% / var(--private-ui-scale));
+  min-height: calc(100svh / var(--private-ui-scale));
+  height: calc(100svh / var(--private-ui-scale));
+  padding-top: max(12px, calc(env(safe-area-inset-top, 0px) / var(--private-ui-scale)));
   box-sizing: border-box;
 }
 .app-version {
