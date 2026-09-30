@@ -673,7 +673,7 @@ export default function Mesas() {
           <span><i className="libre" />LIBRE</span>
           <span><i className="reservada" />RESERVADA</span>
           <span><i className="ocupada" />OCUPADA</span>
-          <span><i className="desactivada" />DESACTIVADA</span>
+          <span><i className="desactivada" />NO DISPONIBLE</span>
         </div>
 
         {assignmentMode && <div className="cr-planos-mesas__assignment-actions"><div>SELECCIONA UNA O VARIAS MESAS Y PULSA GUARDAR ASIGNACIÓN PARA ACTUALIZAR LA RESERVA.</div><button type="button" className="primario" data-cr-guardar-asignacion disabled={saving || (Boolean(nuevaBorrador) && assignmentTablesRef.current.length === 0)} onClick={() => void guardarAsignacion()}>{saving ? 'GUARDANDO...' : 'GUARDAR ASIGNACIÓN'}</button></div>}
@@ -748,7 +748,7 @@ export default function Mesas() {
             {estado === 'desactivada' && (
               <>
                 <div className="cr-planos-mesas__dialog-title">MESA {selectedTable}</div>
-                <div className="cr-planos-mesas__dialog-text">MESA DESACTIVADA</div>
+                <div className="cr-planos-mesas__dialog-text">MESA NO DISPONIBLE</div>
                 <div className="cr-planos-mesas__dialog-actions cr-planos-mesas__dialog-actions--one">
                   <button type="button" onClick={() => setSelectedTable(null)}>CERRAR</button>
                 </div>
