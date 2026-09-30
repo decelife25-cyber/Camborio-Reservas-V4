@@ -272,38 +272,21 @@ export default function Mesas() {
       return;
     }
     setSaving(true);
-    const { data, error: insertError } = await supabase
-      .from('Reservas')
-      .insert({
-        CodigoReserva: null,
-        FechaCreacion: now.toISOString(),
-        FechaReserva: fecha,
-        HoraReserva: now.toTimeString().slice(0, 8),
-        Nombre: 'SIN RESERVA',
-        Telefono: null,
-        Email: null,
-        Personas: 1,
-        Observaciones: null,
-        Estado: 'SENTADA',
-        FechaEstado: now.toISOString(),
-        UsuarioEstado: user?.email || 'PRIVADO',
-        Mesa: selectedTable,
-        Zona: zona.toUpperCase(),
-        ClienteID: null,
-        FechaModificacion: now.toISOString(),
-        OrigenReserva: 'PRIVADO',
-        CreadaPor: user?.email || 'PRIVADO',
-        MesasAdicionales: null,
-        Turno: turno,
-      })
-      .select('ReservaID')
-      .single();
+
+    const { data: reservaId, error: insertError } = await supabase.rpc('cr_ocupar_mesa_atomico', {
+      p_fecha: fecha,
+      p_turno: turno,
+      p_mesa: selectedTable,
+      p_zona: zona.toUpperCase().replace('CHILLOUT', 'CHILL OUT'),
+      p_usuario: user?.email || 'PRIVADO',
+    });
+
     if (insertError) {
       setError(insertError.message);
       setSaving(false);
       return;
     }
-    if (!data?.ReservaID) {
+    if (!reservaId) {
       setError('No se pudo crear la ocupación de la mesa.');
       setSaving(false);
       return;
@@ -562,28 +545,24 @@ export default function Mesas() {
         return;
       }
 
-      const ahoraAsignacion = new Date().toISOString();
       const estadoTrasAsignacion = accion === 'sentar'
         ? 'SENTADA'
         : assignmentReserva.Estado === 'PENDIENTE'
           ? 'CONFIRMADA'
           : assignmentReserva.Estado;
-      const { error: updateError } = await supabase
-        .from('Reservas')
-        .update({
-          Mesa: principal,
-          MesasAdicionales: adicionales.length ? adicionales.join(', ') : null,
-          Zona: zonaAsignada,
-          Turno: turno,
-          Estado: estadoTrasAsignacion,
-          ...(estadoTrasAsignacion !== assignmentReserva.Estado
-            ? { FechaEstado: ahoraAsignacion }
-            : {}),
-          FechaModificacion: ahoraAsignacion,
-        })
-        .eq('ReservaID', assignmentReserva.ReservaID);
+
+      const { data: reservaPersistida, error: updateError } = await supabase.rpc('cr_asignar_mesas_atomico', {
+        p_reserva_id: assignmentReserva.ReservaID,
+        p_fecha: fechaReserva,
+        p_turno: turno,
+        p_mesa: principal,
+        p_mesas_adicionales: adicionales.length ? adicionales.join(', ') : null,
+        p_zona: zonaAsignada,
+        p_estado: estadoTrasAsignacion,
+      });
 
       if (updateError) throw updateError;
+      if (!reservaPersistida) throw new Error('No se pudo guardar la asignación de mesas.');
       if (assignmentReserva.Estado === 'PENDIENTE' && estadoTrasAsignacion !== 'PENDIENTE') {
         window.dispatchEvent(new Event('camborio-pending-count-change'));
       }
