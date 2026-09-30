@@ -147,6 +147,7 @@ export default function Mesas() {
   const assignmentId = searchParams.get('asignar');
   const nuevaAssignment = searchParams.get('nueva') === '1';
   const volverCodigo = searchParams.get('volverCodigo') || '';
+  const volverRuta = searchParams.get('volverRuta') || '';
   const accion = searchParams.get('accion') || '';
   const [assignmentReserva, setAssignmentReserva] = useState<Reserva | null>(null);
   const [nuevaBorrador, setNuevaBorrador] = useState<NuevaReservaBorrador | null>(null);
@@ -440,7 +441,11 @@ export default function Mesas() {
 
   const cerrarAsignacion=()=>{
     if(!assignmentMode||savingRef.current)return;
-    if(!tieneCambiosAsignacion()){navigate('/');return;}
+    if(!tieneCambiosAsignacion()){
+      if (volverRuta && volverRuta.startsWith('/')) navigate(volverRuta);
+      else navigate('/');
+      return;
+    }
     setConfirmModal({
       titulo:'CAMBIOS SIN GUARDAR',
       mensaje:'¿CERRAR SIN GUARDAR?',
@@ -451,7 +456,8 @@ export default function Mesas() {
         assignmentTablesRef.current=original;
         setAssignmentTables(original);
         setConfirmModal(null);
-        navigate('/');
+        if (volverRuta && volverRuta.startsWith('/')) navigate(volverRuta);
+        else navigate('/');
       },
       alCancelar:()=>setConfirmModal(null)
     });
@@ -589,7 +595,9 @@ export default function Mesas() {
         return;
       }
 
-      if (volverCodigo || persistida.CodigoReserva) {
+      if (volverRuta && volverRuta.startsWith('/')) {
+        navigate(volverRuta);
+      } else if (volverCodigo || persistida.CodigoReserva) {
         const codigo = volverCodigo || persistida.CodigoReserva || '';
         navigate('/buscar?codigo=' + encodeURIComponent(codigo));
       } else {
