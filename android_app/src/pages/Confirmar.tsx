@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Check, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { enviarEmailReservaConfirmada } from '../utils/reservationEmail';
 
 type Reserva = {
   ReservaID: string;
@@ -10,6 +11,7 @@ type Reserva = {
   HoraReserva: string;
   Nombre: string | null;
   Telefono: string | null;
+  Email?: string | null;
   Personas: number | null;
   Estado: string;
   Mesa: string | null;
@@ -53,7 +55,7 @@ export default function Confirmar() {
 
       const { data, error: queryError } = await supabase
         .from('Reservas')
-        .select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa')
+        .select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Email,Personas,Estado,Mesa')
         .eq('Estado', 'PENDIENTE')
         .gte('FechaReserva', today)
         .order('FechaReserva', { ascending: true })
@@ -91,6 +93,7 @@ export default function Confirmar() {
       return;
     }
 
+    void enviarEmailReservaConfirmada({ ...reserva, Estado: 'CONFIRMADA' });
     setReservas(current => current.filter(item => item.ReservaID !== reserva.ReservaID));
     window.dispatchEvent(new Event('camborio-pending-count-change'));
     setConfirming(null);
