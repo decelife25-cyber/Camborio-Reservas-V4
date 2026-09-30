@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 import SearchReservationCard from '../components/SearchReservationCard';
 import type { SearchReservation } from '../components/SearchReservationCard';
 
-const selectFields='ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,MesasAdicionales,Turno,Observaciones,FechaCreacion';
+const selectFields='ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,MesasAdicionales,Turno,Email,Observaciones,FechaCreacion';
 
 export default function BuscarReserva(){
  const [searchParams] = useSearchParams();
