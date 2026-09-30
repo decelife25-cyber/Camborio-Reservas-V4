@@ -269,9 +269,6 @@ export default function Mesas() {
     const turnoActual = getTurnoFromHora(horaMadrid);
 
     if (fecha !== hoy || turno !== turnoActual) {
-      setError(
-        'CR_TURNO_OCUPACION: no se puede ocupar una mesa sin reserva fuera del turno actual.'
-      );
       return;
     }
     setSaving(true);
@@ -420,6 +417,24 @@ export default function Mesas() {
         mesaTapTimerRef.current = window.setTimeout(() => {
           mesaTapTimerRef.current = null;
           mesaTapLastKeyRef.current = '';
+
+          // Una mesa libre no abre el diálogo de "OCUPAR MESA" fuera
+          // del día/turno operativo actual. La pulsación se ignora.
+          const ahora = new Date();
+          const hoy = ahora.toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
+          const horaMadrid = ahora.toLocaleTimeString('en-GB', {
+            timeZone: 'Europe/Madrid',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false,
+          });
+          const turnoActual = getTurnoFromHora(horaMadrid);
+          const reservaMesaActual = reservationForTable(reservas, numero);
+
+          if (!reservaMesaActual && (fecha !== hoy || turno !== turnoActual)) {
+            return;
+          }
+
           setSelectedTable(numero);
         }, 320);
         return;
