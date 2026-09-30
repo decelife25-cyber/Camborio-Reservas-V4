@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { getTurnoFromHora } from '../utils/shifts';
+import { getReservationStateActions } from '../utils/reservationStateActions';
 import FechaPicker from './FechaPicker';
 import { Wheel } from '../pages/NuevaReserva';
 
@@ -136,21 +137,13 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
     setStateOpen(false);setDirty(false);setResultado('ESTADO CAMBIADO CORRECTAMENTE');setConfirmAction('resultado');setError('');
   };
 
-  const stateActions = (() => {
-    if(esSinReserva)return [['FINALIZADA','FINALIZAR','finalizada']];
-    if(r.Estado==='PENDIENTE'){
-      return [['CONFIRMADA','CONFIRMAR','confirmar'],['SENTADA','SENTAR','sentar'],['FINALIZADA','FINALIZAR','finalizada'],['CANCELADA_LOCAL','CANCELAR','cancelar'],['NO_PRESENTADO','NO ASISTIÓ','no-presentado']];
-    }
-    if(r.Estado==='CONFIRMADA'){
-      return [['SENTADA','SENTAR','sentar'],['FINALIZADA','FINALIZAR','finalizada'],['CANCELADA_LOCAL','CANCELAR','cancelar'],['NO_PRESENTADO','NO ASISTIÓ','no-presentado']];
-    }
-    if(r.Estado==='SENTADA'){
-      return esFechaPasada(r.FechaReserva,String(r.HoraReserva).slice(0,5))
-        ? [['FINALIZADA','FINALIZAR','finalizada'],['CANCELADA_LOCAL','CANCELAR','cancelar'],['NO_PRESENTADO','NO ASISTIÓ','no-presentado']]
-        : [['FINALIZADA','FINALIZAR','finalizada']];
-    }
-    return [];
-  })();
+  const stateActions = getReservationStateActions({
+    estado: r.Estado,
+    fecha: r.FechaReserva,
+    hora: r.HoraReserva,
+    turno: r.Turno,
+    esSinReserva,
+  });
 
   const solicitarGuardar=()=>{
     if(!dirty||saving||readOnly)return;
