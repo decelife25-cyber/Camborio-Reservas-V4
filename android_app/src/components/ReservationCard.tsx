@@ -189,7 +189,7 @@ export default function ReservationCard({
       if (esContextoFuturoOIncorrecto) {
         return [['CONFIRMADA', 'CONFIRMAR', 'confirmar'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar']];
       }
-      if (esReservaPasada) {
+      if (esFechaPasada) {
         return [['FINALIZADA', 'FINALIZAR', 'finalizada'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']];
       }
       return [
@@ -203,7 +203,7 @@ export default function ReservationCard({
       if (esContextoFuturoOIncorrecto) {
         return [['CANCELADA_LOCAL', 'CANCELAR', 'cancelar']];
       }
-      if (esReservaPasada) {
+      if (esFechaPasada) {
         return [['FINALIZADA', 'FINALIZAR', 'finalizada'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']];
       }
       return [['SENTADA', 'SENTAR', 'sentar'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar']];
@@ -213,8 +213,8 @@ export default function ReservationCard({
       if (esContextoFuturoOIncorrecto) {
         return [['CANCELADA_LOCAL', 'CANCELAR', 'cancelar']];
       }
-      return esReservaPasada
-        ? [['FINALIZAR', 'FINALIZAR', 'finalizada'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']]
+      return esFechaPasada
+        ? [['FINALIZADA', 'FINALIZAR', 'finalizada'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']]
         : [['FINALIZADA', 'FINALIZAR', 'finalizada']];
     }
 
