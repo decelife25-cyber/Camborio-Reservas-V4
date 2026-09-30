@@ -226,7 +226,7 @@ export default function Inicio() {
         ) : (
           <div className="calendar-reservations">
             {visibles.map(reserva => (
-              <ReservationCard key={reserva.ReservaID} reserva={reserva} onAssignTable={r => navigate('/mesas?asignar=' + encodeURIComponent(r.ReservaID))} onUpdate={handleUpdate} />
+              <ReservationCard key={reserva.ReservaID} reserva={reserva} returnTo="/" onAssignTable={r => navigate('/mesas?asignar=' + encodeURIComponent(r.ReservaID) + '&volverRuta=%2F')} onUpdate={handleUpdate} />
             ))}
           </div>
         )}
