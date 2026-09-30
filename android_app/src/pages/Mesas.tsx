@@ -254,7 +254,26 @@ export default function Mesas() {
 
   const ocuparMesa = async () => {
     if (!selectedTable || saving) return;
+
+    // Una mesa SIN RESERVA solo puede ocuparse en el turno operativo actual.
+    // No se permite crear una ocupación de CENA durante COMIDA ni viceversa,
+    // y tampoco ocupar días futuros desde el plano.
     const now = new Date();
+    const hoy = now.toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
+    const horaMadrid = now.toLocaleTimeString('en-GB', {
+      timeZone: 'Europe/Madrid',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+    const turnoActual = getTurnoFromHora(horaMadrid);
+
+    if (fecha !== hoy || turno !== turnoActual) {
+      setError(
+        'CR_TURNO_OCUPACION: no se puede ocupar una mesa sin reserva fuera del turno actual.'
+      );
+      return;
+    }
     setSaving(true);
     const { data, error: insertError } = await supabase
       .from('Reservas')
