@@ -227,6 +227,16 @@ export default function Mesas() {
 
   const actualizarEstado = async (estado: 'SENTADA' | 'FINALIZADA') => {
     if (!reservaSeleccionada?.ReservaID || saving) return;
+
+    const fechaReserva = String(reservaSeleccionada.FechaReserva || '').slice(0, 10);
+    const turnoReserva = String(reservaSeleccionada.Turno || '').trim().toUpperCase();
+    const turnoContexto = String(turno || '').trim().toUpperCase();
+
+    if (fechaReserva !== fecha || (turnoReserva && turnoReserva !== turnoContexto)) {
+      setError('La reserva no pertenece al día y turno actuales del plano.');
+      return;
+    }
+
     setSaving(true);
     const { error: updateError } = await supabase
       .from('Reservas')
@@ -468,6 +478,17 @@ export default function Mesas() {
       const zonaAsignada = principalLayout
         ? principalLayout.zona.toUpperCase().replace('CHILLOUT', 'CHILL OUT')
         : null;
+
+      const fechaReserva = String(assignmentReserva.FechaReserva || '').slice(0, 10);
+      const turnoReserva = String(assignmentReserva.Turno || '').trim().toUpperCase();
+      const turnoContexto = String(turno || '').trim().toUpperCase();
+
+      if (fechaReserva !== fecha || (turnoReserva && turnoReserva !== turnoContexto)) {
+        setError('La reserva no pertenece al día y turno actuales del plano.');
+        savingRef.current = false;
+        setSaving(false);
+        return;
+      }
 
       const ahoraAsignacion = new Date().toISOString();
       const estadoTrasAsignacion = accion === 'sentar'
