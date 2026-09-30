@@ -254,7 +254,23 @@ export default function Mesas() {
 
   const ocuparMesa = async () => {
     if (!selectedTable || saving) return;
+
+    // Una mesa SIN RESERVA solo puede ocuparse en el turno operativo actual.
+    // No se permite crear una ocupación de CENA durante COMIDA ni viceversa,
+    // y tampoco ocupar días futuros desde el plano.
     const now = new Date();
+    const hoy = now.toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
+    const horaMadrid = now.toLocaleTimeString('en-GB', {
+      timeZone: 'Europe/Madrid',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+    const turnoActual = getTurnoFromHora(horaMadrid);
+
+    if (fecha !== hoy || turno !== turnoActual) {
+      return;
+    }
     setSaving(true);
     const { data, error: insertError } = await supabase
       .from('Reservas')
@@ -392,6 +408,25 @@ export default function Mesas() {
       }
 
       const zonaMesa = button.dataset.mesaZona || zona;
+
+      // Si la mesa está libre y el plano está fuera del turno operativo actual,
+      // ignoramos cualquier pulsación antes de iniciar la lógica de toque simple/doble.
+      // Así tampoco un doble/triple toque puede abrir el modal de ocupación.
+      const ahora = new Date();
+      const hoy = ahora.toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
+      const horaMadrid = ahora.toLocaleTimeString('en-GB', {
+        timeZone: 'Europe/Madrid',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      });
+      const turnoActual = getTurnoFromHora(horaMadrid);
+      const reservaMesaActual = reservationForTable(reservas, numero);
+      if (!reservaMesaActual && (fecha !== hoy || turno !== turnoActual)) {
+        limpiarToqueMesa();
+        return;
+      }
+
       const claveToque = zonaMesa + ':' + numero;
       const esDobleToque = mesaTapTimerRef.current !== null && mesaTapLastKeyRef.current === claveToque;
 
@@ -401,6 +436,7 @@ export default function Mesas() {
         mesaTapTimerRef.current = window.setTimeout(() => {
           mesaTapTimerRef.current = null;
           mesaTapLastKeyRef.current = '';
+
           setSelectedTable(numero);
         }, 320);
         return;
