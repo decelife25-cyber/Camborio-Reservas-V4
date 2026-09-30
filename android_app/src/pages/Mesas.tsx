@@ -408,6 +408,25 @@ export default function Mesas() {
       }
 
       const zonaMesa = button.dataset.mesaZona || zona;
+
+      // Si la mesa está libre y el plano está fuera del turno operativo actual,
+      // ignoramos cualquier pulsación antes de iniciar la lógica de toque simple/doble.
+      // Así tampoco un doble/triple toque puede abrir el modal de ocupación.
+      const ahora = new Date();
+      const hoy = ahora.toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
+      const horaMadrid = ahora.toLocaleTimeString('en-GB', {
+        timeZone: 'Europe/Madrid',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      });
+      const turnoActual = getTurnoFromHora(horaMadrid);
+      const reservaMesaActual = reservationForTable(reservas, numero);
+      if (!reservaMesaActual && (fecha !== hoy || turno !== turnoActual)) {
+        limpiarToqueMesa();
+        return;
+      }
+
       const claveToque = zonaMesa + ':' + numero;
       const esDobleToque = mesaTapTimerRef.current !== null && mesaTapLastKeyRef.current === claveToque;
 
@@ -417,23 +436,6 @@ export default function Mesas() {
         mesaTapTimerRef.current = window.setTimeout(() => {
           mesaTapTimerRef.current = null;
           mesaTapLastKeyRef.current = '';
-
-          // Una mesa libre no abre el diálogo de "OCUPAR MESA" fuera
-          // del día/turno operativo actual. La pulsación se ignora.
-          const ahora = new Date();
-          const hoy = ahora.toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
-          const horaMadrid = ahora.toLocaleTimeString('en-GB', {
-            timeZone: 'Europe/Madrid',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false,
-          });
-          const turnoActual = getTurnoFromHora(horaMadrid);
-          const reservaMesaActual = reservationForTable(reservas, numero);
-
-          if (!reservaMesaActual && (fecha !== hoy || turno !== turnoActual)) {
-            return;
-          }
 
           setSelectedTable(numero);
         }, 320);
