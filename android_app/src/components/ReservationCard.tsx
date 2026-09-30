@@ -184,6 +184,26 @@ export default function ReservationCard({
     });
     if (logError) console.warn('No se pudo registrar el log de estado', logError);
 
+    // Tras confirmar una reserva pública con consentimiento, enviar la comunicación de confirmación.
+    if (reserva.Estado === 'PENDIENTE' && nextState === 'CONFIRMADA' && resultado.data?.EmailReservaAutorizado === true && resultado.data?.Email) {
+      try {
+        const session = await supabase.auth.getSession();
+        const accessToken = session.data.session?.access_token;
+        if (accessToken) {
+          const { error: emailError } = await supabase.functions.invoke('public-reservas', {
+            body: {
+              action: 'confirmation-email',
+              reservaId: reserva.ReservaID,
+              _authorization: 'Bearer ' + accessToken,
+            },
+          });
+          if (emailError) console.warn('No se pudo enviar el email de confirmación', emailError);
+        }
+      } catch (emailError) {
+        console.warn('Error enviando email de confirmación', emailError);
+      }
+    }
+
     setSaving(false);
     const next = { ...reserva, ...resultado.data, Estado: nextState } as ReservationCardData;
     onUpdate?.(next);
