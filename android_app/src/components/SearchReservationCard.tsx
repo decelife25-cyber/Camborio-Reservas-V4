@@ -5,8 +5,6 @@ import { getTurnoFromHora } from '../utils/shifts';
 import { getReservationStateActions } from '../utils/reservationStateActions';
 import FechaPicker from './FechaPicker';
 import { Wheel } from '../pages/NuevaReserva';
-import { sendAuthorizedConfirmationEmail } from '../services/reservationEmail';
-
 export type SearchReservation = {
   ReservaID:string; CodigoReserva:string|null; FechaReserva:string; HoraReserva:string;
   Nombre:string|null; Telefono:string|null; Email?:string|null; EmailReservaAutorizado?:boolean|null; Personas:number|null; Estado:string;
