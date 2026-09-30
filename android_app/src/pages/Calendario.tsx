@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import ReservationCard from '../components/ReservationCard';
+import type { ReservationCardData } from '../components/ReservationCard';
 import { useNavigate } from 'react-router-dom';
 
 type Reserva = {
@@ -136,10 +137,12 @@ export default function Calendario() {
     });
   };
 
-  const handleUpdate = (updated: Reserva) => {
+  const handleUpdate = (updated: ReservationCardData) => {
     setReservasMes(current =>
       current.map(reserva =>
-        reserva.ReservaID === updated.ReservaID ? { ...reserva, ...updated } : reserva
+        reserva.ReservaID === updated.ReservaID
+          ? { ...reserva, ...updated, Turno: updated.Turno ?? null }
+          : reserva
       )
     );
   };
