@@ -92,7 +92,6 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
     setSaving(false);
     if(e){setError(e.message);return;}
     const next={...r,...data,...changes} as SearchReservation;
-    if(r.Estado==='PENDIENTE' && nextState==='CONFIRMADA') void enviarEmailReservaConfirmada(next);
     setR(next);onUpdated(next);setDirty(false);setResultado('CAMBIOS GUARDADOS CORRECTAMENTE');setConfirmAction('resultado');setError('');
   };
 
@@ -132,6 +131,7 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
     setSaving(false);
     if(resultado.error){setError(resultado.error.message);return;}
     const next={...r,...resultado.data,Estado:nextState} as SearchReservation;
+    if(r.Estado==='PENDIENTE' && nextState==='CONFIRMADA') void enviarEmailReservaConfirmada(next);
     setR(next);onUpdated(next);
     if(r.Estado==='PENDIENTE' && nextState!=='PENDIENTE'){
       window.dispatchEvent(new Event('camborio-pending-count-change'));
