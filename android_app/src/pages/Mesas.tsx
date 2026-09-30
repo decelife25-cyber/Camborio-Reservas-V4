@@ -297,10 +297,16 @@ export default function Mesas() {
     setSaving(false);
   };
 
-  const mesasVisibles = useMemo(() => layout.mesas.map(m => ({
-    ...m,
-    estado: mesasConfig[m.numero]?.Activa === false ? 'desactivada' : visualState(reservationForTable(reservas, m.numero)),
-  })), [layout.mesas, mesasConfig, reservas]);
+  const mesasVisibles = useMemo(() => layout.mesas.map(m => {
+    const reservaMesa = reservationForTable(reservas, m.numero);
+    const mesasAsignadas = parseAssignedTables(reservaMesa);
+    const numeroPrincipal = mesasAsignadas[0] || m.numero;
+    return {
+      ...m,
+      estado: mesasConfig[m.numero]?.Activa === false ? 'desactivada' : visualState(reservaMesa),
+      numeroVisual: !assignmentMode && reservaMesa ? numeroPrincipal : m.numero,
+    };
+  }), [layout.mesas, mesasConfig, reservas, assignmentMode]);
 
   const assignmentSet = new Set(assignmentTablesRef.current);
   const assignmentOriginalSet = new Set(assignmentOriginalRef.current);
@@ -597,9 +603,9 @@ export default function Mesas() {
                 )}
                 data-mesa-numero={mesa.numero}
                 style={{ '--mesa-x': mesa.x + '%', '--mesa-y': mesa.y + '%' } as CSSProperties}
-                aria-label={'Mesa ' + mesa.numero + ' ' + mesa.estado}
+                aria-label={'Mesa ' + mesa.numeroVisual + ' ' + mesa.estado}
               >
-                {mesa.numero}
+                {mesa.numeroVisual}
               </button>
             ))}
           </div>
@@ -650,7 +656,7 @@ export default function Mesas() {
 
             {estado === 'reservada' && reservaSeleccionada && (
               <>
-                <div className="cr-planos-mesas__dialog-title">MESA {selectedTable}</div>
+                <div className="cr-planos-mesas__dialog-title">MESA {parseAssignedTables(reservaSeleccionada)[0] || selectedTable}</div>
                 <div className="cr-planos-mesas__dialog-type">MESA PRINCIPAL</div>
                 <div className="cr-planos-mesas__dialog-name">{reservaSeleccionada.Nombre || 'SIN NOMBRE'}</div>
                 <div className="cr-planos-mesas__dialog-phone">{reservaSeleccionada.Telefono || 'SIN TELÉFONO'}</div>
@@ -668,7 +674,7 @@ export default function Mesas() {
 
             {estado === 'ocupada' && reservaSeleccionada && (
               <>
-                <div className="cr-planos-mesas__dialog-title">MESA {selectedTable}</div>
+                <div className="cr-planos-mesas__dialog-title">MESA {reservaSeleccionada.Nombre === 'SIN RESERVA' ? selectedTable : (parseAssignedTables(reservaSeleccionada)[0] || selectedTable)}</div>
                 <div className="cr-planos-mesas__dialog-type">{reservaSeleccionada.Nombre === 'SIN RESERVA' ? 'SIN RESERVA' : 'MESA PRINCIPAL'}</div>
                 <div className="cr-planos-mesas__dialog-name">{reservaSeleccionada.Nombre || 'SIN NOMBRE'}</div>
                 <div className="cr-planos-mesas__dialog-phone">{reservaSeleccionada.Telefono || 'SIN TELÉFONO'}</div>
