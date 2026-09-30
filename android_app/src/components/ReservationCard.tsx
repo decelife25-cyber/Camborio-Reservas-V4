@@ -48,7 +48,6 @@ export default function ReservationCard({
   onAssignTable,
   onModify,
   returnTo,
-
   onUpdate,
 }: {
   reserva: ReservationCardData;
@@ -56,7 +55,6 @@ export default function ReservationCard({
   onModify?: (reserva: ReservationCardData) => void;
   returnTo?: string;
   onUpdate?: (reserva: ReservationCardData) => void;
-  returnTo?: string;
 }) {
   const navigate = useNavigate();
   const [showObservations, setShowObservations] = useState(false);
