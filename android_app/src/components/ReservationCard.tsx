@@ -175,7 +175,7 @@ export default function ReservationCard({
     });
     if (logError) console.warn('No se pudo registrar el log de estado', logError);
 
-    if (reserva.Estado === 'PENDIENTE' && nextState === 'CONFIRMADA' && resultado.data?.EmailReservaAutorizado === true && resultado.data?.Email) {
+    if (returnTo === '/' && reserva.Estado === 'PENDIENTE' && nextState === 'CONFIRMADA' && resultado.data?.EmailReservaAutorizado === true && resultado.data?.Email) {
       try {
         await sendAuthorizedConfirmationEmail(reserva.ReservaID);
       } catch (emailError) {
