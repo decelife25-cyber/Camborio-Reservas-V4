@@ -192,11 +192,15 @@ export default function ReservationCard({
       if (esFechaPasada) {
         return [['FINALIZADA', 'FINALIZAR', 'finalizada'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']];
       }
-      return [
+      const acciones: [string, string, string][] = [
         ['CONFIRMADA', 'CONFIRMAR', 'confirmar'],
         ['SENTADA', 'SENTAR', 'sentar'],
         ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar'],
       ];
+      if (esHoraPasadaHoy) {
+        acciones.push(['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']);
+      }
+      return acciones;
     }
 
     if (reserva.Estado === 'CONFIRMADA') {
@@ -206,7 +210,14 @@ export default function ReservationCard({
       if (esFechaPasada) {
         return [['FINALIZADA', 'FINALIZAR', 'finalizada'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']];
       }
-      return [['SENTADA', 'SENTAR', 'sentar'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar']];
+      const acciones: [string, string, string][] = [
+        ['SENTADA', 'SENTAR', 'sentar'],
+        ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar'],
+      ];
+      if (esHoraPasadaHoy) {
+        acciones.push(['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']);
+      }
+      return acciones;
     }
 
     if (reserva.Estado === 'SENTADA') {
