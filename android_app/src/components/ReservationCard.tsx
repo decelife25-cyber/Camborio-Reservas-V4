@@ -10,6 +10,7 @@ export type ReservationCardData = {
   HoraReserva: string;
   Nombre: string | null;
   Telefono: string | null;
+  EmailReservaAutorizado?: boolean | null;
   Personas: number | null;
   Estado: string;
   Mesa: string | null;
@@ -161,6 +162,16 @@ export default function ReservationCard({
       setError(resultado.error.message);
       setSaving(false);
       return;
+    }
+
+    if (nextState === 'CONFIRMADA' && resultado.data?.EmailReservaAutorizado === true && resultado.data?.Email) {
+      const { error: emailError } = await supabase.functions.invoke('public-reservas', {
+        body: { action: 'send-confirmation-email', reservaId: reserva.ReservaID },
+      });
+      if (emailError) {
+        console.warn('Reserva confirmada, pero no se pudo enviar el email de confirmación', emailError);
+        setError('Reserva confirmada, pero no se pudo enviar el email de confirmación.');
+      }
     }
 
     const session = await supabase.auth.getSession();
