@@ -147,6 +147,7 @@ export default function Mesas() {
   const assignmentId = searchParams.get('asignar');
   const nuevaAssignment = searchParams.get('nueva') === '1';
   const volverCodigo = searchParams.get('volverCodigo') || '';
+  const volverRuta = searchParams.get('volverRuta') || '';
   const accion = searchParams.get('accion') || '';
   const [assignmentReserva, setAssignmentReserva] = useState<Reserva | null>(null);
   const [nuevaBorrador, setNuevaBorrador] = useState<NuevaReservaBorrador | null>(null);
@@ -440,7 +441,11 @@ export default function Mesas() {
 
   const cerrarAsignacion=()=>{
     if(!assignmentMode||savingRef.current)return;
-    if(!tieneCambiosAsignacion()){navigate('/');return;}
+    if(!tieneCambiosAsignacion()){
+      if (volverRuta && volverRuta.startsWith('/')) navigate(volverRuta);
+      else navigate('/');
+      return;
+    }
     setConfirmModal({
       titulo:'CAMBIOS SIN GUARDAR',
       mensaje:'¿CERRAR SIN GUARDAR?',
@@ -451,7 +456,8 @@ export default function Mesas() {
         assignmentTablesRef.current=original;
         setAssignmentTables(original);
         setConfirmModal(null);
-        navigate('/');
+        if (volverRuta && volverRuta.startsWith('/')) navigate(volverRuta);
+        else navigate('/');
       },
       alCancelar:()=>setConfirmModal(null)
     });
@@ -589,7 +595,9 @@ export default function Mesas() {
         return;
       }
 
-      if (volverCodigo || persistida.CodigoReserva) {
+      if (volverRuta && volverRuta.startsWith('/')) {
+        navigate(volverRuta);
+      } else if (volverCodigo || persistida.CodigoReserva) {
         const codigo = volverCodigo || persistida.CodigoReserva || '';
         navigate('/buscar?codigo=' + encodeURIComponent(codigo));
       } else {
@@ -657,13 +665,15 @@ export default function Mesas() {
         </div>
 
         <div className="cr-planos-mesas__leyenda" aria-label="Leyenda de estados de mesas">
-          <span><i className="principal" />PRINCIPAL</span>
-          <span><i className="adicional" />ADICIONAL</span>
-          <span><i className="cambio-pendiente" />CAMBIO PENDIENTE</span>
+          {assignmentMode && <>
+            <span><i className="principal" />PRINCIPAL</span>
+            <span><i className="adicional" />ADICIONAL</span>
+            <span><i className="cambio-pendiente" />CAMBIO PENDIENTE</span>
+          </>}
           <span><i className="libre" />LIBRE</span>
           <span><i className="reservada" />RESERVADA</span>
           <span><i className="ocupada" />OCUPADA</span>
-          <span><i className="desactivada" />DESACTIVADA</span>
+          <span><i className="desactivada" />NO DISPONIBLE</span>
         </div>
 
         {assignmentMode && <div className="cr-planos-mesas__assignment-actions"><div>SELECCIONA UNA O VARIAS MESAS Y PULSA GUARDAR ASIGNACIÓN PARA ACTUALIZAR LA RESERVA.</div><button type="button" className="primario" data-cr-guardar-asignacion disabled={saving || (Boolean(nuevaBorrador) && assignmentTablesRef.current.length === 0)} onClick={() => void guardarAsignacion()}>{saving ? 'GUARDANDO...' : 'GUARDAR ASIGNACIÓN'}</button></div>}
@@ -738,7 +748,7 @@ export default function Mesas() {
             {estado === 'desactivada' && (
               <>
                 <div className="cr-planos-mesas__dialog-title">MESA {selectedTable}</div>
-                <div className="cr-planos-mesas__dialog-text">MESA DESACTIVADA</div>
+                <div className="cr-planos-mesas__dialog-text">MESA NO DISPONIBLE</div>
                 <div className="cr-planos-mesas__dialog-actions cr-planos-mesas__dialog-actions--one">
                   <button type="button" onClick={() => setSelectedTable(null)}>CERRAR</button>
                 </div>

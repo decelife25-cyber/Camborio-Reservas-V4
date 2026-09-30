@@ -47,11 +47,13 @@ export default function ReservationCard({
   reserva,
   onAssignTable,
   onModify,
+  returnTo,
   onUpdate,
 }: {
   reserva: ReservationCardData;
   onAssignTable?: (reserva: ReservationCardData) => void;
   onModify?: (reserva: ReservationCardData) => void;
+  returnTo?: string;
   onUpdate?: (reserva: ReservationCardData) => void;
 }) {
   const navigate = useNavigate();
@@ -78,10 +80,11 @@ export default function ReservationCard({
   const readOnly = ['FINALIZADA', 'CANCELADA_CLIENTE', 'CANCELADA_LOCAL', 'NO_PRESENTADO'].includes(reserva.Estado);
 
   const goAssignTable = (autoSeat = false) => {
-    navigate('/mesas?asignar=' + encodeURIComponent(reserva.ReservaID) + '&volverCodigo=' + encodeURIComponent(reserva.CodigoReserva || '') + (autoSeat ? '&accion=sentar' : ''));
+    const retorno = returnTo && returnTo.startsWith('/') ? '&volverRuta=' + encodeURIComponent(returnTo) : '';
+    navigate('/mesas?asignar=' + encodeURIComponent(reserva.ReservaID) + '&volverCodigo=' + encodeURIComponent(reserva.CodigoReserva || '') + retorno + (autoSeat ? '&accion=sentar' : ''));
   };
   const requestTable = () => {
-    if (esSinReserva) return;
+    if (esSinReserva || readOnly) return;
     if (!mesaValida(reserva.Mesa)) { if (onAssignTable) { onAssignTable(reserva); } else { goAssignTable(false); } return; }
     setTableChangeOpen(true);
   };
@@ -230,9 +233,15 @@ export default function ReservationCard({
         </div>
         <div className="reservation-party">
           <div className="pax"><span>👥</span> {reserva.Personas || 0} PAX</div>
-          <button className={"table-button" + (assignedTables.length ? " table-button--assigned" : " table-button--unassigned")} type="button" onClick={requestTable}>
-            {mesaLabel}
-          </button>
+          {readOnly ? (
+            <span className={"table-button" + (assignedTables.length ? " table-button--assigned" : " table-button--unassigned")}>
+              {mesaLabel}
+            </span>
+          ) : (
+            <button className={"table-button" + (assignedTables.length ? " table-button--assigned" : " table-button--unassigned")} type="button" onClick={requestTable}>
+              {mesaLabel}
+            </button>
+          )}
         </div>
       </article>
 
