@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { getTurnoFromHora } from '../utils/shifts';
+import { getReservationStateActions } from '../utils/reservationStateActions';
 
 export type ReservationCardData = {
   ReservaID: string;
@@ -180,57 +180,13 @@ export default function ReservationCard({
     setStateOpen(false);
   };
 
-  const stateActions = (() => {
-    if (esSinReserva) return [['FINALIZADA', 'FINALIZAR', 'finalizada']];
-
-    // V2 como base: no mostramos acciones que sabemos que no son válidas.
-    // Mejora V4: PENDIENTE puede SENTAR de forma fluida en el contexto operativo.
-    if (reserva.Estado === 'PENDIENTE') {
-      if (esContextoFuturoOIncorrecto) {
-        return [['CONFIRMADA', 'CONFIRMAR', 'confirmar'], ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar']];
-      }
-      if (esFechaPasada) {
-        return [['FINALIZADA', 'FINALIZAR', 'finalizada'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']];
-      }
-      const acciones: [string, string, string][] = [
-        ['CONFIRMADA', 'CONFIRMAR', 'confirmar'],
-        ['SENTADA', 'SENTAR', 'sentar'],
-        ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar'],
-      ];
-      if (esHoraPasadaHoy) {
-        acciones.push(['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']);
-      }
-      return acciones;
-    }
-
-    if (reserva.Estado === 'CONFIRMADA') {
-      if (esContextoFuturoOIncorrecto) {
-        return [['CANCELADA_LOCAL', 'CANCELAR', 'cancelar']];
-      }
-      if (esFechaPasada) {
-        return [['FINALIZADA', 'FINALIZAR', 'finalizada'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']];
-      }
-      const acciones: [string, string, string][] = [
-        ['SENTADA', 'SENTAR', 'sentar'],
-        ['CANCELADA_LOCAL', 'CANCELAR', 'cancelar'],
-      ];
-      if (esHoraPasadaHoy) {
-        acciones.push(['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']);
-      }
-      return acciones;
-    }
-
-    if (reserva.Estado === 'SENTADA') {
-      if (esContextoFuturoOIncorrecto) {
-        return [['CANCELADA_LOCAL', 'CANCELAR', 'cancelar']];
-      }
-      return esFechaPasada
-        ? [['FINALIZADA', 'FINALIZAR', 'finalizada'], ['NO_PRESENTADO', 'NO ASISTIÓ', 'no-presentado']]
-        : [['FINALIZADA', 'FINALIZAR', 'finalizada']];
-    }
-
-    return [];
-  })();
+  const stateActions = getReservationStateActions({
+    estado: reserva.Estado,
+    fecha: reserva.FechaReserva,
+    hora: reserva.HoraReserva,
+    turno: reserva.Turno,
+    esSinReserva,
+  });
 
   const assignedTables = [reserva.Mesa, ...(String(reserva.MesasAdicionales || '').split(',').map(v => v.trim()).filter(Boolean))].filter(Boolean) as string[];
   const mesaLabel = assignedTables.length ? 'MESA ' + assignedTables[0] + (assignedTables.length > 1 ? ' (+' + (assignedTables.length - 1) + ')' : '') : 'SIN ASIGNAR';
