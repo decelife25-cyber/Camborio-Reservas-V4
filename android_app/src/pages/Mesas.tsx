@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import FechaPicker from '../components/FechaPicker';
 import { getTurnoFromHora } from '../utils/shifts';
+import { enviarEmailReservaConfirmada } from '../utils/reservationEmail';
 
 type Turno = 'COMIDA' | 'CENA';
 type Zona = 'terraza' | 'salon' | 'chillout';
@@ -569,6 +570,9 @@ export default function Mesas() {
 
       if (updateError) throw updateError;
       if (!reservaPersistida) throw new Error('No se pudo guardar la asignación de mesas.');
+      if (assignmentReserva.Estado === 'PENDIENTE' && estadoTrasAsignacion === 'CONFIRMADA') {
+        void enviarEmailReservaConfirmada({ ...assignmentReserva, Estado: 'CONFIRMADA' });
+      }
       if (assignmentReserva.Estado === 'PENDIENTE' && estadoTrasAsignacion !== 'PENDIENTE') {
         window.dispatchEvent(new Event('camborio-pending-count-change'));
       }

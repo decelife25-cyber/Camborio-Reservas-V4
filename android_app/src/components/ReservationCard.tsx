@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { getReservationStateActions } from '../utils/reservationStateActions';
+import { enviarEmailReservaConfirmada } from '../utils/reservationEmail';
 
 export type ReservationCardData = {
   ReservaID: string;
@@ -10,6 +11,7 @@ export type ReservationCardData = {
   HoraReserva: string;
   Nombre: string | null;
   Telefono: string | null;
+  Email?: string | null;
   Personas: number | null;
   Estado: string;
   Mesa: string | null;
@@ -176,6 +178,9 @@ export default function ReservationCard({
     setSaving(false);
     const next = { ...reserva, ...resultado.data, Estado: nextState } as ReservationCardData;
     onUpdate?.(next);
+    if (reserva.Estado === 'PENDIENTE' && nextState === 'CONFIRMADA') {
+      void enviarEmailReservaConfirmada(next);
+    }
     if (reserva.Estado === 'PENDIENTE' && nextState !== 'PENDIENTE') {
       window.dispatchEvent(new Event('camborio-pending-count-change'));
     }
