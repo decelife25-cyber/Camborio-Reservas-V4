@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Check, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { sendAuthorizedConfirmationEmail } from '../services/reservationEmail';
 
 type Reserva = {
   ReservaID: string;
@@ -13,6 +14,7 @@ type Reserva = {
   Personas: number | null;
   Estado: string;
   Mesa: string | null;
+  EmailReservaAutorizado?: boolean | null;
 };
 
 function formatDate(value: string) {
@@ -89,6 +91,15 @@ export default function Confirmar() {
       setError('No se pudo confirmar la reserva.');
       setConfirming(null);
       return;
+    }
+
+    if(reserva.EmailReservaAutorizado===true){
+      try{
+        await sendAuthorizedConfirmationEmail(reserva.ReservaID);
+      }catch(emailError){
+        console.warn('Reserva confirmada, pero no se pudo enviar el email de confirmación',emailError);
+        setError('Reserva confirmada, pero no se pudo enviar el email de confirmación.');
+      }
     }
 
     setReservas(current => current.filter(item => item.ReservaID !== reserva.ReservaID));
