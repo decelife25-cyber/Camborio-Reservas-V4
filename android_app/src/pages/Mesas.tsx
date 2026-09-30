@@ -446,6 +446,36 @@ export default function Mesas() {
     const adicionales = mesasSeleccionadas.slice(1);
     const asignacionNueva = mesasSeleccionadas.join(', ');
 
+    // Contrato V2: una asignación no puede repetir mesas y todas deben
+    // existir/estar activas y pertenecer a la misma zona que la principal.
+    const mesasUnicas = [...new Set(mesasSeleccionadas)];
+    if (mesasUnicas.length !== mesasSeleccionadas.length) {
+      setError('CR_MESA_REPETIDA: no se puede seleccionar la misma mesa más de una vez.');
+      return;
+    }
+
+    const catalogoPlanos = Object.values(PLANOS).flatMap(plano => plano.mesas);
+    const mesasInvalidas = mesasSeleccionadas.filter(numero => {
+      const layoutMesa = catalogoPlanos.find(mesa => mesa.numero === numero);
+      return !layoutMesa || mesasConfig[numero]?.Activa === false;
+    });
+    if (mesasInvalidas.length) {
+      setError('CR_MESA_INEXISTENTE: una de las mesas seleccionadas no existe o no está activa.');
+      return;
+    }
+
+    if (principal) {
+      const principalLayout = catalogoPlanos.find(mesa => mesa.numero === principal);
+      const zonaPrincipal = principalLayout?.zona;
+      const zonasSeleccionadas = mesasSeleccionadas
+        .map(numero => catalogoPlanos.find(mesa => mesa.numero === numero)?.zona)
+        .filter(Boolean);
+      if (!zonaPrincipal || zonasSeleccionadas.some(zonaMesa => zonaMesa !== zonaPrincipal)) {
+        setError('CR_ZONA_INVALIDA: la zona no corresponde a la mesa principal.');
+        return;
+      }
+    }
+
     if (nuevaBorrador) {
       if (!asignacionNueva) {
         setError('Selecciona al menos una mesa antes de volver a la reserva.');
