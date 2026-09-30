@@ -464,23 +464,24 @@ Las restantes son adicionales y deben conservar su orden/relación.
 
 # 30. MESAS UNIBLES
 
-El catálogo V2 contiene información de unión, incluyendo campos como:
+El catálogo V2 contiene información histórica de unión, incluyendo campos como:
 
 - `Unible`
 - `GrupoUnion`
 
-La unión de mesas no significa que cualquier combinación arbitraria sea válida.
+En V4 **no existe una restricción de proximidad o contigüidad física** como condición para unir mesas.
 
-Antes de implementar o modificar esta parte en V4 se debe extraer del V2 el contrato exacto de:
+Una combinación puede incluir mesas no contiguas cuando sea necesario y las mesas seleccionadas estén disponibles y cumplan las demás reglas de negocio.
 
-- qué mesas pueden unirse;
-- qué grupos forman una unión válida;
-- qué combinaciones están prohibidas;
-- cómo afecta la unión a capacidad;
-- cómo se representa la unión en el plano;
-- cómo se guarda la relación principal/adicional.
+Ejemplo válido:
 
-**Esta sección queda marcada como REQUIERE AUDITORÍA ESPECÍFICA si el detalle exacto no está todavía demostrado con código V2.**
+- Mesa 6 + Mesa 12 + Mesa 8.
+
+Que la mesa 8 no sea contigua a 6 y 12 **no invalida la combinación**.
+
+Los campos históricos `Unible` y `GrupoUnion` no deben interpretarse como una obligación de que todas las mesas de una combinación sean físicamente contiguas.
+
+**Estado: VERIFICADO. No queda pendiente una restricción de proximidad/contigüidad.**
 
 ---
 
