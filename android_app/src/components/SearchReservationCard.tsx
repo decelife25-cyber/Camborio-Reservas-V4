@@ -130,10 +130,6 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
     const resultado=await supabase.from('Reservas').update({Estado:nextState,FechaEstado:ahora,FechaModificacion:ahora}).eq('ReservaID',r.ReservaID).select('*').single();
     setSaving(false);
     if(resultado.error){setError(resultado.error.message);return;}
-    if(r.Estado==='PENDIENTE' && nextState==='CONFIRMADA' && (resultado.data as any)?.EmailReservaAutorizado===true && (resultado.data as any)?.Email){
-      try{ await sendAuthorizedConfirmationEmail(r.ReservaID); }
-      catch(emailError){ console.warn('Reserva confirmada, pero no se pudo enviar el email de confirmación',emailError); setError('Reserva confirmada, pero no se pudo enviar el email de confirmación.'); }
-    }
     const next={...r,...resultado.data,Estado:nextState} as SearchReservation;
     setR(next);onUpdated(next);
     if(r.Estado==='PENDIENTE' && nextState!=='PENDIENTE'){
