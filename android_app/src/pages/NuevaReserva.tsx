@@ -124,6 +124,13 @@ export default function NuevaReserva(){
   const [calendarDraft,setCalendarDraft]=useState(fecha);
   const horaReserva=useMemo(()=>hora+':'+minutos,[hora,minutos]);
 
+  const limpiarCodigoAlEditar=()=>{
+    if(lastCodigo||message==='RESERVA REALIZADA'){
+      setLastCodigo('');
+      setMessage('');
+    }
+  };
+
   async function crearReservaBase(){
     setError('');setMessage('');
     if(!nombre.trim()){setError('Introduce el nombre del cliente.');return null;}
@@ -174,8 +181,8 @@ export default function NuevaReserva(){
         <button className="cr-nueva-reserva__cerrar" type="button" onClick={cerrarNuevaReserva}>X CERRAR</button>
       </header>
       <form className="cr-nueva-reserva__form" onSubmit={guardar}>
-        <label className="cr-nueva-reserva__campo-completo">Nombre<input type="text" value={nombre} onChange={e=>setNombre(e.target.value)} autoComplete="name" placeholder="Nombre del cliente" required /></label>
-        <label className="cr-nueva-reserva__campo-completo">Teléfono<input type="tel" value={telefono} onChange={e=>setTelefono(e.target.value)} inputMode="tel" autoComplete="tel" placeholder="Número de teléfono" /></label>
+        <label className="cr-nueva-reserva__campo-completo">Nombre<input type="text" value={nombre} onFocus={limpiarCodigoAlEditar} onChange={e=>{limpiarCodigoAlEditar();setNombre(e.target.value)}} autoComplete="name" placeholder="Nombre del cliente" required /></label>
+        <label className="cr-nueva-reserva__campo-completo">Teléfono<input type="tel" value={telefono} onFocus={limpiarCodigoAlEditar} onChange={e=>{limpiarCodigoAlEditar();setTelefono(e.target.value)}} inputMode="tel" autoComplete="tel" placeholder="Número de teléfono" /></label>
         <label className="cr-nueva-reserva__personas">Personas
           <span className="cr-nueva-reserva__contador">
             <button type="button" onClick={()=>setPersonas(p=>Math.max(1,p-1))}>−</button><strong>{personas} PAX</strong><button type="button" onClick={()=>setPersonas(p=>p+1)}>+</button>
@@ -188,7 +195,7 @@ export default function NuevaReserva(){
           <button className="cr-nueva-reserva__fecha-boton" type="button" onClick={()=>{setCalendarDraft(fecha);const d=parseISODate(fecha);setCalendarMonth(new Date(d.getFullYear(),d.getMonth(),1));setCalendarOpen(true)}}>{formatDateES(fecha)}<span aria-hidden="true">▾</span></button>
         </label>
         <button className={'cr-nueva-reserva__mesa'+(mesa.trim()?' cr-nueva-reserva__mesa--asignada':'')} type="button" onClick={()=>void asignarMesaDesdeNuevaReserva()} disabled={saving}><span>Mesa asignada</span><strong>{mesa.trim()?('MESA '+mesa.trim()+(mesasAdicionales.length?' (+'+mesasAdicionales.length+')':'')):'SIN ASIGNAR'}</strong></button>
-        <label className="cr-nueva-reserva__campo-completo">Observaciones<textarea rows={2} value={observaciones} onChange={e=>setObservaciones(e.target.value)} placeholder="Observaciones sobre la reserva"/></label>
+        <label className="cr-nueva-reserva__campo-completo">Observaciones<textarea rows={2} value={observaciones} onFocus={limpiarCodigoAlEditar} onChange={e=>{limpiarCodigoAlEditar();setObservaciones(e.target.value)}} placeholder="Observaciones sobre la reserva"/></label>
         {(error||message)&&<div className="cr-nueva-reserva__mensaje" data-tipo={error?'error':'info'}>{error ? error : <><span>RESERVA REALIZADA · CÓDIGO</span> <strong className="cr-nueva-reserva__codigo-destacado">{lastCodigo||'—'}</strong></>}</div>}
         <div className="cr-nueva-reserva__acciones"><button className="cr-button cr-button--primary" type="submit" disabled={saving}>{saving?'GUARDANDO...':'CREAR RESERVA'}</button></div>
       </form>
