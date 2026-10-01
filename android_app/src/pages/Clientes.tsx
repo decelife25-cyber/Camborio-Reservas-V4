@@ -1,3 +1,4 @@
+import { mostrarTelefono } from '../utils/phone';
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Search, User } from 'lucide-react';
@@ -73,7 +74,7 @@ export default function Clientes() {
                       {cliente.nombre_ultimo || 'Sin Nombre'}
                     </h3>
                     <div className="text-gray-500 dark:text-gray-400 text-sm font-mono mt-1">
-                      {cliente.telefono}
+                      {mostrarTelefono(cliente.telefono)}
                     </div>
                   </div>
 
