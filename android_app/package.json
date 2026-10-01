@@ -1,8 +1,8 @@
 {
   "name": "android_app",
   "private": true,
-  "releaseNote": "Email de confirmación desde tarjeta + limpieza modal PWA",
-  "version": "1.0.133",
+  "releaseNote": "Validación teléfono V2 + reservas privadas sin teléfono",
+  "version": "1.0.134",
   "type": "module",
   "scripts": {
     "dev": "vite",
