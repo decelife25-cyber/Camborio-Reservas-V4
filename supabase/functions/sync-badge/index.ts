@@ -80,9 +80,21 @@ serve(async (req: Request) => {
       });
     }
 
-    // Decode base64 service account JSON
-    const serviceAccountStr = atob(firebaseKeyBase64);
-    const serviceAccount = JSON.parse(serviceAccountStr);
+    // Accept either:
+    // 1) the raw Firebase service-account JSON (convenient from a mobile device), or
+    // 2) the Base64-encoded JSON used by the original setup.
+    let serviceAccount: any;
+    const firebaseKeyValue = firebaseKeyBase64.trim();
+
+    try {
+      serviceAccount = JSON.parse(firebaseKeyValue);
+    } catch {
+      try {
+        serviceAccount = JSON.parse(atob(firebaseKeyValue));
+      } catch {
+        throw new Error('FIREBASE_SERVICE_ACCOUNT_KEY must contain valid Firebase service-account JSON or Base64-encoded JSON');
+      }
+    }
 
     // Generate OAuth2 token (simplified for Deno, typically uses a JWT library)
     const header = { alg: 'RS256', typ: 'JWT' };
