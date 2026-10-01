@@ -2,7 +2,7 @@
   "name": "android_app",
   "private": true,
   "releaseNote": "Mensajes de teléfono simplificados en PWA y panel privado",
-  "version": "1.0.135",
+  "version": "1.0.136",
   "type": "module",
   "scripts": {
     "dev": "vite",
