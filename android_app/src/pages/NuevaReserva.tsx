@@ -134,6 +134,9 @@ export default function NuevaReserva(){
   async function crearReservaBase(){
     setError('');setMessage('');
     if(!nombre.trim()){setError('Introduce el nombre del cliente.');return null;}
+    const telefonoNormalizado=telefono.replace(/\D/g,'');
+    if(telefono.trim() && !/^[6789]\d{8}$/.test(telefonoNormalizado)){setError('El teléfono debe tener 9 cifras y empezar por 6, 7, 8 o 9.');return null;}
+    if(telefonoNormalizado && telefonoNormalizado!==telefono.trim()){setTelefono(telefonoNormalizado);}
     const fechaHora=new Date(fecha+'T'+horaReserva+':00');
     if(Number.isNaN(fechaHora.getTime())||fechaHora.getTime()<Date.now()-60000){setError('No puedes usar una fecha u hora pasada.');return null;}
     if(telefono.trim()){
