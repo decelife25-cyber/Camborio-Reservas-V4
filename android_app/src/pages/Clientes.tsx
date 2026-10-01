@@ -1,4 +1,3 @@
-import { mostrarTelefono } from '../utils/phone';
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Search, User } from 'lucide-react';
