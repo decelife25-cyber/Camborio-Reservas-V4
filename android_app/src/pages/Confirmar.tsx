@@ -1,3 +1,4 @@
+import { mostrarTelefono } from '../utils/phone';
 import { useEffect, useState } from 'react';
 import { Check, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -138,7 +139,7 @@ export default function Confirmar() {
               <div className="confirm-pax">{reserva.Personas || 0} PAX</div>
               <div className="confirm-client">
                 <strong>👤 {reserva.Nombre || 'SIN NOMBRE'}</strong>
-                <span>☎ {reserva.Telefono || '—'} · {reserva.CodigoReserva ? (
+                <span>☎ {mostrarTelefono(reserva.Telefono)} · {reserva.CodigoReserva ? (
                   <button
                     type="button"
                     className="confirm-code-button"
