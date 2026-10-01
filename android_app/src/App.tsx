@@ -12,6 +12,7 @@ import Mesas from './pages/Mesas';
 import Clientes from './pages/Clientes';
 import Historial from './pages/Historial';
 import Configuracion from './pages/Configuracion';
+import FCMManager from './components/FCMManager';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
@@ -23,6 +24,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 function App() {
   return (
     <AuthProvider>
+      <FCMManager />
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
