@@ -1,8 +1,8 @@
 {
   "name": "android_app",
   "private": true,
-  "releaseNote": "Validación teléfono V2 + reservas privadas sin teléfono",
-  "version": "1.0.134",
+  "releaseNote": "Mensajes de teléfono simplificados en PWA y panel privado",
+  "version": "1.0.135",
   "type": "module",
   "scripts": {
     "dev": "vite",
