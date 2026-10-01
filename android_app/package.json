@@ -1,8 +1,8 @@
 {
   "name": "android_app",
   "private": true,
-  "releaseNote": "Mensajes de teléfono simplificados en PWA y panel privado",
-  "version": "1.0.136",
+  "releaseNote": "Sincronización inmediata del contador de reservas pendientes",
+  "version": "1.0.137",
   "type": "module",
   "scripts": {
     "dev": "vite",
