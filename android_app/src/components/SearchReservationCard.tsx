@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { sendAuthorizedConfirmationEmail } from '../services/reservationEmail';
 import { getTurnoFromHora } from '../utils/shifts';
 import { getReservationStateActions } from '../utils/reservationStateActions';
 import FechaPicker from './FechaPicker';
@@ -130,10 +131,18 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
     if(resultado.error){setError(resultado.error.message);return;}
     const next={...r,...resultado.data,Estado:nextState} as SearchReservation;
     setR(next);onUpdated(next);
+    if(r.Estado==='PENDIENTE' && nextState==='CONFIRMADA' && resultado.data?.EmailReservaAutorizado===true && resultado.data?.Email){
+      try {
+        await sendAuthorizedConfirmationEmail(r.ReservaID);
+      } catch (emailError) {
+        console.warn('Reserva confirmada, pero no se pudo enviar el email de confirmación', emailError);
+        setError('Reserva confirmada, pero no se pudo enviar el email de confirmación.');
+      }
+    }
     if(r.Estado==='PENDIENTE' && nextState!=='PENDIENTE'){
       window.dispatchEvent(new Event('camborio-pending-count-change'));
     }
-    setStateOpen(false);setDirty(false);setResultado('ESTADO CAMBIADO CORRECTAMENTE');setConfirmAction('resultado');setError('');
+    setStateOpen(false);setDirty(false);setError('');
   };
 
   const stateActions = getReservationStateActions({
