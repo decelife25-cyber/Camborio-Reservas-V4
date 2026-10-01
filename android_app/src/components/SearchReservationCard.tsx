@@ -1,3 +1,4 @@
+import { mostrarTelefono } from '../utils/phone';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
@@ -183,7 +184,7 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
       <div className="cr-busqueda-ficha__cabecera">
         <div className="cr-busqueda-ficha__cliente">
           <strong><span className="cr-busqueda-ficha__cliente-icon">👤</span>{r.Nombre||'Sin nombre'}</strong>
-          <span><span className="cr-busqueda-ficha__telefono-icon">📞</span><span className="cr-busqueda-ficha__telefono">{esSinReserva?'SIN TELÉFONO':(r.Telefono||'Sin teléfono')}</span>{esSinReserva?<span className="cr-busqueda-ficha__codigo cr-busqueda-ficha__codigo--sin-reserva">{r.CodigoReserva||'—'}</span>:r.CodigoReserva&&<button type="button" className="cr-busqueda-ficha__codigo" onClick={e=>{e.stopPropagation();navigate('/buscar?codigo='+encodeURIComponent(r.CodigoReserva||''));}}>🏷️ {r.CodigoReserva}</button>}</span>
+          <span><span className="cr-busqueda-ficha__telefono-icon">📞</span><span className="cr-busqueda-ficha__telefono">{mostrarTelefono(r.Telefono)}</span>{esSinReserva?<span className="cr-busqueda-ficha__codigo cr-busqueda-ficha__codigo--sin-reserva">{r.CodigoReserva||'—'}</span>:r.CodigoReserva&&<button type="button" className="cr-busqueda-ficha__codigo" onClick={e=>{e.stopPropagation();navigate('/buscar?codigo='+encodeURIComponent(r.CodigoReserva||''));}}>🏷️ {r.CodigoReserva}</button>}</span>
         </div>
         <button className="cr-busqueda-ficha__estado" type="button" onClick={()=>!readOnly&&setStateOpen(true)} disabled={readOnly}>{stateLabel(r.Estado)}{!readOnly?' ▼':''}</button>
       </div>
