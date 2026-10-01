@@ -3,17 +3,16 @@ package com.camborio.reservas.privada;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
-import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.capacitorjs.plugins.pushnotifications.MessagingService;
 
-public class BadgeMessagingService extends FirebaseMessagingService {
+public class BadgeMessagingService extends MessagingService {
 
     private static final String TAG = "BadgeMessagingService";
     private static final String CHANNEL_ID = "badge_updates_channel";
@@ -21,25 +20,18 @@ public class BadgeMessagingService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
+        // ALWAYS pass it to Capacitor's standard handler first
         super.onMessageReceived(remoteMessage);
+
         Log.d(TAG, "Message data payload: " + remoteMessage.getData());
 
+        // Process our specific data-only badge payload
         if (remoteMessage.getData().containsKey("pending_count")) {
             try {
                 int pendingCount = Integer.parseInt(remoteMessage.getData().get("pending_count"));
                 updateBadge(pendingCount);
             } catch (NumberFormatException e) {
                 Log.e(TAG, "Error parsing pending_count", e);
-            }
-        } else {
-            // Forward to Capacitor plugin by starting its service with the intent it expects
-            Intent intent = new Intent(this, com.capacitorjs.plugins.pushnotifications.MessagingService.class);
-            intent.setAction("com.google.firebase.MESSAGING_EVENT");
-            intent.putExtra("message", remoteMessage);
-            try {
-                startService(intent);
-            } catch (Exception e) {
-                Log.e(TAG, "Error forwarding to Capacitor MessagingService", e);
             }
         }
     }
@@ -80,21 +72,6 @@ public class BadgeMessagingService extends FirebaseMessagingService {
             Log.d(TAG, "Badge notification updated to " + count);
         } catch (SecurityException e) {
             Log.e(TAG, "Permission denied for POST_NOTIFICATIONS", e);
-        }
-    }
-
-    @Override
-    public void onNewToken(String token) {
-        super.onNewToken(token);
-        Log.d(TAG, "Refreshed token: " + token);
-
-        // Capacitor expects onNewToken without the Context argument inside its service.
-        // We will just invoke it directly.
-        com.capacitorjs.plugins.pushnotifications.MessagingService capService = new com.capacitorjs.plugins.pushnotifications.MessagingService();
-        try {
-            capService.onNewToken(token);
-        } catch (Exception e) {
-            Log.e(TAG, "Error forwarding new token to Capacitor", e);
         }
     }
 }

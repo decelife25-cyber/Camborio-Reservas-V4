@@ -14,9 +14,40 @@ serve(async (req: Request) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+
+    // Internal auth using WEBHOOK_SECRET or User JWT
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: corsHeaders });
+    }
+
+    const token = authHeader.replace('Bearer ', '').trim();
+    const webhookSecret = Deno.env.get('WEBHOOK_SECRET');
+    let isAuthorized = false;
+
+    if (webhookSecret && token === webhookSecret) {
+      // Triggered internally by PostgreSQL/pg_net
+      isAuthorized = true;
+    } else {
+      // Triggered by frontend APK (verify JWT)
+      const anonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
+      const supabaseUserClient = createClient(supabaseUrl, anonKey, {
+        global: { headers: { Authorization: authHeader } }
+      });
+      const { data: { user }, error: userError } = await supabaseUserClient.auth.getUser();
+      if (user && !userError) {
+        isAuthorized = true;
+      }
+    }
+
+    if (!isAuthorized) {
+      return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403, headers: corsHeaders });
+    }
+
+    // We use service role to query all pending reservations and all user devices
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // 1. Calculate pending count
+    // 1. Calculate pending count strictly following V4 rules
     const { count, error: countError } = await supabase
       .from('Reservas')
       .select('*', { count: 'exact', head: true })
@@ -54,12 +85,6 @@ serve(async (req: Request) => {
     const serviceAccount = JSON.parse(serviceAccountStr);
 
     // Generate OAuth2 token (simplified for Deno, typically uses a JWT library)
-    // For simplicity in this Edge Function context without external JWT heavy libraries,
-    // we use a lightweight approach to sign a JWT for Google OAuth.
-    // However, Google FCM HTTP v1 requires a valid OAuth2 token.
-    // We will use the Google REST API for FCM v1.
-
-    // Create JWT header and payload
     const header = { alg: 'RS256', typ: 'JWT' };
     const now = Math.floor(Date.now() / 1000);
     const payload = {
@@ -79,7 +104,6 @@ serve(async (req: Request) => {
     const dataToSign = `${headerEncoded}.${payloadEncoded}`;
 
     // Import private key
-    // Convert PEM to ArrayBuffer
     const pemHeader = "-----BEGIN PRIVATE KEY-----";
     const pemFooter = "-----END PRIVATE KEY-----";
     const pemContents = serviceAccount.private_key.replace(pemHeader, "").replace(pemFooter, "").replace(/\s/g, "");
@@ -127,7 +151,6 @@ serve(async (req: Request) => {
     let sentCount = 0;
     let errorCount = 0;
 
-    // Send to each token
     for (const token of tokens) {
       const fcmPayload = {
         message: {
