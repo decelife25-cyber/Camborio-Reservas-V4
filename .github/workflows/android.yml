@@ -72,6 +72,15 @@ jobs:
           convert "$SRC" -resize "${SIZE}x${SIZE}" "$RES/$DIR/ic_launcher_round.png"
         done
 
+    - name: Configure Firebase Android
+      env:
+        GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+      run: |
+        set -euo pipefail
+        test -n "$GOOGLE_SERVICES_JSON"
+        printf '%s' "$GOOGLE_SERVICES_JSON" > android_app/android/app/google-services.json
+        test -s android_app/android/app/google-services.json
+
     - name: Verify stable signing key
       run: |
         test -f android_app/android/app/camborio-debug.keystore
