@@ -135,7 +135,8 @@ export default function NuevaReserva(){
     setError('');setMessage('');
     if(!nombre.trim()){setError('Introduce el nombre del cliente.');return null;}
     const telefonoNormalizado=telefono.replace(/\D/g,'');
-    if(telefono.trim() && !/^[6789]\d{8}$/.test(telefonoNormalizado)){setError('El teléfono debe tener 9 cifras y empezar por 6, 7, 8 o 9.');return null;}
+    const telefonoInput=document.getElementById('cr-nueva-reserva-telefono') as HTMLInputElement|null;
+    if(telefono.trim() && !/^[6789]\d{8}$/.test(telefonoNormalizado)){telefonoInput?.reportValidity();return null;}
     if(telefonoNormalizado && telefonoNormalizado!==telefono.trim()){setTelefono(telefonoNormalizado);}
     const fechaHora=new Date(fecha+'T'+horaReserva+':00');
     if(Number.isNaN(fechaHora.getTime())||fechaHora.getTime()<Date.now()-60000){setError('No puedes usar una fecha u hora pasada.');return null;}
@@ -168,6 +169,12 @@ export default function NuevaReserva(){
     if(saving)return;
     setError('');setMessage('');
     if(!nombre.trim()){setError('Introduce el nombre del cliente.');return;}
+    const telefonoNormalizado=telefono.replace(/\D/g,'');
+    if(telefono.trim() && !/^[6789]\d{8}$/.test(telefonoNormalizado)){
+      const telefonoInput=document.getElementById('cr-nueva-reserva-telefono') as HTMLInputElement|null;
+      telefonoInput?.reportValidity();
+      return;
+    }
     const fechaHora=new Date(fecha+'T'+horaReserva+':00');
     if(Number.isNaN(fechaHora.getTime())||fechaHora.getTime()<Date.now()-60000){setError('No puedes usar una fecha u hora pasada.');return;}
     try{
@@ -185,7 +192,7 @@ export default function NuevaReserva(){
       </header>
       <form className="cr-nueva-reserva__form" onSubmit={guardar}>
         <label className="cr-nueva-reserva__campo-completo">Nombre<input type="text" value={nombre} onFocus={limpiarCodigoAlEditar} onChange={e=>{limpiarCodigoAlEditar();setNombre(e.target.value)}} autoComplete="name" placeholder="Nombre del cliente" required /></label>
-        <label className="cr-nueva-reserva__campo-completo">Teléfono<input type="tel" value={telefono} onFocus={limpiarCodigoAlEditar} onChange={e=>{limpiarCodigoAlEditar();setTelefono(e.target.value)}} inputMode="tel" autoComplete="tel" placeholder="Número de teléfono" /></label>
+        <label className="cr-nueva-reserva__campo-completo">Teléfono<input id="cr-nueva-reserva-telefono" type="tel" value={telefono} onFocus={limpiarCodigoAlEditar} onChange={e=>{limpiarCodigoAlEditar();setTelefono(e.target.value)}} inputMode="tel" autoComplete="tel" pattern="[6789][0-9]{8}" title="Introduce un número de teléfono español válido o deja este campo vacío." placeholder="Número de teléfono" /></label>
         <label className="cr-nueva-reserva__personas">Personas
           <span className="cr-nueva-reserva__contador">
             <button type="button" onClick={()=>setPersonas(p=>Math.max(1,p-1))}>−</button><strong>{personas} PAX</strong><button type="button" onClick={()=>setPersonas(p=>p+1)}>+</button>
