@@ -1,3 +1,4 @@
+import { mostrarTelefono } from '../utils/phone';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -632,7 +633,7 @@ export default function Mesas() {
           <button type="button" className="cr-planos-mesas__cerrar" onClick={assignmentMode ? cerrarAsignacion : () => navigate('/')}>CERRAR</button>
         </header>
 
-        {assignmentMode ? <div className="cr-planos-mesas__reserva-info"><div><span>NOMBRE</span><strong>{assignmentReserva?.Nombre || nuevaBorrador?.nombre || 'SIN NOMBRE'}</strong></div><div className="cr-planos-mesas__reserva-fecha">📅 {formatHeaderDate(assignmentReserva?.FechaReserva || nuevaBorrador?.fecha || fecha)}</div><div className="cr-planos-mesas__reserva-grid"><div><span data-cr-asignacion-etiqueta>{assignmentTables.length === 1 ? 'MESA ASIGNADA' : 'MESAS ASIGNADAS'}</span><strong data-cr-asignacion-resumen className={assignmentOriginalRef.current.length ? 'cr-planos-mesas__asignacion--asignada' : ''}>{assignmentTables.length ? assignmentTables.join(', ') : 'SIN ASIGNAR'}</strong></div><div><span>TELÉFONO</span><strong>{assignmentReserva?.Telefono || nuevaBorrador?.telefono || '—'}</strong></div><div><span>HORA</span><strong>{String(assignmentReserva?.HoraReserva || nuevaBorrador?.horaReserva || '').slice(0,5)}</strong></div><div><span>PERSONAS</span><strong>{assignmentReserva?.Personas || nuevaBorrador?.personas || 0} PAX</strong></div></div></div> : <button className="cr-planos-mesas__fecha" type="button" onClick={() => setCalendarOpen(true)} aria-label="Cambiar fecha">📅 {formatHeaderDate(fecha)}</button>}
+        {assignmentMode ? <div className="cr-planos-mesas__reserva-info"><div><span>NOMBRE</span><strong>{assignmentReserva?.Nombre || nuevaBorrador?.nombre || 'SIN NOMBRE'}</strong></div><div className="cr-planos-mesas__reserva-fecha">📅 {formatHeaderDate(assignmentReserva?.FechaReserva || nuevaBorrador?.fecha || fecha)}</div><div className="cr-planos-mesas__reserva-grid"><div><span data-cr-asignacion-etiqueta>{assignmentTables.length === 1 ? 'MESA ASIGNADA' : 'MESAS ASIGNADAS'}</span><strong data-cr-asignacion-resumen className={assignmentOriginalRef.current.length ? 'cr-planos-mesas__asignacion--asignada' : ''}>{assignmentTables.length ? assignmentTables.join(', ') : 'SIN ASIGNAR'}</strong></div><div><span>TELÉFONO</span><strong>{mostrarTelefono(assignmentReserva?.Telefono || nuevaBorrador?.telefono)}</strong></div><div><span>HORA</span><strong>{String(assignmentReserva?.HoraReserva || nuevaBorrador?.horaReserva || '').slice(0,5)}</strong></div><div><span>PERSONAS</span><strong>{assignmentReserva?.Personas || nuevaBorrador?.personas || 0} PAX</strong></div></div></div> : <button className="cr-planos-mesas__fecha" type="button" onClick={() => setCalendarOpen(true)} aria-label="Cambiar fecha">📅 {formatHeaderDate(fecha)}</button>}
 
         {!assignmentMode && <div className="cr-planos-mesas__turnos" role="tablist" aria-label="Turnos">
           <button type="button" className={turno === 'COMIDA' ? 'activo' : ''} onClick={() => setTurno('COMIDA')}>☀ COMIDA</button>
@@ -725,7 +726,7 @@ export default function Mesas() {
                 <div className="cr-planos-mesas__dialog-title">MESA {parseAssignedTables(reservaSeleccionada)[0] || selectedTable}</div>
                 <div className="cr-planos-mesas__dialog-type">MESA PRINCIPAL</div>
                 <div className="cr-planos-mesas__dialog-name">{reservaSeleccionada.Nombre || 'SIN NOMBRE'}</div>
-                <div className="cr-planos-mesas__dialog-phone">{reservaSeleccionada.Telefono || 'SIN TELÉFONO'}</div>
+                <div className="cr-planos-mesas__dialog-phone">{mostrarTelefono(reservaSeleccionada.Telefono)}</div>
                 <div className="cr-planos-mesas__dialog-data">{String(reservaSeleccionada.HoraReserva).slice(0,5)} · {reservaSeleccionada.Personas || '—'} PAX</div>
                 <div className="cr-planos-mesas__dialog-code">CÓDIGO: {reservaSeleccionada.CodigoReserva || reservaSeleccionada.ReservaID}</div>
                 <div className="cr-planos-mesas__dialog-state">ESTADO: {reservaSeleccionada.Estado}</div>
