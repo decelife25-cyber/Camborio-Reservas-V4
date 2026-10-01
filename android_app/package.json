@@ -34,5 +34,6 @@
     "tailwindcss": "^4.3.3",
     "typescript": "~6.0.2",
     "vite": "^8.2.2"
-  }
+  },
+  "buildRevision": "1.0.132"
 }
