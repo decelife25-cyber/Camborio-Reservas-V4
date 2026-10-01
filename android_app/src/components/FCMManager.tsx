@@ -26,6 +26,22 @@ export default function FCMManager() {
 
       if (error) {
         console.error('Error saving FCM token:', error);
+        return;
+      }
+
+      // The device may be registering for the first time while pending
+      // reservations already exist. Force an immediate sync so the launcher
+      // badge is initialized without waiting for a later DB change or
+      // app-state transition.
+      try {
+        const { data, error: syncError } = await supabase.functions.invoke('sync-badge');
+        if (syncError) {
+          console.error('Error syncing initial badge after FCM registration:', syncError);
+        } else {
+          console.log('Initial badge synced after FCM registration:', data);
+        }
+      } catch (err) {
+        console.error('Exception syncing initial badge after FCM registration:', err);
       }
     });
 
