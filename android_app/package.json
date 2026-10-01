@@ -2,7 +2,7 @@
   "name": "android_app",
   "private": true,
   "releaseNote": "Final build 1.0.130",
-  "version": "1.0.130",
+  "version": "1.0.127",
   "type": "module",
   "scripts": {
     "dev": "vite",
