@@ -15,7 +15,7 @@ import com.capacitorjs.plugins.pushnotifications.MessagingService;
 public class BadgeMessagingService extends MessagingService {
 
     private static final String TAG = "BadgeMessagingService";
-    private static final String CHANNEL_ID = "badge_updates_channel";
+    private static final String CHANNEL_ID = "badge_updates_channel_v2";
     private static final int BADGE_NOTIFICATION_ID = 1001;
 
     @Override
@@ -50,7 +50,7 @@ public class BadgeMessagingService extends MessagingService {
                 NotificationChannel channel = new NotificationChannel(
                         CHANNEL_ID,
                         "Reservas Pendientes",
-                        NotificationManager.IMPORTANCE_LOW
+                        NotificationManager.IMPORTANCE_DEFAULT
                 );
                 channel.setDescription("Actualizaciones silenciosas del contador de reservas pendientes");
                 channel.setShowBadge(true);
@@ -62,10 +62,13 @@ public class BadgeMessagingService extends MessagingService {
                 .setSmallIcon(R.mipmap.ic_launcher_round)
                 .setContentTitle("Reservas por confirmar")
                 .setContentText("Tienes " + count + " reserva" + (count == 1 ? "" : "s") + " pendiente" + (count == 1 ? "" : "s"))
-                .setPriority(NotificationCompat.PRIORITY_LOW)
+                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setNumber(count)
+                .setBadgeIconType(NotificationCompat.BADGE_ICON_NONE)
                 .setAutoCancel(false)
-                .setOngoing(false);
+                .setOngoing(true)
+                .setOnlyAlertOnce(true)
+                .setSilent(true);
 
         try {
             notificationManager.notify(BADGE_NOTIFICATION_ID, builder.build());
