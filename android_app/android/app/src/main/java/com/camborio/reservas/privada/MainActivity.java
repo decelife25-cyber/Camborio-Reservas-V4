@@ -14,6 +14,12 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Opening the app must NOT mark pending reservations as read.
+        // Restore the last known badge immediately; the app will reconcile it
+        // with Supabase through FCMManager afterwards.
+        BadgeNotificationHelper.restoreBadge(this);
+
         WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
 
         // Android 15+ enforces edge-to-edge for apps targeting SDK 35+.
