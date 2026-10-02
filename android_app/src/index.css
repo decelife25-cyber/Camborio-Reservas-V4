@@ -3605,3 +3605,15 @@ html.light .table-button--unassigned{
 
 .reservation-phone--sin-reserva{font-size:.78em;font-weight:700;letter-spacing:.2px}
 .cr-planos-mesas__mesa{-webkit-user-select:none;user-select:none;transition:none!important;animation:none!important}
+
+/* 1.0.149 — modo día: COMIDA/CENA más oscuros que las mesas asignadas, ambos con texto blanco. */
+html.light .turn-button.selected{
+  background:linear-gradient(145deg,#9f7b1e 0,#7f5d00 100%)!important;
+  color:#fff!important;
+  border-color:#7f5d00!important;
+}
+html.light .table-button--assigned{
+  background:linear-gradient(180deg,#d2b15a 0,#b89a42 100%)!important;
+  color:#fff!important;
+  border-color:#a48735!important;
+}
