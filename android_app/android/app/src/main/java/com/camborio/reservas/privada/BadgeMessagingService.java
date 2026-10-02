@@ -4,8 +4,6 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
@@ -20,7 +18,8 @@ public class BadgeMessagingService extends MessagingService {
     private static final String CHANNEL_ID = "badge_updates_channel_v3";
     private static final String LEGACY_CHANNEL_ID = "badge_updates_channel_v2";
     private static final String ORIGINAL_CHANNEL_ID = "badge_updates_channel";
-    private static final int BADGE_NOTIFICATION_ID = 1001;
+    private static final int BADGE_NOTIFICATION_ID_BASE = 1001;
+    private static final String PREF_NOTIFICATION_ID = "notification_id";
     private static final String PREFS_NAME = "badge_state";
     private static final String PREF_PENDING_COUNT = "pending_count";
 
@@ -40,16 +39,6 @@ public class BadgeMessagingService extends MessagingService {
         }
     }
 
-    public static void restoreBadge(Context context) {
-        int count = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-                .getInt(PREF_PENDING_COUNT, 0);
-        if (count > 0) {
-            new Handler(Looper.getMainLooper()).postDelayed(
-                    () -> updateBadgeForContext(context, count), 500
-            );
-        }
-    }
-
     private void updateBadge(int count) {
         getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
                 .edit().putInt(PREF_PENDING_COUNT, count).apply();
@@ -58,11 +47,26 @@ public class BadgeMessagingService extends MessagingService {
 
     private static void updateBadgeForContext(Context context, int count) {
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+        android.content.SharedPreferences prefs =
+                context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        int previousId = prefs.getInt(PREF_NOTIFICATION_ID, BADGE_NOTIFICATION_ID_BASE);
 
         if (count == 0) {
-            notificationManager.cancel(BADGE_NOTIFICATION_ID);
+            notificationManager.cancel(previousId);
+            prefs.edit().putInt(PREF_NOTIFICATION_ID, BADGE_NOTIFICATION_ID_BASE).apply();
             return;
         }
+
+        // Xiaomi HyperOS hides the badge when the app is opened. Its official
+        // guidance says the badge is shown again either by updating messageCount
+        // or by posting a new notification with a different ID. Use a new ID
+        // for every real pending-count update so this also works on other Android
+        // launchers without relying on Xiaomi-specific APIs.
+        notificationManager.cancel(previousId);
+        int notificationId = previousId == Integer.MAX_VALUE
+                ? BADGE_NOTIFICATION_ID_BASE
+                : previousId + 1;
+        prefs.edit().putInt(PREF_NOTIFICATION_ID, notificationId).apply();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -89,10 +93,10 @@ public class BadgeMessagingService extends MessagingService {
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setNumber(count)
                 .setAutoCancel(false)
-                .setOngoing(true);
+                .setOngoing(false);
 
         try {
-            notificationManager.notify(BADGE_NOTIFICATION_ID, builder.build());
+            notificationManager.notify(notificationId, builder.build());
             Log.d(TAG, "Badge notification updated to " + count);
         } catch (SecurityException e) {
             Log.e(TAG, "Permission denied for POST_NOTIFICATIONS", e);
