@@ -89,7 +89,7 @@ public class BadgeMessagingService extends MessagingService {
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setNumber(count)
                 .setAutoCancel(false)
-                .setOngoing(false);
+                .setOngoing(true);
 
         try {
             notificationManager.notify(BADGE_NOTIFICATION_ID, builder.build());
