@@ -1,8 +1,8 @@
 {
   "name": "android_app",
   "private": true,
-  "releaseNote": "Badge actualizado exclusivamente por cambios reales en pendientes",
-  "version": "1.0.145",
+  "releaseNote": "Badge persistente mientras existan reservas pendientes",
+  "version": "1.0.146",
   "type": "module",
   "scripts": {
     "dev": "vite",
