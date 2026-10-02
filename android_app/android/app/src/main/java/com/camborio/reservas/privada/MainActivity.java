@@ -1,6 +1,8 @@
 package com.camborio.reservas.privada;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 
 import androidx.core.graphics.Insets;
@@ -11,6 +13,16 @@ import androidx.core.view.WindowInsetsCompat;
 import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Xiaomi may hide the launcher badge while the app is in the foreground.
+        // Restore the last real pending count after the activity becomes visible.
+        new Handler(Looper.getMainLooper()).postDelayed(
+            () -> BadgeMessagingService.restoreBadge(this), 300
+        );
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
