@@ -1,8 +1,8 @@
 {
   "name": "android_app",
   "private": true,
-  "releaseNote": "Sincronización inmediata del contador de reservas pendientes",
-  "version": "1.0.142",
+  "releaseNote": "Canal limpio para badge numérico en Xiaomi",
+  "version": "1.0.143",
   "type": "module",
   "scripts": {
     "dev": "vite",
