@@ -81,20 +81,22 @@ export default function FCMManager() {
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;
 
-    // Invoke sync-badge when app state changes to active
+    // Re-sync the real pending count whenever the app enters or leaves
+    // the foreground. HyperOS may hide launcher badges when the app is opened;
+    // publishing the current count again when leaving foreground recreates
+    // the notification/badge from the authoritative Supabase state.
     const appStateListener = CapacitorApp.addListener('appStateChange', async ({ isActive }) => {
-      if (isActive && session?.access_token) {
-        try {
-          // Since we use the edge function with JWT auth for frontend
-          const { data, error } = await supabase.functions.invoke('sync-badge');
-          if (error) {
-            console.error('Error syncing badge from Edge Function', error);
-          } else {
-            console.log('Badge synced:', data);
-          }
-        } catch (err) {
-          console.error('Exception syncing badge on app foreground:', err);
+      if (!session?.access_token) return;
+
+      try {
+        const { data, error } = await supabase.functions.invoke('sync-badge');
+        if (error) {
+          console.error('Error syncing badge from Edge Function', error);
+        } else {
+          console.log('Badge synced on app state change:', isActive ? 'foreground' : 'background', data);
         }
+      } catch (err) {
+        console.error('Exception syncing badge on app state change:', err);
       }
     });
 
