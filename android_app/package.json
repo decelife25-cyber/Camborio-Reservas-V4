@@ -2,7 +2,7 @@
   "name": "android_app",
   "private": true,
   "releaseNote": "Sincronización inmediata del contador de reservas pendientes",
-  "version": "1.0.140",
+  "version": "1.0.141",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -21,6 +21,7 @@
     "lucide-react": "^1.41.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "lucide-react": "^1.41.0",
     "react-router-dom": "^7.18.3"
   },
   "devDependencies": {
