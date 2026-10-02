@@ -4,6 +4,8 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
@@ -19,6 +21,8 @@ public class BadgeMessagingService extends MessagingService {
     private static final String LEGACY_CHANNEL_ID = "badge_updates_channel_v2";
     private static final String ORIGINAL_CHANNEL_ID = "badge_updates_channel";
     private static final int BADGE_NOTIFICATION_ID = 1001;
+    private static final String PREFS_NAME = "badge_state";
+    private static final String PREF_PENDING_COUNT = "pending_count";
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
@@ -36,8 +40,24 @@ public class BadgeMessagingService extends MessagingService {
         }
     }
 
+    public static void restoreBadge(Context context) {
+        int count = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                .getInt(PREF_PENDING_COUNT, 0);
+        if (count > 0) {
+            new Handler(Looper.getMainLooper()).postDelayed(
+                    () -> updateBadgeForContext(context, count), 500
+            );
+        }
+    }
+
     private void updateBadge(int count) {
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                .edit().putInt(PREF_PENDING_COUNT, count).apply();
+        updateBadgeForContext(this, count);
+    }
+
+    private static void updateBadgeForContext(Context context, int count) {
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
 
         if (count == 0) {
             notificationManager.cancel(BADGE_NOTIFICATION_ID);
@@ -45,7 +65,7 @@ public class BadgeMessagingService extends MessagingService {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             if (nm != null) {
                 // Use a fresh channel so Xiaomi does not inherit stale per-channel badge settings.
                 nm.deleteNotificationChannel(LEGACY_CHANNEL_ID);
@@ -62,7 +82,7 @@ public class BadgeMessagingService extends MessagingService {
             }
         }
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.mipmap.ic_launcher_round)
                 .setContentTitle("Reservas por confirmar")
                 .setContentText("Tienes " + count + " reserva" + (count == 1 ? "" : "s") + " pendiente" + (count == 1 ? "" : "s"))
