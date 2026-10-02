@@ -1,7 +1,7 @@
 {
   "name": "android_app",
   "private": true,
-  "releaseNote": "Resincronizar badge al cambiar de estado la aplicación",
+  "releaseNote": "Ajuste consentimiento de correo y colores modo día",
   "version": "1.0.149",
   "type": "module",
   "scripts": {
