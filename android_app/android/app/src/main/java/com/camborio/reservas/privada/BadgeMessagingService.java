@@ -20,12 +20,10 @@ public class BadgeMessagingService extends MessagingService {
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        // ALWAYS pass it to Capacitor's standard handler first
         super.onMessageReceived(remoteMessage);
 
         Log.d(TAG, "Message data payload: " + remoteMessage.getData());
 
-        // Process our specific data-only badge payload
         if (remoteMessage.getData().containsKey("pending_count")) {
             try {
                 int pendingCount = Integer.parseInt(remoteMessage.getData().get("pending_count"));
@@ -65,7 +63,7 @@ public class BadgeMessagingService extends MessagingService {
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setNumber(count)
                 .setAutoCancel(false)
-                .setOngoing(true);
+                .setOngoing(false);
 
         try {
             notificationManager.notify(BADGE_NOTIFICATION_ID, builder.build());
