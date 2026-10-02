@@ -48,11 +48,14 @@ serve(async (req: Request) => {
       return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403, headers: corsHeaders });
     }
 
-    // 1. Calculate pending count strictly following V4 rules
+    // 1. Calculate pending count using the same rule as POR CONFIRMAR:
+    // only PENDIENTE reservations dated today or later in Europe/Madrid.
+    const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' });
     const { count, error: countError } = await supabase
       .from('Reservas')
       .select('*', { count: 'exact', head: true })
-      .eq('Estado', 'PENDIENTE');
+      .eq('Estado', 'PENDIENTE')
+      .gte('FechaReserva', today);
 
     if (countError) throw countError;
     const pendingCount = (count || 0).toString();
