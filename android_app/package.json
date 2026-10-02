@@ -1,8 +1,8 @@
 {
   "name": "android_app",
   "private": true,
-  "releaseNote": "Canal limpio para badge numérico en Xiaomi",
-  "version": "1.0.143",
+  "releaseNote": "Restaurar badge al volver a primer plano",
+  "version": "1.0.144",
   "type": "module",
   "scripts": {
     "dev": "vite",
