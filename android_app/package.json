@@ -1,8 +1,8 @@
 {
   "name": "android_app",
   "private": true,
-  "releaseNote": "Restaurar badge al volver a primer plano",
-  "version": "1.0.144",
+  "releaseNote": "Badge actualizado exclusivamente por cambios reales en pendientes",
+  "version": "1.0.145",
   "type": "module",
   "scripts": {
     "dev": "vite",
