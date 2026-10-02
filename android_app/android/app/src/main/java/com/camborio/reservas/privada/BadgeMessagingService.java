@@ -16,6 +16,7 @@ public class BadgeMessagingService extends MessagingService {
 
     private static final String TAG = "BadgeMessagingService";
     private static final String CHANNEL_ID = "badge_updates_channel";
+    private static final String LEGACY_CHANNEL_ID = "badge_updates_channel_v2";
     private static final int BADGE_NOTIFICATION_ID = 1001;
 
     @Override
@@ -45,6 +46,8 @@ public class BadgeMessagingService extends MessagingService {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             if (nm != null) {
+                nm.deleteNotificationChannel(LEGACY_CHANNEL_ID);
+
                 NotificationChannel channel = new NotificationChannel(
                         CHANNEL_ID,
                         "Reservas Pendientes",
@@ -63,7 +66,7 @@ public class BadgeMessagingService extends MessagingService {
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setNumber(count)
                 .setAutoCancel(false)
-                .setOngoing(false);
+                .setOngoing(true);
 
         try {
             notificationManager.notify(BADGE_NOTIFICATION_ID, builder.build());
