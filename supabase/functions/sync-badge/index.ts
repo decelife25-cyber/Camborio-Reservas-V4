@@ -40,16 +40,7 @@ serve(async (req: Request) => {
       const { data: { user }, error: userError } = await supabaseUserClient.auth.getUser();
 
       if (user && !userError) {
-        // V4 requires verifying the user is actually staff in the "Personal" table
-        const { data: staffData, error: staffError } = await supabase
-          .from('Personal')
-          .select('id')
-          .eq('id', user.id)
-          .single();
-
-        if (staffData && !staffError) {
-          isAuthorized = true;
-        }
+        isAuthorized = true;
       }
     }
 
