@@ -2,7 +2,7 @@
   "name": "android_app",
   "private": true,
   "releaseNote": "Sincronización inmediata del contador de reservas pendientes",
-  "version": "1.0.137",
+  "version": "1.0.138",
   "type": "module",
   "scripts": {
     "dev": "vite",
