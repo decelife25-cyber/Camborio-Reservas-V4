@@ -1,7 +1,7 @@
 {
   "name": "android_app",
   "private": true,
-  "releaseNote": "Ajuste consentimiento de correo y colores modo día",
+  "releaseNote": "Ajuste consentimiento de correo y colores modo día 1.0.149",
   "version": "1.0.149",
   "type": "module",
   "scripts": {
