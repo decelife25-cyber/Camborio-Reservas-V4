@@ -14,8 +14,21 @@ export default function FCMManager() {
 
     let isRegistered = false;
 
-    // Register listeners FIRST before requesting permission/registration
-    // This avoids the race condition where the token is received before the listener is active
+    const syncBadge = async (reason: string) => {
+      try {
+        const { data, error } = await supabase.functions.invoke('sync-badge');
+        if (error) {
+          console.error(`Error syncing badge (${reason}):`, error);
+        } else {
+          console.log(`Badge synced (${reason}):`, data);
+        }
+      } catch (err) {
+        console.error(`Exception syncing badge (${reason}):`, err);
+      }
+    };
+
+    // Register listeners FIRST before requesting permission/registration.
+    // This avoids the race condition where the token is received before the listener is active.
     const registrationListener = PushNotifications.addListener('registration', async (token) => {
       console.log('FCM token received');
       const { error } = await supabase.from('fcm_tokens').upsert({
@@ -29,20 +42,8 @@ export default function FCMManager() {
         return;
       }
 
-      // The device may be registering for the first time while pending
-      // reservations already exist. Force an immediate sync so the launcher
-      // badge is initialized without waiting for a later DB change or
-      // app-state transition.
-      try {
-        const { data, error: syncError } = await supabase.functions.invoke('sync-badge');
-        if (syncError) {
-          console.error('Error syncing initial badge after FCM registration:', syncError);
-        } else {
-          console.log('Initial badge synced after FCM registration:', data);
-        }
-      } catch (err) {
-        console.error('Exception syncing initial badge after FCM registration:', err);
-      }
+      // A new/renewed token must immediately receive the current count.
+      await syncBadge('FCM registration');
     });
 
     const registrationErrorListener = PushNotifications.addListener('registrationError', (error) => {
@@ -72,6 +73,10 @@ export default function FCMManager() {
 
     registerPush();
 
+    // Reconcile the persisted badge with Supabase every time the authenticated
+    // app starts. Opening the app is NOT equivalent to confirming a reservation.
+    syncBadge('app startup');
+
     return () => {
       registrationListener.then(l => l.remove());
       registrationErrorListener.then(l => l.remove());
@@ -81,16 +86,14 @@ export default function FCMManager() {
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;
 
-    // Invoke sync-badge when app state changes to active
     const appStateListener = CapacitorApp.addListener('appStateChange', async ({ isActive }) => {
       if (isActive && session?.access_token) {
         try {
-          // Since we use the edge function with JWT auth for frontend
           const { data, error } = await supabase.functions.invoke('sync-badge');
           if (error) {
             console.error('Error syncing badge from Edge Function', error);
           } else {
-            console.log('Badge synced:', data);
+            console.log('Badge synced on foreground:', data);
           }
         } catch (err) {
           console.error('Exception syncing badge on app foreground:', err);
