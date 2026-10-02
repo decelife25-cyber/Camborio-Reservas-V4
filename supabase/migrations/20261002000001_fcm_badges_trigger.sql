@@ -16,19 +16,20 @@ declare
 begin
   -- Only trigger if Estado is involved and changes to/from PENDIENTE
   if TG_OP = 'UPDATE' then
-    if new."Estado" = old."Estado" then
+    -- Handle potential NULLs safely
+    if (new."Estado" is not distinct from old."Estado") then
       return new;
     end if;
-    if new."Estado" <> 'PENDIENTE' and old."Estado" <> 'PENDIENTE' then
+    if coalesce(new."Estado", '') <> 'PENDIENTE' and coalesce(old."Estado", '') <> 'PENDIENTE' then
       return new;
     end if;
   end if;
 
-  if TG_OP = 'INSERT' and new."Estado" <> 'PENDIENTE' then
+  if TG_OP = 'INSERT' and coalesce(new."Estado", '') <> 'PENDIENTE' then
     return new;
   end if;
 
-  if TG_OP = 'DELETE' and old."Estado" <> 'PENDIENTE' then
+  if TG_OP = 'DELETE' and coalesce(old."Estado", '') <> 'PENDIENTE' then
     return old;
   end if;
 
