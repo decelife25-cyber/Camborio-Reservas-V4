@@ -170,6 +170,9 @@ serve(async (req: Request) => {
           token: token,
           data: {
             pending_count: pendingCount
+          },
+          android: {
+            priority: "high"
           }
         }
       };
