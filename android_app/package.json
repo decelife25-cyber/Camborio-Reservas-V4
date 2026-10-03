@@ -1,8 +1,8 @@
 {
   "name": "android_app",
   "private": true,
-  "releaseNote": "AÑADIR HORA: panel más compacto y rueda completa hasta 23:45",
-  "version": "1.0.160",
+  "releaseNote": "AÑADIR HORA: selector igual a NuevaReserva y botón único",
+  "version": "1.0.161",
   "type": "module",
   "scripts": {
     "dev": "vite",
