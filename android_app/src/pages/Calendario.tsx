@@ -15,6 +15,7 @@ type Reserva = {
   Personas: number | null;
   Estado: string;
   Mesa: string | null;
+  MesasAdicionales: string | null;
   Turno: string | null;
   Observaciones: string | null;
 };
@@ -91,7 +92,7 @@ export default function Calendario() {
 
       const { data, error } = await supabase
         .from('Reservas')
-        .select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,Turno,Observaciones')
+        .select('ReservaID,CodigoReserva,FechaReserva,HoraReserva,Nombre,Telefono,Personas,Estado,Mesa,MesasAdicionales,Turno,Observaciones')
         .gte('FechaReserva', start)
         .lte('FechaReserva', end)
         .order('FechaReserva', { ascending: true })
