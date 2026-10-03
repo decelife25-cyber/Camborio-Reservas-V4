@@ -6,7 +6,7 @@ import { sendAuthorizedConfirmationEmail } from '../services/reservationEmail';
 import { getTurnoFromHora } from '../utils/shifts';
 import { getReservationStateActions } from '../utils/reservationStateActions';
 import FechaPicker from './FechaPicker';
-import { Wheel } from '../pages/NuevaReserva';
+import { HoraMinutosPicker } from '../pages/NuevaReserva';
 export type SearchReservation = {
   ReservaID:string; CodigoReserva:string|null; FechaReserva:string; HoraReserva:string;
   Nombre:string|null; Telefono:string|null; Email?:string|null; EmailReservaAutorizado?:boolean|null; Personas:number|null; Estado:string;
@@ -278,7 +278,12 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
       <div className="v2-edit-modal ficha-edit-modal" onClick={e=>e.stopPropagation()}>
         <p className="cr-confirmacion-mesa__eyebrow">{editing==='hora'?'CAMBIAR HORA':editing==='personas'?'CAMBIAR PAX':'OBSERVACIONES'}</p>
         {editing==='hora'
-          ? <div className="ficha-time-picker"><label>HORA<Wheel values={['09','10','11','12','13','14','15','16','17','18','19','20','21','22','23']} value={(value.split(':')[0]||'13')} onChange={v=>setValue(v+':'+(value.split(':')[1]||'00'))} kind="hora"/></label><label>MINUTOS<Wheel values={['00','15','30','45']} value={(value.split(':')[1]||'00')} onChange={v=>setValue((value.split(':')[0]||'13')+':'+v)} kind="minutos"/></label></div>
+          ? <div className="ficha-time-picker"><HoraMinutosPicker
+            hora={value.split(':')[0]||'13'}
+            minutos={value.split(':')[1]||'00'}
+            onHoraChange={v=>setValue(v+':'+(value.split(':')[1]||'00'))}
+            onMinutosChange={v=>setValue((value.split(':')[0]||'13')+':'+v)}
+          /></div>
           : editing==='personas'
             ? <div className="v2-personas-control ficha-pax-control"><button type="button" onClick={()=>setValue(String(Math.max(1,Number(value||1)-1)))}>−</button><strong>{Number(value||1)} PAX</strong><button type="button" onClick={()=>setValue(String(Number(value||1)+1))}>+</button></div>
             : <textarea className="ficha-observaciones-input" rows={4} value={value} onChange={e=>setValue(e.target.value)}/>}

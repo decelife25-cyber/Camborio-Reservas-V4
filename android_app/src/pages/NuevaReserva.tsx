@@ -14,7 +14,7 @@ const isoDate = (d:Date) => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(
 export function Wheel({ values, value, onChange, kind }: { values:string[]; value:string; onChange:(v:string)=>void; kind:'hora'|'minutos' }) {
   const controlRef=useRef<HTMLSpanElement|null>(null);
   const encajeRef=useRef<number|null>(null);
-  const ITEM_HEIGHT=32;
+  const ITEM_HEIGHT=44;
   const [indiceVisual,setIndiceVisual]=useState(Math.max(1,values.indexOf(value)+1));
 
   const limitarIndice=(indice:number)=>{
@@ -109,6 +109,13 @@ export function Wheel({ values, value, onChange, kind }: { values:string[]; valu
   </span>;
 }
 
+export function HoraMinutosPicker({hora,minutos,onHoraChange,onMinutosChange}:{hora:string;minutos:string;onHoraChange:(v:string)=>void;onMinutosChange:(v:string)=>void}){
+  return <>
+    <label className="cr-nueva-reserva__hora-bloque">Hora<Wheel values={HORAS} value={hora} onChange={onHoraChange} kind="hora"/></label>
+    <label className="cr-nueva-reserva__minutos-bloque">Minutos<Wheel values={MINUTOS} value={minutos} onChange={onMinutosChange} kind="minutos"/></label>
+  </>;
+}
+
 export default function NuevaReserva(){
   const navigate=useNavigate();
   const location=useLocation();
@@ -198,8 +205,7 @@ export default function NuevaReserva(){
             <button type="button" onClick={()=>setPersonas(p=>Math.max(1,p-1))}>−</button><strong>{personas} PAX</strong><button type="button" onClick={()=>setPersonas(p=>p+1)}>+</button>
           </span>
         </label>
-        <label className="cr-nueva-reserva__hora-bloque">Hora<Wheel values={HORAS} value={hora} onChange={setHora} kind="hora"/></label>
-        <label className="cr-nueva-reserva__minutos-bloque">Minutos<Wheel values={MINUTOS} value={minutos} onChange={setMinutos} kind="minutos"/></label>
+        <HoraMinutosPicker hora={hora} minutos={minutos} onHoraChange={setHora} onMinutosChange={setMinutos}/>
         <label className="cr-nueva-reserva__fecha">Fecha
           <input className="cr-nueva-reserva__fecha-input-oculto" type="date" min={todayMadrid()} value={fecha} onChange={e=>setFecha(e.target.value)} required aria-hidden="true" tabIndex={-1} />
           <button className="cr-nueva-reserva__fecha-boton" type="button" onClick={()=>{setCalendarDraft(fecha);const d=parseISODate(fecha);setCalendarMonth(new Date(d.getFullYear(),d.getMonth(),1));setCalendarOpen(true)}}>{formatDateES(fecha)}<span aria-hidden="true">▾</span></button>
