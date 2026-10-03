@@ -65,9 +65,9 @@ export default function HorarioConfiguracion({onBack,darkMode,onToggleTheme}:Pro
     <div className="cr-horario-form__box">
       <h3>AÑADIR HORA</h3>
       <div className="cr-horario-fijos"><span>SERVICIO: <strong>{servicioDeHora(newHour)}</strong></span></div>
-      <div className="cr-horario-time-picker">
-        <label className="cr-nueva-reserva__hora-bloque"><span>HORA</span><Wheel values={['09','10','11','12','13','14','15','16','17','18','19','20','21','22','23']} value={newHour.slice(0,2)||'12'} onChange={v=>setNewHour(v+':'+(newHour.slice(3,5)||'30'))} kind="hora"/></label>
-        <label className="cr-nueva-reserva__minutos-bloque"><span>MINUTOS</span><Wheel values={['00','15','30','45']} value={newHour.slice(3,5)||'30'} onChange={v=>setNewHour((newHour.slice(0,2)||'12')+':'+v)} kind="minutos"/></label>
+      <div className="ficha-time-picker">
+        <label>HORA<Wheel values={['09','10','11','12','13','14','15','16','17','18','19','20','21','22','23']} value={(newHour.split(':')[0]||'12')} onChange={v=>setNewHour(v+':'+(newHour.split(':')[1]||'30'))} kind="hora"/></label>
+        <label>MINUTOS<Wheel values={['00','15','30','45']} value={(newHour.split(':')[1]||'30')} onChange={v=>setNewHour((newHour.split(':')[0]||'12')+':'+v)} kind="minutos"/></label>
       </div>
       <fieldset className="cr-horario-dias-form"><legend>DÍAS ACTIVOS</legend>{DIAS.map(d=><label key={d.nombre}><input type="checkbox" checked={newDays[d.nombre]} onChange={e=>setNewDays(a=>({...a,[d.nombre]:e.target.checked}))}/><span>{d.corto}</span></label>)}</fieldset>
       <div className="cr-horario-form__actions">
