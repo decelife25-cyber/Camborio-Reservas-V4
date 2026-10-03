@@ -1,8 +1,8 @@
 {
   "name": "android_app",
   "private": true,
-  "releaseNote": "Horarios móvil: modal ajustado y AÑADIR HORA único arriba",
-  "version": "1.0.162",
+  "releaseNote": "Selector de hora y minutos compartido con NuevaReserva",
+  "version": "1.0.163",
   "type": "module",
   "scripts": {
     "dev": "vite",
