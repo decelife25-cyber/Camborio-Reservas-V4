@@ -1,8 +1,8 @@
 {
   "name": "android_app",
   "private": true,
-  "releaseNote": "NOMBRE en negro en modo día",
-  "version": "1.0.157",
+  "releaseNote": "Configuración: controles en una fila y alta de horas funcional",
+  "version": "1.0.158",
   "type": "module",
   "scripts": {
     "dev": "vite",
