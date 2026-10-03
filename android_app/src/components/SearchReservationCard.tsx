@@ -98,7 +98,19 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
     });
     setSaving(false);
     if(e){
-      setError(e.message);
+      if(String(e.message||'').includes('CR_COLISION_MESA')){
+        const match=String(e.message).match(/CR_COLISION_MESA:\s*la mesa\s+(.+?)\s+ya está asignada a otra reserva/i);
+        setContextChange({
+          available:false,
+          conflictMesa:match?.[1]||null,
+          fecha,
+          hora,
+          turno:turnoNuevo,
+        });
+        setError('');
+      }else{
+        setError(e.message);
+      }
       return;
     }
     const next={...r,...data} as SearchReservation;
@@ -280,7 +292,7 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
         <div className="cr-confirmacion-mesa__contenido">
           {contextChange.available
             ? <>La reserva cambia a <strong>{contextChange.fecha} · {contextChange.turno}</strong> y la {assignedTables().length>1?'asignación de mesas':'mesa'} {assignedTables().join(', ')} está disponible.<br/><br/>¿Quieres mantener la misma {assignedTables().length>1?'asignación de mesas':'mesa'}?</>
-            : <>La mesa {contextChange.conflictMesa} ya está asignada a otra reserva en <strong>{contextChange.fecha} · {contextChange.turno}</strong>.<br/><br/>No se puede mantener esa mesa. Puedes cambiar de mesa o dejar la reserva sin asignar.</>}
+            : <>LA MESA {contextChange.conflictMesa} YA ESTÁ ASIGNADA A OTRA RESERVA.<br/><br/>DEBES CAMBIAR DE MESA O DEJARLA SIN ASIGNAR.</>}
         </div>
         <div className="v2-edit-actions ficha-edit-actions ficha-result-actions">
           <button type="button" onClick={()=>setContextChange(null)} disabled={saving}>CANCELAR</button>
