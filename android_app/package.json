@@ -1,8 +1,8 @@
 {
   "name": "android_app",
   "private": true,
-  "releaseNote": "Horarios móvil: modal ajustado y AÑADIR HORA único arriba",
-  "version": "1.0.162",
+  "releaseNote": "Rollback: recuperar selector y modales de 1.0.162",
+  "version": "1.0.164",
   "type": "module",
   "scripts": {
     "dev": "vite",
