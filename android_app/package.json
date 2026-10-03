@@ -1,8 +1,8 @@
 {
   "name": "android_app",
   "private": true,
-  "releaseNote": "AÑADIR HORA: selector igual a NuevaReserva y botón único",
-  "version": "1.0.161",
+  "releaseNote": "Horarios móvil: modal ajustado y AÑADIR HORA único arriba",
+  "version": "1.0.162",
   "type": "module",
   "scripts": {
     "dev": "vite",
