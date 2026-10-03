@@ -1,8 +1,8 @@
 {
   "name": "android_app",
   "private": true,
-  "releaseNote": "AÑADIR HORA: panel compacto y selector de hora V4",
-  "version": "1.0.159",
+  "releaseNote": "AÑADIR HORA: panel más compacto y rueda completa hasta 23:45",
+  "version": "1.0.160",
   "type": "module",
   "scripts": {
     "dev": "vite",
