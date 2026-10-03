@@ -1,8 +1,8 @@
 {
   "name": "android_app",
   "private": true,
-  "releaseNote": "Nombre e instrucciones del plano de mesas en negro",
-  "version": "1.0.156",
+  "releaseNote": "NOMBRE en negro en modo día",
+  "version": "1.0.157",
   "type": "module",
   "scripts": {
     "dev": "vite",
