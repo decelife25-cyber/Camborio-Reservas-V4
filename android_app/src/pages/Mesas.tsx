@@ -160,6 +160,29 @@ export default function Mesas() {
   const [confirmModal, setConfirmModal] = useState<ConfirmModal | null>(null);
   const assignmentMode = Boolean(assignmentId || nuevaAssignment);
 
+  const mostrarAdvertencia = (mensaje: string) => {
+    setConfirmModal({
+      titulo: '⚠️ ADVERTENCIA',
+      mensaje,
+      aceptar: 'CERRAR',
+      cancelar: '',
+      alAceptar: () => setConfirmModal(null),
+      soloAviso: true,
+    });
+  };
+
+  const advertenciaDesdeError = (raw: unknown) => {
+    const mensaje = String(raw || '').trim();
+    const colision = mensaje.match(/CR_COLISION_MESA:\s*la mesa\s+(.+?)\s+ya está asignada a otra reserva/i);
+    if (colision) {
+      return `LA MESA ${colision[1]} YA ESTÁ ASIGNADA A OTRA RESERVA. DEBES CAMBIAR DE MESA O DEJARLA SIN ASIGNAR.`;
+    }
+    if (/^CR_MESA_REPETIDA:/i.test(mensaje)) return 'NO SE PUEDE SELECCIONAR LA MISMA MESA MÁS DE UNA VEZ.';
+    if (/^CR_MESA_INEXISTENTE:/i.test(mensaje)) return 'UNA DE LAS MESAS SELECCIONADAS NO EXISTE O NO ESTÁ ACTIVA.';
+    if (/^CR_ZONA_INVALIDA:/i.test(mensaje)) return 'LAS MESAS SELECCIONADAS DEBEN PERTENECER A LA MISMA ZONA.';
+    return mensaje.replace(/^CR_[A-Z0-9_]+:\s*/i, '').trim() || 'NO SE PUDO COMPLETAR LA OPERACIÓN.';
+  };
+
   const cargar = useCallback(async () => {
     setLoading(true);
     setError('');
@@ -477,7 +500,7 @@ export default function Mesas() {
     // existir/estar activas y pertenecer a la misma zona que la principal.
     const mesasUnicas = [...new Set(mesasSeleccionadas)];
     if (mesasUnicas.length !== mesasSeleccionadas.length) {
-      setError('CR_MESA_REPETIDA: no se puede seleccionar la misma mesa más de una vez.');
+      mostrarAdvertencia('NO SE PUEDE SELECCIONAR LA MISMA MESA MÁS DE UNA VEZ.');
       return;
     }
 
@@ -487,7 +510,7 @@ export default function Mesas() {
       return !layoutMesa || mesasConfig[numero]?.Activa === false;
     });
     if (mesasInvalidas.length) {
-      setError('CR_MESA_INEXISTENTE: una de las mesas seleccionadas no existe o no está activa.');
+      mostrarAdvertencia('UNA DE LAS MESAS SELECCIONADAS NO EXISTE O NO ESTÁ ACTIVA.');
       return;
     }
 
@@ -498,7 +521,7 @@ export default function Mesas() {
         .map(numero => catalogoPlanos.find(mesa => mesa.numero === numero)?.zona)
         .filter(Boolean);
       if (!zonaPrincipal || zonasSeleccionadas.some(zonaMesa => zonaMesa !== zonaPrincipal)) {
-        setError('CR_ZONA_INVALIDA: la zona no corresponde a la mesa principal.');
+        mostrarAdvertencia('LAS MESAS SELECCIONADAS DEBEN PERTENECER A LA MISMA ZONA.');
         return;
       }
     }
@@ -619,7 +642,9 @@ export default function Mesas() {
       savingRef.current = false;
       setSaving(false);
       console.error('Error guardando asignación de mesas', err);
-      setError(err?.hint || err?.message || 'No se pudo guardar la asignación de mesas.');
+      const mensajeError = err?.hint || err?.message || 'No se pudo guardar la asignación de mesas.';
+      if (String(mensajeError).includes('CR_')) mostrarAdvertencia(advertenciaDesdeError(mensajeError));
+      else setError(mensajeError);
     }
   };
   const estado: 'disponible' | 'reservada' | 'ocupada' | 'desactivada' = selectedTable && mesasConfig[selectedTable]?.Activa === false ? 'desactivada' : (selectedTable ? visualState(reservaSeleccionada) : 'disponible');
