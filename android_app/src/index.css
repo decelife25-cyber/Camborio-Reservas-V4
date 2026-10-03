@@ -3646,3 +3646,123 @@ html.light .cr-planos-mesas__panel--asignacion .cr-planos-mesas__assignment-acti
 html.light .cr-planos-mesas__panel--asignacion .cr-planos-mesas__reserva-info>div:first-child strong{color:#000!important}
 html.light .cr-planos-mesas__panel--asignacion .cr-planos-mesas__reserva-info>div:first-child span{color:#000!important}
 html.light .cr-planos-mesas__panel--asignacion .cr-planos-mesas__assignment-actions{color:#000!important}
+
+
+/* 1.0.159 — AÑADIR HORA: panel compacto y selector de hora con la rueda V4, nunca el input nativo de Android. */
+.cr-horario-form{
+  position:fixed!important;
+  inset:0!important;
+  z-index:10001!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  min-height:100dvh!important;
+  max-height:100dvh!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  padding:12px!important;
+  background:rgba(0,0,0,.88)!important;
+  display:flex!important;
+  align-items:flex-start!important;
+  justify-content:center!important;
+}
+.cr-horario-form__box{
+  box-sizing:border-box!important;
+  width:min(680px,calc(100vw - 24px))!important;
+  max-height:calc(100dvh - 24px)!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  margin:0 auto!important;
+  padding:14px!important;
+  border:1px solid var(--cr-line)!important;
+  border-radius:8px!important;
+  background:#050505!important;
+  box-shadow:0 20px 50px rgba(0,0,0,.55)!important;
+}
+.cr-horario-form__box h3{
+  margin:0 0 10px!important;
+  color:var(--cr-gold)!important;
+  font-size:var(--cr-text-panel-title)!important;
+}
+.cr-horario-time-picker{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:10px!important;
+  margin:8px 0 12px!important;
+}
+.cr-horario-time-picker>label{
+  display:grid!important;
+  gap:6px!important;
+  min-width:0!important;
+  color:var(--cr-muted)!important;
+  font-size:15px!important;
+  font-weight:900!important;
+  text-align:center!important;
+}
+.cr-horario-time-picker .cr-nueva-reserva__rueda{
+  display:block!important;
+  width:100%!important;
+  height:132px!important;
+  box-sizing:border-box!important;
+  overflow-y:auto!important;
+  border:1px solid var(--cr-line)!important;
+  border-radius:8px!important;
+  background:linear-gradient(180deg,#050505 0,#111 34%,#060606 50%,#111 66%,#050505 100%)!important;
+  scroll-snap-type:y mandatory!important;
+  scrollbar-width:none!important;
+}
+.cr-horario-time-picker .cr-nueva-reserva__rueda::-webkit-scrollbar{display:none!important}
+.cr-horario-time-picker .cr-nueva-reserva__rueda-item{
+  height:32px!important;
+  display:grid!important;
+  place-items:center!important;
+  scroll-snap-align:center!important;
+  font-family:Arial,sans-serif!important;
+}
+.cr-horario-time-picker .cr-nueva-reserva__rueda-item--actual{
+  color:#fff!important;
+  font-size:32px!important;
+  font-weight:1000!important;
+  opacity:1!important;
+}
+.cr-horario-time-picker .cr-nueva-reserva__rueda-item--cerca{
+  color:#b5b5b5!important;
+  font-size:16px!important;
+  opacity:.75!important;
+}
+.cr-horario-time-picker .cr-nueva-reserva__rueda-item--lejos{
+  color:#777!important;
+  font-size:14px!important;
+  opacity:.5!important;
+}
+.cr-horario-dias-form{
+  margin:0 0 12px!important;
+}
+.cr-horario-form__actions{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:8px!important;
+}
+.cr-horario-form__actions .cr-button{
+  width:100%!important;
+  min-height:58px!important;
+}
+html.light .cr-horario-form{
+  background:rgba(255,255,255,.82)!important;
+}
+html.light .cr-horario-form__box{
+  background:linear-gradient(180deg,#fff,#f2f0eb)!important;
+  border-color:#b89a42!important;
+  color:#171717!important;
+}
+html.light .cr-horario-form__box .cr-horario-fijos,
+html.light .cr-horario-form__box .cr-horario-time-picker>label{
+  color:#6f6f6f!important;
+}
+@media(max-width:620px){
+  .cr-horario-form{padding:12px 8px!important}
+  .cr-horario-form__box{
+    width:calc(100vw - 16px)!important;
+    max-height:calc(100dvh - 24px)!important;
+    padding:12px!important;
+  }
+}
