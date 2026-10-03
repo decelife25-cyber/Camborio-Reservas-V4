@@ -3617,3 +3617,361 @@ html.light .table-button--assigned{
   color:#fff!important;
   border-color:#a48735!important;
 }
+
+html.light .cr-planos-mesas__reserva-nombre{color:#000!important}
+
+html.light .cr-planos-mesas__panel--asignacion .cr-planos-mesas__assignment-actions{color:#000!important}
+
+/* Ajustes de configuración: cabecera en una sola fila y modal ligeramente más abajo en móvil. */
+.cr-config-modal__header{flex-wrap:nowrap!important}
+.cr-config-modal__header-actions{display:flex!important;align-items:center!important;justify-content:flex-end!important;flex-direction:row!important;flex-wrap:nowrap!important;width:max-content!important;white-space:nowrap!important;gap:6px!important}
+.cr-config-modal__header-actions > button{flex:0 0 auto!important}
+@media(max-width:620px){.cr-config-modal:not(.cr-config-modal--horarios){padding-top:102px!important}}
+/* AÑADIR HORA se renderiza mediante portal sobre la pantalla de horarios: debe quedar por encima del fullscreen. */
+.cr-horario-form{
+  position:fixed!important;
+  inset:0!important;
+  z-index:10001!important;
+  box-sizing:border-box!important;
+  width:100vw!important;
+  min-height:100dvh!important;
+  max-height:100dvh!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  padding:max(24px,env(safe-area-inset-top,24px)) 10px max(10px,env(safe-area-inset-bottom,10px))!important;
+  background:#020202!important;
+  align-content:start!important;
+}
+/* En modo día, nombre e instrucciones del plano de mesas deben ser negros. */
+html.light .cr-planos-mesas__panel--asignacion .cr-planos-mesas__reserva-info>div:first-child strong{color:#000!important}
+html.light .cr-planos-mesas__panel--asignacion .cr-planos-mesas__reserva-info>div:first-child span{color:#000!important}
+html.light .cr-planos-mesas__panel--asignacion .cr-planos-mesas__assignment-actions{color:#000!important}
+
+
+/* 1.0.159 — AÑADIR HORA: panel compacto y selector de hora con la rueda V4, nunca el input nativo de Android. */
+.cr-horario-form{
+  position:fixed!important;
+  inset:0!important;
+  z-index:10001!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  min-height:100dvh!important;
+  max-height:100dvh!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  padding:12px!important;
+  background:rgba(0,0,0,.88)!important;
+  display:flex!important;
+  align-items:flex-start!important;
+  justify-content:center!important;
+}
+.cr-horario-form__box{
+  box-sizing:border-box!important;
+  width:min(560px,calc(100vw - 32px))!important;
+  max-height:calc(100dvh - 24px)!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  margin:0 auto!important;
+  padding:14px!important;
+  border:1px solid var(--cr-line)!important;
+  border-radius:8px!important;
+  background:#050505!important;
+  box-shadow:0 20px 50px rgba(0,0,0,.55)!important;
+}
+.cr-horario-form__box h3{
+  margin:0 0 10px!important;
+  color:var(--cr-gold)!important;
+  font-size:var(--cr-text-panel-title)!important;
+}
+.cr-horario-time-picker{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:10px!important;
+  margin:8px 0 12px!important;
+}
+.cr-horario-time-picker>label{
+  display:grid!important;
+  gap:6px!important;
+  min-width:0!important;
+  color:var(--cr-muted)!important;
+  font-size:15px!important;
+  font-weight:900!important;
+  text-align:center!important;
+}
+.cr-horario-time-picker .cr-nueva-reserva__rueda{
+  display:block!important;
+  width:100%!important;
+  height:132px!important;
+  box-sizing:border-box!important;
+  overflow-y:auto!important;
+  border:1px solid var(--cr-line)!important;
+  border-radius:8px!important;
+  background:linear-gradient(180deg,#050505 0,#111 34%,#060606 50%,#111 66%,#050505 100%)!important;
+  scroll-snap-type:y mandatory!important;
+  scrollbar-width:none!important;
+}
+.cr-horario-time-picker .cr-nueva-reserva__rueda::-webkit-scrollbar{display:none!important}
+.cr-horario-time-picker .cr-nueva-reserva__rueda-item{
+  height:32px!important;
+  display:grid!important;
+  place-items:center!important;
+  scroll-snap-align:center!important;
+  font-family:Arial,sans-serif!important;
+}
+.cr-horario-time-picker .cr-nueva-reserva__rueda-item--actual{
+  color:#fff!important;
+  font-size:32px!important;
+  font-weight:1000!important;
+  opacity:1!important;
+}
+.cr-horario-time-picker .cr-nueva-reserva__rueda-item--cerca{
+  color:#b5b5b5!important;
+  font-size:16px!important;
+  opacity:.75!important;
+}
+.cr-horario-time-picker .cr-nueva-reserva__rueda-item--lejos{
+  color:#777!important;
+  font-size:14px!important;
+  opacity:.5!important;
+}
+.cr-horario-dias-form{
+  margin:0 0 12px!important;
+}
+.cr-horario-form__actions{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:8px!important;
+}
+.cr-horario-form__actions .cr-button{
+  width:100%!important;
+  min-height:58px!important;
+}
+html.light .cr-horario-form{
+  background:rgba(255,255,255,.82)!important;
+}
+html.light .cr-horario-form__box{
+  background:linear-gradient(180deg,#fff,#f2f0eb)!important;
+  border-color:#b89a42!important;
+  color:#171717!important;
+}
+html.light .cr-horario-form__box .cr-horario-fijos,
+html.light .cr-horario-form__box .cr-horario-time-picker>label{
+  color:#6f6f6f!important;
+}
+@media(max-width:620px){
+  .cr-horario-form{padding:12px 8px!important}
+  .cr-horario-form__box{
+    width:min(560px,calc(100vw - 24px))!important;
+    max-height:calc(100dvh - 24px)!important;
+    padding:12px!important;
+  }
+}
+
+
+/* 1.0.160 — La rueda debe poder centrar también el último valor (23 / 45). */
+.cr-horario-time-picker .cr-nueva-reserva__rueda{
+  height:132px!important;
+}
+.cr-horario-time-picker .cr-nueva-reserva__rueda-item{
+  height:44px!important;
+  min-height:44px!important;
+}
+.cr-horario-time-picker .cr-nueva-reserva__rueda-item--actual{
+  font-size:32px!important;
+}
+.cr-horario-time-picker .cr-nueva-reserva__rueda-item--cerca{
+  font-size:18px!important;
+}
+.cr-horario-time-picker .cr-nueva-reserva__rueda-item--lejos{
+  font-size:14px!important;
+}
+
+
+/* 1.0.161 — Alta de hora: mismo selector visual que NuevaReserva y un único botón global. */
+.cr-horario-form__box{
+  width:min(520px,calc(100vw - 40px))!important;
+  max-width:520px!important;
+}
+.cr-horario-time-picker{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:10px!important;
+  margin:0!important;
+}
+.cr-horario-time-picker>label{
+  display:grid!important;
+  gap:7px!important;
+  min-width:0!important;
+}
+.cr-horario-time-picker .cr-nueva-reserva__rueda{
+  position:relative!important;
+  display:block!important;
+  height:132px!important;
+  padding:0 10px!important;
+  box-sizing:border-box!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  scroll-snap-type:y mandatory!important;
+  border:1px solid #d6a900!important;
+  border-radius:8px!important;
+  background:linear-gradient(180deg,#050505 0,#111 34%,#060606 50%,#111 66%,#050505 100%)!important;
+}
+.cr-horario-time-picker .cr-nueva-reserva__rueda-item{
+  height:44px!important;
+  min-height:44px!important;
+  font:1000 16px/1 var(--cr-font)!important;
+}
+.cr-horario-time-picker .cr-nueva-reserva__rueda-item--actual{
+  font-size:36px!important;
+}
+.cr-horario-time-picker .cr-nueva-reserva__rueda-item--cerca{
+  font-size:18px!important;
+}
+.cr-horario-time-picker .cr-nueva-reserva__rueda-item--lejos{
+  font-size:16px!important;
+}
+html.light .cr-horario-form__box .cr-horario-fijos{
+  color:#171717!important;
+}
+html.light .cr-horario-form__box .cr-horario-fijos strong{
+  color:#171717!important;
+}
+.cr-horarios-anadir-global{
+  display:flex!important;
+  justify-content:center!important;
+  margin:12px 0 4px!important;
+}
+.cr-horarios-anadir-global .cr-horario-anadir{
+  width:min(420px,100%)!important;
+}
+@media(max-width:620px){
+  .cr-horario-form__box{
+    width:calc(100vw - 40px)!important;
+    max-width:520px!important;
+  }
+}
+
+
+/* 1.0.162 — Horarios móvil: un solo AÑADIR HORA arriba y modal contenido dentro de la pantalla. */
+.cr-horarios-anadir-top{
+  display:flex!important;
+  justify-content:flex-end!important;
+  align-items:center!important;
+  margin:4px 10px 10px!important;
+}
+.cr-horarios-anadir-top .cr-horario-anadir{
+  width:auto!important;
+  min-width:190px!important;
+  min-height:44px!important;
+}
+.cr-horario-form{
+  position:fixed!important;
+  inset:0!important;
+  z-index:10001!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  height:100dvh!important;
+  min-height:0!important;
+  max-height:none!important;
+  overflow:auto!important;
+  overflow-x:hidden!important;
+  padding:56px 8px 12px!important;
+  background:rgba(0,0,0,.82)!important;
+  display:flex!important;
+  align-items:flex-start!important;
+  justify-content:center!important;
+}
+.cr-horario-form__box{
+  box-sizing:border-box!important;
+  width:min(440px,calc(100vw - 20px))!important;
+  max-width:440px!important;
+  max-height:none!important;
+  min-height:0!important;
+  overflow:visible!important;
+  margin:0 auto!important;
+  padding:10px!important;
+  border-radius:8px!important;
+}
+.cr-horario-form__box h3{
+  margin:0 0 6px!important;
+  font-size:30px!important;
+  line-height:1.05!important;
+}
+.cr-horario-fijos{
+  margin:0 0 5px!important;
+}
+.cr-horario-time-picker{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:8px!important;
+  margin:0 0 8px!important;
+}
+.cr-horario-time-picker>label{
+  display:grid!important;
+  gap:4px!important;
+  min-width:0!important;
+  font-size:15px!important;
+  line-height:1!important;
+}
+.cr-horario-time-picker .cr-nueva-reserva__rueda{
+  width:100%!important;
+  height:132px!important;
+  min-height:132px!important;
+  box-sizing:border-box!important;
+}
+.cr-horario-dias-form{
+  box-sizing:border-box!important;
+  width:100%!important;
+  min-width:0!important;
+  display:grid!important;
+  grid-template-columns:repeat(7,minmax(0,1fr))!important;
+  gap:2px!important;
+  margin:0 0 8px!important;
+  padding:7px 5px!important;
+  overflow:hidden!important;
+}
+.cr-horario-dias-form legend{
+  padding:0 3px!important;
+}
+.cr-horario-dias-form label{
+  min-width:0!important;
+  width:100%!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:2px!important;
+  font-size:9px!important;
+  line-height:1!important;
+  overflow:hidden!important;
+}
+.cr-horario-dias-form input{
+  width:22px!important;
+  min-width:22px!important;
+  height:22px!important;
+  min-height:22px!important;
+  margin:0!important;
+}
+.cr-horario-form__actions{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:8px!important;
+}
+.cr-horario-form__actions .cr-button{
+  min-width:0!important;
+  width:100%!important;
+  min-height:52px!important;
+  height:52px!important;
+  padding:4px!important;
+}
+@media(max-width:620px){
+  .cr-horario-form{
+    padding-top:56px!important;
+    padding-left:8px!important;
+    padding-right:8px!important;
+    padding-bottom:12px!important;
+  }
+  .cr-horario-form__box{
+    width:min(440px,calc(100vw - 20px))!important;
+    max-width:440px!important;
+  }
+}
