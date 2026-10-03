@@ -3621,3 +3621,11 @@ html.light .table-button--assigned{
 html.light .cr-planos-mesas__reserva-nombre{color:#000!important}
 
 html.light .cr-planos-mesas__panel--asignacion .cr-planos-mesas__assignment-actions{color:#000!important}
+
+/* Ajustes de configuración: cabecera en una sola fila y modal ligeramente más abajo en móvil. */
+.cr-config-modal__header{flex-wrap:nowrap!important}
+.cr-config-modal__header-actions{flex-direction:row!important;flex-wrap:nowrap!important;width:max-content!important;white-space:nowrap}
+@media(max-width:620px){.cr-config-modal:not(.cr-config-modal--horarios){padding-top:92px!important}}
+/* En modo día, nombre e instrucciones del plano de mesas deben ser negros. */
+html.light .cr-planos-mesas__panel--asignacion .cr-planos-mesas__reserva-info>div:first-child strong{color:#000!important}
+html.light .cr-planos-mesas__panel--asignacion .cr-planos-mesas__assignment-actions{color:#000!important}
