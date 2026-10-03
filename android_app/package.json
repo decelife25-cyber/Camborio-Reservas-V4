@@ -1,8 +1,8 @@
 {
   "name": "android_app",
   "private": true,
-  "releaseNote": "Configuración: controles en una fila y alta de horas funcional",
-  "version": "1.0.158",
+  "releaseNote": "AÑADIR HORA: panel compacto y selector de hora V4",
+  "version": "1.0.159",
   "type": "module",
   "scripts": {
     "dev": "vite",
