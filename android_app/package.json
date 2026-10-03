@@ -1,8 +1,8 @@
 {
   "name": "android_app",
   "private": true,
-  "releaseNote": "Ajustes del consentimiento de email y control de personas",
-  "version": "1.0.153",
+  "releaseNote": "Horarios móvil: modal ajustado y AÑADIR HORA único arriba",
+  "version": "1.0.162",
   "type": "module",
   "scripts": {
     "dev": "vite",
