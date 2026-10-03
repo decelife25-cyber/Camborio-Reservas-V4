@@ -47,6 +47,7 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
   const[error,setError]=useState('');
   const[confirmAction,setConfirmAction]=useState<null|'guardar'|'salir'|'resultado'|'mesas'>(null);
   const[resultado,setResultado]=useState('');
+  const[contextChange,setContextChange]=useState<null|{available:boolean;conflictMesa:string|null;fecha:string;hora:string;turno:string}>(null);
 
   const parts=dateParts(r.FechaReserva);
   const nombreNormalizado=String(r.Nombre||'').trim().toUpperCase().replace(/\s+/g,' ');
@@ -79,20 +80,78 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
     setError('');
   };
 
+  const assignedTables=()=>[r.Mesa,...String(r.MesasAdicionales||'').split(',').map(v=>v.trim()).filter(Boolean)].filter(Boolean).map(String);
+
+  const persistContextChange=async(mantenerMesas:boolean,after?:'mesas')=>{
+    const fecha=r.FechaReserva;
+    const hora=String(r.HoraReserva).slice(0,5);
+    const turnoNuevo=getTurnoFromHora(hora);
+    setSaving(true);
+    const{data,error:e}=await supabase.rpc('cr_actualizar_contexto_reserva_atomico',{
+      p_reserva_id:r.ReservaID,
+      p_fecha:fecha,
+      p_hora:hora,
+      p_turno:turnoNuevo,
+      p_personas:r.Personas||1,
+      p_observaciones:r.Observaciones||null,
+      p_mantener_mesas:mantenerMesas,
+    });
+    setSaving(false);
+    if(e){
+      setError(e.message);
+      return;
+    }
+    const next={...r,...data} as SearchReservation;
+    setR(next);
+    onUpdated(next);
+    setDirty(false);
+    setContextChange(null);
+    setError('');
+    if(after==='mesas'){
+      navigate('/mesas?asignar='+encodeURIComponent(r.ReservaID)+'&volverCodigo='+encodeURIComponent(r.CodigoReserva||''));
+      return;
+    }
+    setResultado(mantenerMesas?'CAMBIOS GUARDADOS. SE HA MANTENIDO LA MISMA MESA.':'CAMBIOS GUARDADOS. LA RESERVA HA QUEDADO SIN ASIGNAR.');
+    setConfirmAction('resultado');
+  };
+
   const save=async()=>{
     if(!dirty||saving||readOnly||esSinReserva)return;
     const fecha=r.FechaReserva;
     const hora=String(r.HoraReserva).slice(0,5);
     if(new Date(fecha+'T'+hora+':00').getTime()<Date.now()-60000){setError('No puedes usar una fecha u hora pasada.');return;}
     const turnoNuevo=getTurnoFromHora(hora);
-    const changes:any={FechaReserva:fecha,HoraReserva:hora,Personas:r.Personas||1,Observaciones:r.Observaciones||null,Turno:turnoNuevo};
-    if(turnoNuevo!==r.Turno){changes.Mesa=null;changes.MesasAdicionales=null;}
-    setSaving(true);
-    const{data,error:e}=await supabase.from('Reservas').update(changes).eq('ReservaID',r.ReservaID).select('*').single();
-    setSaving(false);
-    if(e){setError(e.message);return;}
-    const next={...r,...data,...changes} as SearchReservation;
-    setR(next);onUpdated(next);setDirty(false);setResultado('CAMBIOS GUARDADOS CORRECTAMENTE');setConfirmAction('resultado');setError('');
+    const cambiaContexto=fecha!==initial.FechaReserva||turnoNuevo!==initial.Turno;
+    const mesas=assignedTables();
+
+    if(cambiaContexto&&mesas.length){
+      setSaving(true);
+      const{data,error:e}=await supabase
+        .from('Reservas')
+        .select('ReservaID,Mesa,MesasAdicionales')
+        .eq('FechaReserva',fecha)
+        .eq('Turno',turnoNuevo)
+        .in('Estado',['PENDIENTE','CONFIRMADA','SENTADA'])
+        .neq('ReservaID',r.ReservaID);
+      setSaving(false);
+      if(e){setError(e.message);return;}
+
+      const conflicto=(data||[]).flatMap(row=>[row.Mesa,...String(row.MesasAdicionales||'').split(',').map(v=>v.trim()).filter(Boolean)])
+        .map(v=>String(v||'').trim())
+        .find(mesa=>mesas.includes(mesa));
+
+      setContextChange({
+        available:!conflicto,
+        conflictMesa:conflicto||null,
+        fecha,
+        hora,
+        turno:turnoNuevo,
+      });
+      setError('');
+      return;
+    }
+
+    await persistContextChange(false);
   };
 
   const changeState=async(nextState:string)=>{
@@ -212,6 +271,29 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
             ? <div className="v2-personas-control ficha-pax-control"><button type="button" onClick={()=>setValue(String(Math.max(1,Number(value||1)-1)))}>−</button><strong>{Number(value||1)} PAX</strong><button type="button" onClick={()=>setValue(String(Number(value||1)+1))}>+</button></div>
             : <textarea className="ficha-observaciones-input" rows={4} value={value} onChange={e=>setValue(e.target.value)}/>}
         <div className="v2-edit-actions ficha-edit-actions"><button type="button" onClick={()=>setEditing(null)}>CANCELAR</button><button type="button" onClick={acceptEdit}>ACEPTAR</button></div>
+      </div>
+    </div>}
+
+    {contextChange&&<div className="v2-edit-overlay" onClick={()=>!saving&&setContextChange(null)}>
+      <div className="v2-edit-modal ficha-edit-modal" onClick={e=>e.stopPropagation()}>
+        <p className="cr-confirmacion-mesa__eyebrow">{contextChange.available?'MESA DISPONIBLE':'MESA NO DISPONIBLE'}</p>
+        <div className="cr-confirmacion-mesa__contenido">
+          {contextChange.available
+            ? <>La reserva cambia a <strong>{contextChange.fecha} · {contextChange.turno}</strong> y la {assignedTables().length>1?'asignación de mesas':'mesa'} {assignedTables().join(', ')} está disponible.<br/><br/>¿Quieres mantener la misma {assignedTables().length>1?'asignación de mesas':'mesa'}?</>
+            : <>La mesa {contextChange.conflictMesa} ya está asignada a otra reserva en <strong>{contextChange.fecha} · {contextChange.turno}</strong>.<br/><br/>No se puede mantener esa mesa. Puedes cambiar de mesa o dejar la reserva sin asignar.</>}
+        </div>
+        <div className="v2-edit-actions ficha-edit-actions ficha-result-actions">
+          <button type="button" onClick={()=>setContextChange(null)} disabled={saving}>CANCELAR</button>
+          {contextChange.available
+            ? <>
+                <button type="button" onClick={()=>void persistContextChange(false)} disabled={saving}>DEJAR SIN ASIGNAR</button>
+                <button type="button" onClick={()=>void persistContextChange(true)} disabled={saving}>{saving?'GUARDANDO...':'MANTENER MESA'}</button>
+              </>
+            : <>
+                <button type="button" onClick={()=>void persistContextChange(false)} disabled={saving}>DEJAR SIN ASIGNAR</button>
+                <button type="button" onClick={()=>void persistContextChange(false,'mesas')} disabled={saving}>CAMBIAR MESA</button>
+              </>}
+        </div>
       </div>
     </div>}
 
