@@ -3628,4 +3628,5 @@ html.light .cr-planos-mesas__panel--asignacion .cr-planos-mesas__assignment-acti
 @media(max-width:620px){.cr-config-modal:not(.cr-config-modal--horarios){padding-top:92px!important}}
 /* En modo día, nombre e instrucciones del plano de mesas deben ser negros. */
 html.light .cr-planos-mesas__panel--asignacion .cr-planos-mesas__reserva-info>div:first-child strong{color:#000!important}
+html.light .cr-planos-mesas__panel--asignacion .cr-planos-mesas__reserva-info>div:first-child span{color:#000!important}
 html.light .cr-planos-mesas__panel--asignacion .cr-planos-mesas__assignment-actions{color:#000!important}
