@@ -151,7 +151,7 @@ export default function SearchReservationCard({reserva:initial,index,total,onNav
       return;
     }
 
-    await persistContextChange(false);
+    await persistContextChange(!cambiaContexto);
   };
 
   const changeState=async(nextState:string)=>{
