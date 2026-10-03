@@ -3850,3 +3850,128 @@ html.light .cr-horario-form__box .cr-horario-fijos strong{
     max-width:520px!important;
   }
 }
+
+
+/* 1.0.162 — Horarios móvil: un solo AÑADIR HORA arriba y modal contenido dentro de la pantalla. */
+.cr-horarios-anadir-top{
+  display:flex!important;
+  justify-content:flex-end!important;
+  align-items:center!important;
+  margin:4px 10px 10px!important;
+}
+.cr-horarios-anadir-top .cr-horario-anadir{
+  width:auto!important;
+  min-width:190px!important;
+  min-height:44px!important;
+}
+.cr-horario-form{
+  position:fixed!important;
+  inset:0!important;
+  z-index:10001!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  height:100dvh!important;
+  min-height:0!important;
+  max-height:none!important;
+  overflow:auto!important;
+  overflow-x:hidden!important;
+  padding:56px 8px 12px!important;
+  background:rgba(0,0,0,.82)!important;
+  display:flex!important;
+  align-items:flex-start!important;
+  justify-content:center!important;
+}
+.cr-horario-form__box{
+  box-sizing:border-box!important;
+  width:min(440px,calc(100vw - 20px))!important;
+  max-width:440px!important;
+  max-height:none!important;
+  min-height:0!important;
+  overflow:visible!important;
+  margin:0 auto!important;
+  padding:10px!important;
+  border-radius:8px!important;
+}
+.cr-horario-form__box h3{
+  margin:0 0 6px!important;
+  font-size:30px!important;
+  line-height:1.05!important;
+}
+.cr-horario-fijos{
+  margin:0 0 5px!important;
+}
+.cr-horario-time-picker{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:8px!important;
+  margin:0 0 8px!important;
+}
+.cr-horario-time-picker>label{
+  display:grid!important;
+  gap:4px!important;
+  min-width:0!important;
+  font-size:15px!important;
+  line-height:1!important;
+}
+.cr-horario-time-picker .cr-nueva-reserva__rueda{
+  width:100%!important;
+  height:132px!important;
+  min-height:132px!important;
+  box-sizing:border-box!important;
+}
+.cr-horario-dias-form{
+  box-sizing:border-box!important;
+  width:100%!important;
+  min-width:0!important;
+  display:grid!important;
+  grid-template-columns:repeat(7,minmax(0,1fr))!important;
+  gap:2px!important;
+  margin:0 0 8px!important;
+  padding:7px 5px!important;
+  overflow:hidden!important;
+}
+.cr-horario-dias-form legend{
+  padding:0 3px!important;
+}
+.cr-horario-dias-form label{
+  min-width:0!important;
+  width:100%!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:2px!important;
+  font-size:9px!important;
+  line-height:1!important;
+  overflow:hidden!important;
+}
+.cr-horario-dias-form input{
+  width:22px!important;
+  min-width:22px!important;
+  height:22px!important;
+  min-height:22px!important;
+  margin:0!important;
+}
+.cr-horario-form__actions{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:8px!important;
+}
+.cr-horario-form__actions .cr-button{
+  min-width:0!important;
+  width:100%!important;
+  min-height:52px!important;
+  height:52px!important;
+  padding:4px!important;
+}
+@media(max-width:620px){
+  .cr-horario-form{
+    padding-top:56px!important;
+    padding-left:8px!important;
+    padding-right:8px!important;
+    padding-bottom:12px!important;
+  }
+  .cr-horario-form__box{
+    width:min(440px,calc(100vw - 20px))!important;
+    max-width:440px!important;
+  }
+}
