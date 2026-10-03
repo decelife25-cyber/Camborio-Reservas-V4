@@ -3624,8 +3624,24 @@ html.light .cr-planos-mesas__panel--asignacion .cr-planos-mesas__assignment-acti
 
 /* Ajustes de configuración: cabecera en una sola fila y modal ligeramente más abajo en móvil. */
 .cr-config-modal__header{flex-wrap:nowrap!important}
-.cr-config-modal__header-actions{flex-direction:row!important;flex-wrap:nowrap!important;width:max-content!important;white-space:nowrap}
-@media(max-width:620px){.cr-config-modal:not(.cr-config-modal--horarios){padding-top:92px!important}}
+.cr-config-modal__header-actions{display:flex!important;align-items:center!important;justify-content:flex-end!important;flex-direction:row!important;flex-wrap:nowrap!important;width:max-content!important;white-space:nowrap!important;gap:6px!important}
+.cr-config-modal__header-actions > button{flex:0 0 auto!important}
+@media(max-width:620px){.cr-config-modal:not(.cr-config-modal--horarios){padding-top:102px!important}}
+/* AÑADIR HORA se renderiza mediante portal sobre la pantalla de horarios: debe quedar por encima del fullscreen. */
+.cr-horario-form{
+  position:fixed!important;
+  inset:0!important;
+  z-index:10001!important;
+  box-sizing:border-box!important;
+  width:100vw!important;
+  min-height:100dvh!important;
+  max-height:100dvh!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  padding:max(24px,env(safe-area-inset-top,24px)) 10px max(10px,env(safe-area-inset-bottom,10px))!important;
+  background:#020202!important;
+  align-content:start!important;
+}
 /* En modo día, nombre e instrucciones del plano de mesas deben ser negros. */
 html.light .cr-planos-mesas__panel--asignacion .cr-planos-mesas__reserva-info>div:first-child strong{color:#000!important}
 html.light .cr-planos-mesas__panel--asignacion .cr-planos-mesas__reserva-info>div:first-child span{color:#000!important}
