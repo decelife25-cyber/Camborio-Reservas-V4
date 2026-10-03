@@ -3667,7 +3667,7 @@ html.light .cr-planos-mesas__panel--asignacion .cr-planos-mesas__assignment-acti
 }
 .cr-horario-form__box{
   box-sizing:border-box!important;
-  width:min(680px,calc(100vw - 24px))!important;
+  width:min(560px,calc(100vw - 32px))!important;
   max-height:calc(100dvh - 24px)!important;
   overflow-y:auto!important;
   overflow-x:hidden!important;
@@ -3761,8 +3761,27 @@ html.light .cr-horario-form__box .cr-horario-time-picker>label{
 @media(max-width:620px){
   .cr-horario-form{padding:12px 8px!important}
   .cr-horario-form__box{
-    width:calc(100vw - 16px)!important;
+    width:min(560px,calc(100vw - 24px))!important;
     max-height:calc(100dvh - 24px)!important;
     padding:12px!important;
   }
+}
+
+
+/* 1.0.160 — La rueda debe poder centrar también el último valor (23 / 45). */
+.cr-horario-time-picker .cr-nueva-reserva__rueda{
+  height:132px!important;
+}
+.cr-horario-time-picker .cr-nueva-reserva__rueda-item{
+  height:44px!important;
+  min-height:44px!important;
+}
+.cr-horario-time-picker .cr-nueva-reserva__rueda-item--actual{
+  font-size:32px!important;
+}
+.cr-horario-time-picker .cr-nueva-reserva__rueda-item--cerca{
+  font-size:18px!important;
+}
+.cr-horario-time-picker .cr-nueva-reserva__rueda-item--lejos{
+  font-size:14px!important;
 }
