@@ -1,8 +1,8 @@
 {
   "name": "android_app",
   "private": true,
-  "releaseNote": "Advertencias de conflictos de mesa en modal",
-  "version": "1.0.151",
+  "releaseNote": "Mostrar mesas múltiples correctamente en Calendario",
+  "version": "1.0.152",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -28,10 +28,8 @@
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
-    "@vitejs/plugin-react": "^6.1.0",
-    "autoprefixer": "^10.5.5",
     "oxlint": "^1.79.0",
-    "postcss": "^8.5.28",
+    "postcss": "^8.5.5",
     "tailwindcss": "^4.3.3",
     "typescript": "~6.0.2",
     "vite": "^8.2.2"
