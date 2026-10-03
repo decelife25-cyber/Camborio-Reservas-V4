@@ -3785,3 +3785,68 @@ html.light .cr-horario-form__box .cr-horario-time-picker>label{
 .cr-horario-time-picker .cr-nueva-reserva__rueda-item--lejos{
   font-size:14px!important;
 }
+
+
+/* 1.0.161 — Alta de hora: mismo selector visual que NuevaReserva y un único botón global. */
+.cr-horario-form__box{
+  width:min(520px,calc(100vw - 40px))!important;
+  max-width:520px!important;
+}
+.cr-horario-time-picker{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:10px!important;
+  margin:0!important;
+}
+.cr-horario-time-picker>label{
+  display:grid!important;
+  gap:7px!important;
+  min-width:0!important;
+}
+.cr-horario-time-picker .cr-nueva-reserva__rueda{
+  position:relative!important;
+  display:block!important;
+  height:132px!important;
+  padding:0 10px!important;
+  box-sizing:border-box!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  scroll-snap-type:y mandatory!important;
+  border:1px solid #d6a900!important;
+  border-radius:8px!important;
+  background:linear-gradient(180deg,#050505 0,#111 34%,#060606 50%,#111 66%,#050505 100%)!important;
+}
+.cr-horario-time-picker .cr-nueva-reserva__rueda-item{
+  height:44px!important;
+  min-height:44px!important;
+  font:1000 16px/1 var(--cr-font)!important;
+}
+.cr-horario-time-picker .cr-nueva-reserva__rueda-item--actual{
+  font-size:36px!important;
+}
+.cr-horario-time-picker .cr-nueva-reserva__rueda-item--cerca{
+  font-size:18px!important;
+}
+.cr-horario-time-picker .cr-nueva-reserva__rueda-item--lejos{
+  font-size:16px!important;
+}
+html.light .cr-horario-form__box .cr-horario-fijos{
+  color:#171717!important;
+}
+html.light .cr-horario-form__box .cr-horario-fijos strong{
+  color:#171717!important;
+}
+.cr-horarios-anadir-global{
+  display:flex!important;
+  justify-content:center!important;
+  margin:12px 0 4px!important;
+}
+.cr-horarios-anadir-global .cr-horario-anadir{
+  width:min(420px,100%)!important;
+}
+@media(max-width:620px){
+  .cr-horario-form__box{
+    width:calc(100vw - 40px)!important;
+    max-width:520px!important;
+  }
+}
