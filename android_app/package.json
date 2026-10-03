@@ -1,8 +1,8 @@
 {
   "name": "android_app",
   "private": true,
-  "releaseNote": "Ajustes del consentimiento de email y control de personas",
-  "version": "1.0.153",
+  "releaseNote": "AÑADIR HORA: selector igual a NuevaReserva y botón único",
+  "version": "1.0.161",
   "type": "module",
   "scripts": {
     "dev": "vite",
