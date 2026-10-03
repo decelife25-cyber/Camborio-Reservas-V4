@@ -14,7 +14,7 @@ const isoDate = (d:Date) => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(
 export function Wheel({ values, value, onChange, kind }: { values:string[]; value:string; onChange:(v:string)=>void; kind:'hora'|'minutos' }) {
   const controlRef=useRef<HTMLSpanElement|null>(null);
   const encajeRef=useRef<number|null>(null);
-  const ITEM_HEIGHT=32;
+  const ITEM_HEIGHT=44;
   const [indiceVisual,setIndiceVisual]=useState(Math.max(1,values.indexOf(value)+1));
 
   const limitarIndice=(indice:number)=>{
