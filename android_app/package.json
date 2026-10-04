@@ -1,8 +1,8 @@
 {
   "name": "android_app",
   "private": true,
-  "releaseNote": "Ajustes del consentimiento de email y control de personas",
-  "version": "1.0.153",
+  "releaseNote": "Horarios: filas compactas para mostrar más líneas",
+  "version": "1.0.170",
   "type": "module",
   "scripts": {
     "dev": "vite",
