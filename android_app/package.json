@@ -1,8 +1,8 @@
 {
   "name": "android_app",
   "private": true,
-  "releaseNote": "Horarios: aprovechar más altura disponible",
-  "version": "1.0.166",
+  "releaseNote": "Horarios: aprovechar la altura real de la matriz",
+  "version": "1.0.167",
   "type": "module",
   "scripts": {
     "dev": "vite",
