@@ -3977,7 +3977,5 @@ html.light .cr-horario-form__box .cr-horario-fijos strong{
 }
 
 
-/* 1.0.168 — La matriz de Horarios debe aprovechar todo el alto libre real. */
-.cr-horario-matriz tbody td{
-  height:60px!important;
-}
+/* 1.0.169 — Horarios: filas compactas para que COMIDA y CENA quepan en pantalla. */
+.cr-horario-matriz th,.cr-horario-matriz td{height:43px!important;}
