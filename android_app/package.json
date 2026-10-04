@@ -1,8 +1,8 @@
 {
   "name": "android_app",
   "private": true,
-  "releaseNote": "Horarios: aprovechar todo el alto libre de la matriz",
-  "version": "1.0.168",
+  "releaseNote": "Horarios: filas compactas para mostrar más líneas",
+  "version": "1.0.169",
   "type": "module",
   "scripts": {
     "dev": "vite",
