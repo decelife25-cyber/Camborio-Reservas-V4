@@ -2515,7 +2515,7 @@ html.light .cr-planos-mesas__leyenda .desactivada{background:#555!important}html
 .cr-config-v4__bloque-actions button{flex:0 0 auto;min-height:44px;border:1px solid #2777c7;border-radius:7px;background:#123b64;color:#fff;padding:7px 9px;font:900 13px Arial,sans-serif}
 .cr-config-v4__matrix-wrap{max-width:100%;overflow-x:auto}
 .cr-config-v4__matrix{width:100%;min-width:320px;table-layout:fixed;border-collapse:separate;border-spacing:0;color:#fff;font-family:Arial,sans-serif}
-.cr-config-v4__matrix th,.cr-config-v4__matrix td{box-sizing:border-box;width:calc((100% - 96px)/7);height:43px;border-bottom:1px solid #292929;padding:2px;text-align:center}
+.cr-config-v4__matrix th,.cr-config-v4__matrix td{box-sizing:border-box;width:calc((100% - 96px)/7);height:47px;border-bottom:1px solid #292929;padding:2px;text-align:center}
 .cr-config-v4__matrix th{position:sticky;top:0;z-index:1;background:#111;color:#bbb;font-size:10px}
 .cr-config-v4__matrix .hora-col{position:sticky;left:0;z-index:2;width:50px;background:#0b0b0b;text-align:left}
 .cr-config-v4__matrix thead .hora-col{z-index:3;background:#111}
