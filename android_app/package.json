@@ -1,7 +1,7 @@
 {
   "name": "android_app",
   "private": true,
-  "releaseNote": "Horarios: filas compactas para mostrar más líneas",
+  "releaseNote": "Horarios: filas compactas 43px para que quepan más líneas",
   "version": "1.0.169",
   "type": "module",
   "scripts": {
