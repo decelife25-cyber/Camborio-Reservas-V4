@@ -1,8 +1,8 @@
 {
   "name": "android_app",
   "private": true,
-  "releaseNote": "Horarios: usar exactamente el selector de hora existente",
-  "version": "1.0.165",
+  "releaseNote": "Horarios: aprovechar más altura disponible",
+  "version": "1.0.166",
   "type": "module",
   "scripts": {
     "dev": "vite",
