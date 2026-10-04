@@ -3975,3 +3975,9 @@ html.light .cr-horario-form__box .cr-horario-fijos strong{
     max-width:440px!important;
   }
 }
+
+
+/* 1.0.168 — La matriz de Horarios debe aprovechar todo el alto libre real. */
+.cr-horario-matriz tbody td{
+  height:60px!important;
+}
